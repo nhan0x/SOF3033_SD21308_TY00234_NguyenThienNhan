@@ -6,8 +6,7 @@ labels: logic
 assignees: ''
 ---
 
-**Yêu cầu**: `docs/requirements/REQ_<số>_<TEN>/` <!-- tạo ở Bước 1-2 của docs/HUONG_DAN_QUY_TRINH_PHAT_TRIEN.md -->
-**Quy tắc phụ trách**: BR-<x>, BR-<y> <!-- lấy từ 02_PHAN_TICH.md -->
+**Đặc tả**: `docs/SPECIFICATIONS.md` mục <!-- ví dụ 2.4 Giỏ hàng & đặt hàng -->
 **Đi cùng / Phụ thuộc**: <!-- ví dụ #75. Không có thì xóa dòng này -->
 **Sprint**: <!-- nếu dự án dùng Scrum -->
 
@@ -24,7 +23,7 @@ assignees: ''
 <!-- Mỗi dòng đo được: làm gì, thấy gì. Lấy từ các BR-x. -->
 - [ ]
 - [ ]
-- [ ] Các ca của issue này trong `03_TEST_CASES.md` đều Pass, unit test xanh
+- [ ] Các ca của issue này trong `docs/TEST_CASES.md` đều Pass, `mvn test` và GitHub Actions xanh
 
 ---
 **Quy tắc chung**: tạo nhánh và mở PR theo `docs/SPECIFICATIONS.md` → *Quy ước Git*, PR ghi `Closes #<số-issue>`.

@@ -5,7 +5,7 @@
 
 
 > 🛍️ **Dự án thực hiện: Saltair - website bán quần áo basic** (Java 17, Jakarta Servlet/JSP, MySQL 8, Tomcat 11).
-> Bối cảnh dự án: [`docs/SPECIFICATIONS.md`](docs/SPECIFICATIONS.md) · Nghiệp vụ chi tiết: [`project.md`](project.md) · Quy trình phát triển: [`docs/HUONG_DAN_QUY_TRINH_PHAT_TRIEN.md`](docs/HUONG_DAN_QUY_TRINH_PHAT_TRIEN.md) · Danh sách yêu cầu: [`docs/requirements/`](docs/requirements/README.md)
+> Đặc tả nghiệp vụ: [`docs/SPECIFICATIONS.md`](docs/SPECIFICATIONS.md) · Kế hoạch kiểm thử: [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md) · Test case: [`docs/TEST_CASES.md`](docs/TEST_CASES.md)
 
 ---
 

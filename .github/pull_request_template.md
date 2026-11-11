@@ -2,11 +2,9 @@
 
 <!-- Làm gì, vì sao. Một đến ba câu. -->
 
-## Issue & Yêu cầu
+## Issue
 
 Closes #
-
-- Yêu cầu: `docs/requirements/REQ_<số>_<TEN>/` <!-- Việc rất nhỏ không có REQ thì ghi "Không có" -->
 
 ## Đã làm
 
@@ -29,18 +27,16 @@ Closes #
 - [ ] Không có
 - [ ] Có (mô tả bên dưới, kèm lệnh chạy migration):
 
-## Checklist chung (theo docs/HUONG_DAN_QUY_TRINH_PHAT_TRIEN.md)
+## Checklist
 
 - [ ] Nhánh tách từ nhánh phát triển chính, PR vào nhánh đó, đã cập nhật nhánh chính trước khi mở PR
-- [ ] `02_PHAN_TICH.md` khớp với code (quy tắc đổi trong lúc code đã cập nhật lại)
-- [ ] `03_TEST_CASES.md` đã điền Pass/Fail, unit test xanh, luồng chính trong `TEST_PLAN.md` vẫn chạy
-- [ ] Dùng AI thì đã ghi `04_AI_LOG.md`
+- [ ] Đổi quy tắc nghiệp vụ thì đã cập nhật `docs/SPECIFICATIONS.md`
+- [ ] Ca kiểm thử liên quan trong `docs/TEST_CASES.md` đã điền Pass/Fail, luồng chính trong `docs/TEST_PLAN.md` vẫn chạy
+- [ ] Dùng AI thì đã ghi vào `docs/ai-logs/`
 - [ ] Commit theo dạng `<loại>(<phạm vi>): ... (#số)`
 - [ ] Không commit file cấu hình bí mật, file build, mật khẩu, khóa API
 
-## Checklist riêng dự án (theo docs/SPECIFICATIONS.md mục 7)
-
-<!-- Sang dự án mới: thay các dòng dưới bằng checklist trong SPECIFICATIONS.md của dự án đó -->
+## Checklist riêng dự án
 
 - [ ] Đúng luồng `Servlet -> Service -> Repository`; Servlet không viết SQL, JSP không gọi Repository/Service
 - [ ] SQL dùng `PreparedStatement`, không nối chuỗi từ dữ liệu người dùng

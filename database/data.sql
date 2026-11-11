@@ -1,4 +1,4 @@
--- Dữ liệu mẫu cho Saltair, tạo bằng script từ docs/product-catalog.csv (24 sản phẩm, 276 biến thể).
+-- Dữ liệu mẫu cho Saltair (24 sản phẩm, 276 biến thể).
 -- Chạy SAU database/schema.sql (schema.sql sẽ xóa và tạo lại toàn bộ bảng).
 --
 -- Tài khoản demo (đăng nhập bằng email + mã 6 số; email demo là email giả nên cần bật auth.devCode=true
