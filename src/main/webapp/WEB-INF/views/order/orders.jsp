@@ -10,7 +10,8 @@
     orderPage    : Page<Order>         - thông tin phân trang
     baseUrl      : String              - "/orders?status=..." không có page (cho t:pagination)
     status       : String              - PENDING | SHIPPING | COMPLETED | CANCELLED, rỗng = tất cả
-    statusCounts : Map<String,Integer> - số đơn theo trạng thái, khóa: ALL, PENDING, SHIPPING, COMPLETED, CANCELLED
+    statusCounts : Map<String,Integer> - số đơn theo trạng thái, khóa: ALL (tab Tất cả, không tính đơn đã hủy),
+                                         TOTAL (mọi đơn), PENDING, SHIPPING, COMPLETED, CANCELLED
     welcomeProducts : List<Product>    - chỉ có khi khách chưa có đơn nào: sản phẩm cho dải ảnh ở thẻ chào mừng (#85)
   Form (đều gửi tới /order, xử lý ở OrderDetailServlet):
     POST /order action=cancel          fields: orderCode, cancelReason, returnTo=orders   (hộp thoại dùng chung)
@@ -29,7 +30,7 @@
       <c:otherwise><c:set var="statusName" value=""/></c:otherwise>
     </c:choose>
 
-    <c:set var="noOrders" value="${statusCounts['ALL'] == 0}"/>
+    <c:set var="noOrders" value="${statusCounts['TOTAL'] == 0}"/>
         <div class="acct-head sh-enter">
           <h1 class="acct-title">Đơn hàng</h1>
         </div>
@@ -63,6 +64,18 @@
         </nav>
 
         <c:choose>
+          <c:when test="${empty orders and empty status}">
+            <%-- Tab Tất cả trống vì khách chỉ còn đơn đã hủy (#4) --%>
+            <div class="acct-card empty-state sh-enter" style="--d:2">
+              <t:icon name="package"/>
+              <h2 class="h-2">Không có đơn đang xử lý</h2>
+              <p>Các đơn bạn đã hủy nằm ở mục “Đã hủy”.</p>
+              <div class="row" style="gap:12px;justify-content:center;flex-wrap:wrap">
+                <a class="btn btn--outline" href="${ctx}/orders?status=CANCELLED">Xem đơn đã hủy</a>
+                <a class="btn btn--primary" href="${ctx}/products">Mua sắm ngay</a>
+              </div>
+            </div>
+          </c:when>
           <c:when test="${empty orders}">
             <div class="acct-card empty-state sh-enter" style="--d:2">
               <t:icon name="package"/>

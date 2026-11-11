@@ -52,6 +52,7 @@
 
 ### 2.6. Đơn hàng & đánh giá
 * Trạng thái: `Chờ xác nhận → Đang giao → Hoàn thành`, nhánh `Đã hủy`.
+* Trang Đơn hàng của khách (`/orders`): tab **Tất cả** không hiện đơn đã hủy và số trên tab không tính đơn đã hủy; đơn đã hủy chỉ xem ở tab **Đã hủy**. Khách chỉ còn đơn đã hủy thì tab Tất cả báo "Không có đơn đang xử lý".
 * Khách chỉ hủy được đơn "Chờ xác nhận"; hủy thì cộng trả tồn kho và lượt voucher. Admin hủy phải nhập lý do.
 * Chỉ đơn "Hoàn thành" mới được đánh giá (1 đến 5 sao + bình luận); khách sửa, xóa đánh giá của mình; Admin ẩn/hiện bình luận.
 

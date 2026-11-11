@@ -19,7 +19,7 @@ import java.io.IOException;
 /**
  * GET /orders?status=...&page=... : danh sách đơn hàng của khách đang đăng nhập (Customer, khu vực tài khoản).
  * JSP: /WEB-INF/views/order/orders.jsp
- * Tham số: status = PENDING | SHIPPING | COMPLETED | CANCELLED (rỗng hoặc sai = tất cả); page (mặc định 1).
+ * Tham số: status = PENDING | SHIPPING | COMPLETED | CANCELLED (rỗng hoặc sai = tất cả, không gồm đơn đã hủy); page (mặc định 1).
  * Thuộc tính request: orders (List&lt;Order&gt; của trang hiện tại, mới nhất trước, kèm items), orderPage (Page&lt;Order&gt;),
  * status (String), statusCounts (Map&lt;String,Integer&gt;), baseUrl (cho phân trang); welcomeProducts (List&lt;Product&gt;)
  * chỉ có khi khách chưa có đơn nào, để hiện dải ảnh ở thẻ chào mừng.
@@ -47,7 +47,7 @@ public class OrderServlet extends HttpServlet {
         req.setAttribute("status", status == null ? "" : status.name());
         var statusCounts = orderService.countByStatusForUser(user.getId());
         req.setAttribute("statusCounts", statusCounts);
-        if (statusCounts.getOrDefault("ALL", 0) == 0) {
+        if (statusCounts.getOrDefault("TOTAL", 0) == 0) {
             req.setAttribute("welcomeProducts", productService.bestSellers(WELCOME_PRODUCTS));
         }
         req.setAttribute("baseUrl", status == null ? "/orders" : "/orders?status=" + status.name());

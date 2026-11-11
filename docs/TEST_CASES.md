@@ -35,4 +35,13 @@
 | **TC_AUTH_26** | Giao diện đăng nhập | Tắt JavaScript vẫn đăng nhập được | Positive | 1. Tắt JS<br>2. Nhập 6 ô, bấm "Xác nhận" | Mã đúng | Đăng nhập thành công | Pass |
 | **TC_AUTH_27** | Giao diện đăng nhập | Khổ điện thoại | Positive | 1. Mở ở 375px<br>2. Bấm icon người | | Khung rộng `100vw - 32px`, 6 ô vừa màn hình | Pass |
 
+## 2. ĐƠN HÀNG CỦA KHÁCH (mục 2.6 trong SPECIFICATIONS)
+
+| Test Case ID | Chức năng | Mô tả ca kiểm thử | Loại test (Pos/Neg) | Các bước thực hiện | Dữ liệu kiểm thử (Test Data) | Kết quả mong đợi | Trạng thái (Pass/Fail) |
+| :---: | :---: | :--- | :---: | :--- | :--- | :--- | :---: |
+| **TC_ORDER_01** | Đơn hàng | Tab Tất cả không hiện đơn đã hủy | Positive | 1. Đăng nhập<br>2. Mở `/orders` | `khach@saltair.vn` (5 đơn, 1 đã hủy) | Hiện 4 đơn, không có `SA20261024005`; số trên tab Tất cả là 4 | Pass |
+| **TC_ORDER_02** | Đơn hàng | Tab Đã hủy vẫn hiện đơn đã hủy | Positive | 1. Mở `/orders?status=CANCELLED` | `khach@saltair.vn` | Hiện đơn `SA20261024005`, số trên tab Đã hủy là 1 | Pass |
+| **TC_ORDER_03** | Đơn hàng | Khách chỉ còn đơn đã hủy | Negative | 1. Hủy hết đơn của khách<br>2. Mở `/orders` | `duc.vo@example.com` | Tab Tất cả 0, báo "Không có đơn đang xử lý", có nút "Xem đơn đã hủy" | Pass |
+| **TC_ORDER_04** | Đơn hàng | Khách chưa từng đặt hàng | Positive | 1. Đăng nhập email mới<br>2. Mở `/orders` | `newbie4@x.vn` | Hiện thẻ "Chào mừng, sẵn sàng mua sắm?", không có các tab | Pass |
+
 > Các chức năng còn lại (giỏ hàng, voucher, đặt hàng, CRUD quản trị) sẽ bổ sung ở Y2 theo [HUONG_DAN_CHI_TIET_6_TUAN.md](HUONG_DAN_CHI_TIET_6_TUAN.md).
