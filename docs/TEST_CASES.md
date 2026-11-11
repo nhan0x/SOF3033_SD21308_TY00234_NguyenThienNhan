@@ -34,6 +34,7 @@
 | **TC_AUTH_25** | Giao diện đăng nhập | Gõ mã sai trên 6 ô | Negative | 1. Gõ 6 số sai | `000000` | Ô viền đỏ, rung, báo số lần còn lại, xóa ô và focus ô đầu | Pass |
 | **TC_AUTH_26** | Giao diện đăng nhập | Tắt JavaScript vẫn đăng nhập được | Positive | 1. Tắt JS<br>2. Nhập 6 ô, bấm "Xác nhận" | Mã đúng | Đăng nhập thành công | Pass |
 | **TC_AUTH_27** | Giao diện đăng nhập | Khổ điện thoại | Positive | 1. Mở ở 375px<br>2. Bấm icon người | | Khung rộng `100vw - 32px`, 6 ô vừa màn hình | Pass |
+| **TC_AUTH_28** | Giao diện đăng nhập | Trang đăng nhập tối giản, không ảnh | Positive | 1. Mở `/login` và `/admin/login` ở 1440px và 375px | | Không có khung ảnh, form nằm giữa trang, không tràn ngang; lỗi email vẫn hiện dưới ô nhập | Pass |
 
 ## 2. ĐƠN HÀNG CỦA KHÁCH (mục 2.6 trong SPECIFICATIONS)
 
