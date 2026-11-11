@@ -71,11 +71,8 @@ public class ProductDetailServlet extends HttpServlet {
         }
         double avg = total == 0 ? 0 : Math.round(sum * 10.0 / total) / 10.0;
 
-        // Ảnh: dự án mỗi sản phẩm 1 ảnh. JSP lặp qua danh sách này nên thêm nhiều ảnh sau này vẫn chạy.
-        List<String> galleryImages = new ArrayList<>();
-        if (product.getImage() != null && !product.getImage().isBlank()) {
-            galleryImages.add(product.getImage());
-        }
+        // Khung ảnh: tối đa 4 ảnh (2 ảnh sản phẩm, 2 ảnh người mẫu mặc); chưa có ảnh phụ thì chỉ có ảnh chính
+        List<String> galleryImages = productService.galleryImages(product);
 
         // Được đánh giá khi có đơn Hoàn thành chứa sản phẩm; đã đánh giá thì form dùng để sửa
         User user = WebUtil.currentUser(req);

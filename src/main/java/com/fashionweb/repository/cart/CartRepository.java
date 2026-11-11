@@ -62,6 +62,38 @@ public class CartRepository {
     }
 
     /**
+     * Thông tin hiển thị của các biến thể (giỏ của khách chưa đăng nhập, lưu trong session).
+     * Trả CartItem với id = variantId, quantity = 0; biến thể không còn tồn tại thì không có trong kết quả.
+     */
+    public List<CartItem> findVariantItems(java.util.Collection<Integer> variantIds) {
+        List<CartItem> items = new ArrayList<>();
+        if (variantIds.isEmpty()) {
+            return items;
+        }
+        String marks = String.join(",", java.util.Collections.nCopies(variantIds.size(), "?"));
+        String sql = "SELECT v.id, 0 AS cart_id, v.id AS variant_id, 0 AS quantity, p.id AS product_id, p.category_id, "
+                + "p.name AS product_name, p.slug AS product_slug, p.image_thumb, p.price, p.is_deleted, v.stock, "
+                + "co.name AS color_name, s.name AS size_name "
+                + "FROM product_variants v JOIN products p ON p.id = v.product_id "
+                + "JOIN colors co ON co.id = v.color_id JOIN sizes s ON s.id = v.size_id WHERE v.id IN (" + marks + ")";
+        try (Connection con = DBContext.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            int i = 1;
+            for (Integer id : variantIds) {
+                ps.setInt(i++, id);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    items.add(mapItem(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Lỗi đọc giỏ hàng", e);
+        }
+        return items;
+    }
+
+    /**
      * INSERT giỏ, trả id.
      */
     public int create(int userId) {

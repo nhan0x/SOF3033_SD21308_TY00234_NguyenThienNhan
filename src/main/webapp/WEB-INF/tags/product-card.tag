@@ -1,4 +1,4 @@
-<%@ tag description="Thẻ sản phẩm (ô ảnh xám, hãng, tên, giá, sao). Rê chuột: ảnh phóng nhẹ, thanh size còn hàng trượt lên ở đáy ảnh." pageEncoding="UTF-8" body-content="empty" %>
+<%@ tag description="Thẻ sản phẩm (ô ảnh xám dọc 2:3, hãng, tên, giá, sao). Rê chuột: đổi sang ảnh thứ hai nếu có (product.hoverImage), ảnh phóng nhẹ, thanh size còn hàng trượt lên ở đáy ảnh." pageEncoding="UTF-8" body-content="empty" %>
 <%@ attribute name="product" required="true" type="com.fashionweb.model.Product" %>
 <%@ attribute name="eager" required="false" type="java.lang.Boolean" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
@@ -9,6 +9,7 @@
   <div class="product-card__media">
     <c:if test="${product.stockTotal == 0}"><span class="product-card__badge product-card__badge--sold">Hết hàng</span></c:if>
     <t:img src="${product.imageThumb}" alt="${product.name}" eager="${eager}"/>
+    <c:if test="${not empty product.hoverImage}"><t:img src="${product.hoverImage}" alt="" cls="product-card__alt"/></c:if>
     <%-- Nút size nổi như a-dam: mỗi size còn hàng là một nút trắng; bấm thì sang trang chi tiết với size đó chọn sẵn
          (app.js bắt sự kiện data-size-href vì thẻ đã là liên kết, không lồng thẻ a). Bàn phím dùng liên kết của cả thẻ. --%>
     <c:if test="${not empty product.sizes}">

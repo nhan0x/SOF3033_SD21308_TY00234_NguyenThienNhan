@@ -93,6 +93,23 @@ public class ProductService {
         return p;
     }
 
+    /** Số ô ảnh tối đa của khung ảnh trang chi tiết: 2 ảnh sản phẩm, 2 ảnh người mẫu mặc. */
+    public static final int GALLERY_SIZE = 4;
+
+    /**
+     * Ảnh cho khung ảnh trang chi tiết, tối đa GALLERY_SIZE. Chưa có ảnh phụ thì trả ảnh chính (0 hoặc 1 phần tử).
+     */
+    public List<String> galleryImages(Product p) {
+        List<String> images = productRepository.findImages(p.getId());
+        if (images.isEmpty()) {
+            if (p.getImage() != null && !p.getImage().isBlank()) {
+                images.add(p.getImage());
+            }
+            return images;
+        }
+        return images.size() > GALLERY_SIZE ? new ArrayList<>(images.subList(0, GALLERY_SIZE)) : images;
+    }
+
     /**
      * Sản phẩm chưa xóa mềm theo id kèm variants (form sửa của Admin). null nếu không có.
      */

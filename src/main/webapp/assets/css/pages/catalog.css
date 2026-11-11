@@ -14,6 +14,19 @@
    1. DANH SÁCH SẢN PHẨM
    ========================================================================== */
 .toolbar { flex-wrap: wrap; }
+/* Trang danh sách (#89), đo trên trang danh mục của a-dam ở 1440x900: tiêu đề đệm 72px, thanh công cụ có kẻ trên,
+   chữ 12px/500, nút lọc dạng chữ kèm icon, lưới 4 cột khe 40px 12px */
+.plp-page .page-head { padding: 72px var(--gutter); }
+.plp-page .page-head p { max-width: 768px; margin-top: 32px; color: var(--navy); }
+.plp-page .toolbar { padding: 28.8px 28px; border-top: 1px solid var(--line); font-size: 12px; font-weight: 500; line-height: normal; }
+.plp-page .toolbar__count, .plp-page .toolbar__count strong { color: var(--navy); font-weight: 500; }
+.plp-page .toolbar__right { gap: 24px; }
+.plp-page .view-toggle { gap: 14px; padding-right: 24px; border-right: 1px solid var(--line-2); }
+.plp-page .view-toggle button { width: 16px; height: 16px; }
+.toolbar__filter { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 500; line-height: normal; transition: opacity var(--t) var(--ease); }
+.toolbar__filter:hover { opacity: .6; }
+.plp-page .pagination { gap: 16px; }
+.plp-page .pagination a, .plp-page .pagination span { min-width: 40px; height: 40px; font-size: 12px; font-weight: 500; }
 .toolbar__count { color: var(--navy-60); }
 .toolbar__count strong { color: var(--navy); font-weight: 700; }
 .filter-count { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--navy); color: var(--white); font-size: 11px; font-weight: 700; line-height: 20px; text-align: center; transition: background-color var(--t) var(--ease), color var(--t) var(--ease); }
@@ -55,8 +68,15 @@
 /* ==========================================================================
    2. CHI TIẾT SẢN PHẨM
    ========================================================================== */
-.pdp-page .pdp { padding-top: 24px; }
+/* Bố cục như mẫu (1440px): khung ảnh 48..720, cột thông tin 820..1340 rộng 520px, cách header 28px, không có breadcrumb */
+.pdp-page .pdp { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; padding-top: 28px; }
+.pdp-page .pdp__info { width: 100%; max-width: 520px; margin-left: 100px; }
+@media (max-width: 1240px) { .pdp-page .pdp__info { margin-left: 48px; max-width: none; width: auto; } }
 .pdp__gallery .media:first-child { aspect-ratio: 4 / 5; }
+/* Nhiều ảnh: lưới 2 cột, mọi ô dọc 2:3, khe 4px; khung ảnh dính khi cột thông tin dài hơn */
+.pdp__gallery--grid { position: sticky; top: calc(var(--header-h-small) + 24px); }
+.pdp__gallery--grid .media,
+.pdp__gallery--grid .media:first-child { grid-column: auto; aspect-ratio: 2 / 3; background: #f4f4f4; }
 .pdp__gallery .media > img { transition: transform .3s ease-out; }
 .pdp__gallery .media.is-zoomable { cursor: zoom-in; }
 .pdp__gallery .media.is-zoom > img { transform: scale(1.6); }
@@ -72,6 +92,36 @@
 .swatch.is-soldout span { opacity: .45; }
 .swatch.is-soldout span::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(to top right, transparent calc(50% - 1px), var(--navy-50) 50%, transparent calc(50% + 1px)); }
 .pdp-info-note { display: grid; gap: 6px; }
+/* Cột thông tin (#90, đo trên trang tham chiếu ở 1440x900): các khối cách nhau 28px, tên và giá cách 13px */
+.pdp__head { gap: 13px; }
+.pdp__rating { margin-top: 15px; font-size: 15px; line-height: 21px; }
+.pdp__rating a { color: var(--navy); }
+.pdp__label { margin-bottom: 8px; font-size: 15px; line-height: 21px; color: var(--navy); }
+.pdp__label b { font-weight: 400; margin-left: 4px; }
+.pdp__buy .btn { height: 53px; font-size: 16px; }
+.pdp__meta { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 15px; line-height: 21px; }
+.pdp__wish { flex: none; display: inline-flex; align-items: center; gap: 6px; color: var(--navy); transition: opacity .2s ease-in-out; }
+.pdp__wish:hover { opacity: .6; }
+.pdp__wish span { text-decoration: underline; text-underline-offset: 3px; }
+.pdp__wish.is-on .icon { fill: currentColor; }
+.pdp__wish.is-pop .icon { animation: pop .35s ease; }
+.size-guide { padding: 14px 0; }
+.size-guide > summary { list-style: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 15px; line-height: 21px; color: #000; }
+.size-guide > summary::-webkit-details-marker { display: none; }
+.size-guide__link { text-decoration: underline; text-underline-offset: 3px; transition: opacity .2s ease-in-out; }
+.size-guide > summary:hover .size-guide__link { opacity: .6; }
+.size-guide__content { margin-top: 14px; animation: acc-in .3s ease-out both; }
+.size-guide__note { margin-bottom: 10px; font-size: 13px; color: var(--navy-60); }
+.size-guide__table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.size-guide__table th, .size-guide__table td { padding: 8px 10px; border: 1px solid var(--line); text-align: center; }
+.size-guide__table th { background: var(--bg); font-weight: 700; }
+.size-guide__table td:first-child, .size-guide__table th:first-child { text-align: left; font-weight: 700; white-space: nowrap; }
+.pdp__accordions .accordion > summary { gap: 12px; height: 60px; font-size: 15px; line-height: 21px; font-weight: 400; }
+.pdp__accordions .accordion__arrow { flex: none; transition: transform .3s ease-in-out; }
+.pdp__accordions .accordion[open] .accordion__arrow { transform: rotate(180deg); }
+.pdp__accordions .accordion__body { padding: 0 0 20px; color: var(--navy); animation: acc-in .3s ease-out both; }
+@keyframes acc-in { from { opacity: 0; } to { opacity: 1; } }
+
 .accordion__body p + p { margin-top: 10px; }
 
 /* Thanh thêm vào giỏ cố định (chỉ điện thoại) */
@@ -137,55 +187,82 @@
 .article-others { padding-top: 24px; }
 .article-others .section-title { padding: 0 12px 32px; }
 .article-others .blog-grid { padding-bottom: 0; }
+/* Trang danh sách blog (#91, đo trên trang tham chiếu ở 1440x900): tiêu đề 58px, lưới 3 cột cách 48px, ảnh 416:513 */
+.blog-page .page-head { padding: 48px var(--gutter); }
+.blog-page .page-head .h-1 { font-size: 58.33px; line-height: 58.33px; }
+.blog-page .page-head p { margin-top: 24px; color: var(--navy); }
+.blog-page .blog-grid { gap: 48px; padding: 0 var(--gutter) 96px; }
+.blog-card__media { aspect-ratio: 416 / 513; }
+.blog-page .blog-card__body { padding: 24px 0 0; }
+
 .read-progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 120; background: var(--navy); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none; }
 
 /* ==========================================================================
    4. GIỚI THIỆU
    ========================================================================== */
-.about-hero { padding: 96px var(--gutter) 72px; text-align: center; }
-.about-hero .h-display { max-width: 900px; margin: 16px auto 0; }
-.about-hero p.about-hero__lead { max-width: 640px; margin: 28px auto 0; color: var(--navy-60); font-size: 17px; line-height: 26px; }
-.about-story { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; max-width: 1200px; margin-inline: auto; padding: 72px var(--gutter) 96px; }
-.about-story__text { display: grid; gap: 20px; color: var(--navy-60); }
-.about-values { display: grid; grid-template-columns: repeat(3, 1fr); border-block: 1px solid var(--line); }
-.about-value { padding: 56px 32px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; border-right: 1px solid var(--line); }
-.about-value:last-child { border-right: 0; }
-.about-value .icon { width: 28px; height: 28px; transition: transform var(--t) ease; }
-.about-value:hover .icon { transform: translateY(-3px); }
-.about-value p:last-child { color: var(--navy-60); max-width: 300px; }
-.about-split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; }
-.about-split__text { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 20px; padding: 48px var(--gutter); }
-.about-split__text p { color: var(--navy-60); max-width: 480px; }
-.about-split .media > img { transition: transform .6s var(--ease); }
-.about-split .media:hover > img { transform: scale(1.03); }
+/* Số đo lấy trên trang "Who we are" của trang tham chiếu ở 1440x900 (#91) */
+.about-cover { position: relative; height: 720px; background: var(--navy); overflow: hidden; }
+.about-cover__media, .about-statement__media { position: absolute; inset: 0; }
+.about-cover__media img, .about-statement__media img, .about-cover__media .ph, .about-statement__media .ph { width: 100%; height: 100%; object-fit: cover; }
+.marquee { overflow: hidden; padding: 60px 0; }
+.marquee__track { display: flex; width: max-content; animation: marquee 40s linear infinite; }
+.marquee__item { flex: none; padding-right: 80px; font-size: 72px; line-height: 72px; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+.about-tm { display: grid; grid-template-columns: 1fr 1fr; align-items: center; }
+.about-tm__media { padding: 48px 0 48px 48px; }
+.about-tm__media .media, .about-tm__brand { aspect-ratio: 1 / 1; }
+.about-tm__brand { display: grid; place-items: center; background: var(--cobalt); }
+.about-tm__brand span { width: 49%; aspect-ratio: 1 / 1; display: grid; place-items: center; border-radius: 50%; background: var(--white); }
+.about-tm__brand img { width: 46%; height: auto; }
+.about-tm__text { display: grid; gap: 24px; padding: 48px; max-width: 624px; font-size: 13px; line-height: 18.2px; }
+.about-tm__title { font-size: 20.2px; line-height: 22.2px; font-weight: 700; margin-bottom: 8px; max-width: 480px; }
+.about-tm__text strong { font-weight: 700; }
+.about-statement { position: relative; min-height: 720px; display: grid; place-content: center; justify-items: center; gap: 32px; padding: 96px var(--gutter); background: var(--navy); color: var(--white); text-align: center; overflow: hidden; }
+.about-statement__media::after { content: ""; position: absolute; inset: 0; background: rgba(0, 0, 197, .62); }
+.about-statement__text { position: relative; max-width: 960px; font-size: 70.5px; line-height: 70.5px; font-weight: 700; text-wrap: balance; }
+.about-statement .btn { position: relative; padding-inline: 40px; }
+.about-statement--solid { min-height: 520px; background: var(--navy); }
+.about-line { max-width: calc(768px + var(--gutter) * 2); margin: 0 auto; padding: 24px var(--gutter) 72px; text-align: center; font-size: 20.2px; line-height: 22.2px; font-weight: 700; text-wrap: balance; }
+@media (prefers-reduced-motion: reduce) { .marquee__track { animation: none; } }
 
-/* ==========================================================================
-   Responsive: cùng điểm ngắt với style.css (990px, 750px)
-   ========================================================================== */
 @media (max-width: 990px) {
+  .pdp-page .pdp { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-top: 16px; }
+  .pdp-page .pdp__info { margin-left: 0; max-width: none; }
+  .about-cover { height: 520px; }
+  .about-tm { grid-template-columns: 1fr; }
+  .about-tm__media { padding: 24px var(--gutter) 0; }
+  .about-tm__text { padding: 32px var(--gutter) 48px; }
+  .about-statement { min-height: 520px; }
+  .about-statement__text { font-size: 44px; line-height: 46px; }
+  .marquee { padding: 40px 0; }
+  .marquee__item { font-size: 44px; line-height: 44px; padding-right: 48px; }
   .reviews-layout { grid-template-columns: 1fr; gap: 32px; }
   .rating-summary { position: static; }
   .blog-grid { grid-template-columns: repeat(2, 1fr); }
-  .about-hero { padding-top: 64px; }
-  .about-story { grid-template-columns: 1fr; gap: 24px; padding-block: 48px 64px; }
-  .about-split { grid-template-columns: 1fr; }
-  .about-split__text { padding-block: 40px; }
 }
 
 @media (max-width: 750px) {
+  .about-cover { height: 440px; }
+  .about-statement, .about-statement--solid { min-height: 440px; }
+  .about-statement__text { font-size: 32px; line-height: 36px; }
+  .plp-page .page-head { padding: 48px var(--gutter); }
+  .plp-page .toolbar { padding: 20px var(--gutter); }
+  .plp-page .view-toggle { border-right: 0; padding-right: 0; }
   .toolbar { padding-inline: 8px; }
   .active-filters { padding-inline: 8px; }
   .product-grid[data-view="large"] { grid-template-columns: 1fr; }
   .blog-grid { grid-template-columns: 1fr; padding-bottom: 64px; }
-  .about-hero { padding-block: 48px; }
-  .about-values { grid-template-columns: 1fr; }
-  .about-value { border-right: 0; border-bottom: 1px solid var(--line); padding-block: 40px; }
-  .about-value:last-child { border-bottom: 0; }
+  .blog-page .page-head { padding: 32px var(--gutter); }
+  .blog-page .page-head .h-1 { font-size: 37.6px; line-height: 41.4px; }
+  .blog-page .blog-grid { gap: 32px; padding-bottom: 64px; }
   .article__body p { font-size: 16px; line-height: 26px; }
   .article__body p:first-child { font-size: 17px; line-height: 27px; }
   .review-form { padding: 24px 20px; }
   .rating-summary { padding: 24px 20px; }
 
+  .pdp__gallery--grid { position: static; display: flex; gap: 4px; margin: 0 calc(-1 * var(--gutter)); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .pdp__gallery--grid::-webkit-scrollbar { display: none; }
+  .pdp__gallery--grid .media { flex: 0 0 86%; scroll-snap-align: center; }
   .pdp-page .footer__bottom { padding-bottom: 88px; }
   .pdp-sticky { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; display: flex; align-items: center; gap: 12px; padding: 10px var(--gutter); background: var(--white); border-top: 1px solid var(--line); transform: translateY(100%); visibility: hidden; transition: transform .25s var(--ease), visibility .25s var(--ease); }
   .pdp-sticky.is-visible { transform: none; visibility: visible; }

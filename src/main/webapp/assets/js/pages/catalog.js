@@ -159,6 +159,8 @@
       });
 
       const sizeEl = sizeInputs.find((i) => i.checked);
+      const sizeLabel = $('[data-selected-size]', form);
+      if (sizeLabel) sizeLabel.textContent = sizeEl ? sizeEl.dataset.name : '';
       const v = sizeEl && colorId !== null ? find(colorId, Number(sizeEl.value)) : null;
       if (variantInput) variantInput.value = v ? String(v.id) : '';
 

@@ -55,6 +55,15 @@ final class LoginSupport {
         session.removeAttribute(AppConstant.SESSION_ADMIN_LOGIN_REDIRECT);
         session.removeAttribute(AppConstant.SESSION_DEV_CODE);
         session.setAttribute(AppConstant.SESSION_USER, user);
+        // Giỏ khách đã chọn lúc chưa đăng nhập được gộp vào giỏ của tài khoản (Admin không có giỏ)
+        if (user.getRole() == com.fashionweb.constant.Role.CUSTOMER
+                && session.getAttribute(AppConstant.SESSION_GUEST_CART) instanceof java.util.Map<?, ?> guest) {
+            @SuppressWarnings("unchecked")
+            java.util.Map<Integer, Integer> lines = (java.util.Map<Integer, Integer>) guest;
+            CART_SERVICE.mergeGuestCart(user.getId(), lines);
+        }
+        session.removeAttribute(AppConstant.SESSION_GUEST_CART);
+        session.removeAttribute(AppConstant.SESSION_GUEST_ORDER);
         session.setAttribute(AppConstant.SESSION_CART_COUNT, CART_SERVICE.countItems(user.getId()));
         return session;
     }

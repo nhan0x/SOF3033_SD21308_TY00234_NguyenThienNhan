@@ -98,7 +98,7 @@
   }
 
   /* ---------- Thanh toán ---------- */
-  const addrRadios = $$('input[name="addressId"]');
+  const addrRadios = $$('input[type="radio"][name="addressId"]');
   const newBox = $('[data-new-address]');
   if (addrRadios.length && newBox) {
     const sync = () => {
@@ -109,6 +109,51 @@
     };
     addrRadios.forEach((r) => r.addEventListener('change', sync));
     sync();
+  } else if (newBox) {
+    // Khách chưa đăng nhập: không có sổ địa chỉ, luôn nhập địa chỉ mới
+    $$('[data-req]', newBox).forEach((i) => { i.required = true; });
+  }
+
+  // Trang thanh toán mới (#86): chip gợi ý điền mã, gập mở tóm tắt trên điện thoại, chống bấm Đặt hàng hai lần
+  const voucherInput = $('[data-voucher-input]');
+  if (voucherInput) {
+    $$('[data-voucher-fill]').forEach((b) => b.addEventListener('click', () => {
+      voucherInput.value = b.dataset.voucherFill;
+      voucherInput.focus();
+    }));
+    // Enter trong ô mã giảm giá thì áp mã, không đặt hàng
+    voucherInput.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      $('[data-voucher-apply]')?.click();
+    });
+  }
+  const coToggle = $('[data-co-toggle]');
+  const coSummary = $('[data-co-summary]');
+  if (coToggle && coSummary) {
+    coToggle.addEventListener('click', () => {
+      const open = coSummary.classList.toggle('is-open');
+      coToggle.setAttribute('aria-expanded', String(open));
+      const text = $('[data-co-toggle-text]', coToggle);
+      if (text) text.textContent = open ? 'Ẩn tóm tắt đơn hàng' : 'Hiện tóm tắt đơn hàng';
+    });
+  }
+  const coForm = $('form.co');
+  if (coForm) {
+    let sent = false;
+    coForm.addEventListener('submit', (e) => {
+      if (sent) { e.preventDefault(); return; }
+      sent = true;
+      const btn = e.submitter;
+      if (btn && btn.hasAttribute('data-co-submit')) btn.classList.add('is-loading');
+      // Khóa nút sau khi trình duyệt đã lấy tên/giá trị của nút bấm
+      setTimeout(() => $$('button[type="submit"]', coForm).forEach((b) => { b.disabled = true; }), 0);
+    });
+    window.addEventListener('pageshow', (e) => {
+      if (!e.persisted) return;
+      sent = false;
+      $$('button[type="submit"]', coForm).forEach((b) => { b.disabled = false; b.classList.remove('is-loading'); });
+    });
   }
 
   const voucherForm = $('[data-voucher-form]');
