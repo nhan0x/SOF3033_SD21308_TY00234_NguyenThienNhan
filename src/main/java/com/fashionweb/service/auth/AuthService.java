@@ -170,6 +170,30 @@ public class AuthService {
     }
 
     /**
+     * Tài khoản khách hàng để gắn đơn của khách chưa đăng nhập: email đã có thì dùng tài khoản đó, chưa có thì tạo mới
+     * (không mật khẩu). KHÔNG đăng nhập khách vào tài khoản này. Email sai, thuộc Admin hoặc tài khoản bị khóa thì ném
+     * ValidationException field "email".
+     */
+    public User findOrCreateCustomer(String email, String fullName, String phone) {
+        String e = normalizeEmail(email);
+        User u = userRepository.findByEmail(e);
+        if (u == null) {
+            u = new User();
+            u.setEmail(e);
+            u.setFullName(fullName);
+            u.setPhone(phone);
+            u.setRole(Role.CUSTOMER);
+            u.setActive(true);
+            u.setId(userRepository.insert(u));
+            return u;
+        }
+        if (u.getRole() == Role.ADMIN || !u.isActive()) {
+            throw new ValidationException("email", "Email này không dùng để đặt hàng được. Vui lòng dùng email khác.");
+        }
+        return u;
+    }
+
+    /**
      * Gửi mail báo có lượt đăng nhập trang quản trị (chạy nền, lỗi chỉ ghi log). auth.devCode bật thì chỉ ghi log.
      */
     public void notifyAdminLogin(User admin, String ip, String userAgent) {

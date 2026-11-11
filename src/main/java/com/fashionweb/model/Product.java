@@ -14,6 +14,8 @@ public class Product {
     private long price;
     private String image;
     private String imageThumb;
+    /** Ảnh thứ hai của khung ảnh (product_images), hiện khi rê chuột lên thẻ sản phẩm; null nếu sản phẩm chưa có ảnh phụ. */
+    private String hoverImage;
     private boolean featured;
     private boolean deleted;
     private Date deletedAt;
@@ -96,6 +98,14 @@ public class Product {
 
     public void setImageThumb(String imageThumb) {
         this.imageThumb = imageThumb;
+    }
+
+    public String getHoverImage() {
+        return hoverImage;
+    }
+
+    public void setHoverImage(String hoverImage) {
+        this.hoverImage = hoverImage;
     }
 
     public boolean isFeatured() {

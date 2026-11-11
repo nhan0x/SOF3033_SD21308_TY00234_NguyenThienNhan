@@ -1,6 +1,8 @@
 package com.fashionweb.controller.order;
 
+import com.fashionweb.constant.AppConstant;
 import com.fashionweb.model.Order;
+import com.fashionweb.model.User;
 import com.fashionweb.service.order.OrderService;
 import com.fashionweb.util.WebUtil;
 import jakarta.servlet.ServletException;
@@ -12,7 +14,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * GET /order-success?code=... : trang đặt hàng thành công (Customer, AuthFilter bắt buộc đăng nhập).
+ * GET /order-success?code=... : trang đặt hàng thành công. Khách đã đăng nhập xem được đơn của mình; khách chưa đăng nhập
+ * chỉ xem được đơn vừa đặt trong phiên này (mã lưu ở session, AppConstant.SESSION_GUEST_ORDER).
  * JSP: /WEB-INF/views/order/order-success.jsp. Thuộc tính request: order (Order).
  * Mã sai hoặc đơn của người khác thì 404.
  */
@@ -23,7 +26,16 @@ public class OrderSuccessServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Order order = orderService.findByCodeAndUser(req.getParameter("code"), WebUtil.currentUser(req).getId());
+        String code = req.getParameter("code");
+        User user = WebUtil.currentUser(req);
+        Order order = null;
+        if (user != null) {
+            order = orderService.findByCodeAndUser(code, user.getId());
+        } else if (code != null && req.getSession(false) != null
+                && code.trim().equals(req.getSession(false).getAttribute(AppConstant.SESSION_GUEST_ORDER))) {
+            order = orderService.findByCode(code);
+        }
+        req.setAttribute("guest", user == null);
         if (order == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;

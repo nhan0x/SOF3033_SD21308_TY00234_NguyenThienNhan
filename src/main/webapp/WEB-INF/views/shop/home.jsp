@@ -47,7 +47,7 @@
   <section class="section--lg carousel--floating" data-carousel>
     <div class="container section__head reveal">
       <h2 class="h-1">Hàng mới về</h2>
-      <a class="btn btn--outline btn--sm hide-mobile" href="${ctx}/products?sort=newest">Xem tất cả <t:icon name="arrow-right"/></a>
+      <a class="btn btn--outline hide-mobile" href="${ctx}/products?sort=newest">Xem tất cả <t:icon name="arrow-right"/></a>
     </div>
     <div class="carousel__viewport">
       <button type="button" class="carousel__float carousel__float--prev" data-carousel-prev aria-label="Sản phẩm trước"><t:icon name="chevron-left"/></button>
@@ -108,7 +108,7 @@
   <section class="section--lg carousel--floating" data-carousel>
     <div class="container section__head reveal">
       <h2 class="h-1">Nổi bật</h2>
-      <a class="btn btn--outline btn--sm hide-mobile" href="${ctx}/products">Xem tất cả <t:icon name="arrow-right"/></a>
+      <a class="btn btn--outline hide-mobile" href="${ctx}/products">Xem tất cả <t:icon name="arrow-right"/></a>
     </div>
     <div class="carousel__viewport">
       <button type="button" class="carousel__float carousel__float--prev" data-carousel-prev aria-label="Sản phẩm trước"><t:icon name="chevron-left"/></button>
@@ -126,7 +126,7 @@
   <section class="section--lg carousel--floating" data-carousel>
     <div class="container section__head reveal">
       <h2 class="h-1">Bán chạy</h2>
-      <a class="btn btn--outline btn--sm hide-mobile" href="${ctx}/products?sort=bestseller">Xem tất cả <t:icon name="arrow-right"/></a>
+      <a class="btn btn--outline hide-mobile" href="${ctx}/products?sort=bestseller">Xem tất cả <t:icon name="arrow-right"/></a>
     </div>
     <div class="carousel__viewport">
       <button type="button" class="carousel__float carousel__float--prev" data-carousel-prev aria-label="Sản phẩm trước"><t:icon name="chevron-left"/></button>

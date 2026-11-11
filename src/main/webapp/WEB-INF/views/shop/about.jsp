@@ -4,71 +4,68 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%--
-  GIỚI THIỆU  (GET /about -> AboutServlet)
-  Thuộc tính request:
-    aboutImage   String   (tùy chọn) đường dẫn ảnh cho khối ảnh + chữ; rỗng/null thì hiện khung xám
+  GIỚI THIỆU  (GET /about -> AboutServlet)  [#91: bố cục theo trang "Who we are" của trang tham chiếu]
+  Thứ tự khối như mẫu: ảnh bìa cao 720px dưới header trong suốt, dải chữ chạy, ảnh vuông + chữ, ảnh phủ màu có câu lớn,
+  ảnh vuông + chữ, dòng chữ đậm, khối kêu gọi.
+  Thuộc tính request (rỗng/null thì hiện khung xám):
+    aboutCover   String   ảnh bìa đầu trang
+    aboutImage   String   ảnh của khối câu lớn và khối ảnh + chữ thứ hai
   Không có form.
 --%>
-<t:layout title="Giới thiệu" nav="about" description="Saltair làm đồ basic nhẹ, thoáng và dễ phối, lấy cảm hứng từ không khí của biển.">
-  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/catalog.css"></jsp:attribute>
+<t:layout title="Giới thiệu" nav="about" overlay="true" bodyClass="about-page" description="Saltair làm đồ basic nhẹ, thoáng và dễ phối, lấy cảm hứng từ không khí của biển.">
+  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/catalog.css?v=6"></jsp:attribute>
   <jsp:body>
 
-    <%-- 1. Mở đầu --%>
-    <header class="about-hero">
-      <span class="t-label cat-enter">Về Saltair</span>
-      <h1 class="h-display cat-enter" style="--i:1">Basic cho những ngày nắng.</h1>
-      <p class="about-hero__lead cat-enter" style="--i:2">Saltair làm những món đồ nhẹ, thoáng và dễ phối, để bạn mặc nhiều hơn là đắn đo mỗi sáng.</p>
+    <%-- 1. Ảnh bìa --%>
+    <header class="about-cover">
+      <div class="about-cover__media"><t:img src="${aboutCover}" alt="Saltair bên bờ biển" dark="true" eager="true"/></div>
+      <h1 class="sr-only">Giới thiệu Saltair</h1>
     </header>
 
-    <%-- 2. Câu chuyện thương hiệu --%>
-    <section class="about-story" aria-labelledby="about-story-title">
-      <div class="reveal">
-        <span class="t-label">Câu chuyện</span>
-        <h2 class="h-1 mt-16" id="about-story-title">Bắt đầu từ một buổi sáng bên biển.</h2>
+    <%-- 2. Dải chữ chạy (lặp lại để nối liền, phần lặp ẩn với trình đọc màn hình) --%>
+    <div class="marquee" aria-label="Bắt đầu từ một buổi sáng bên biển">
+      <div class="marquee__track" aria-hidden="true">
+        <c:forEach begin="1" end="6"><span class="marquee__item">Bắt đầu từ một buổi sáng bên biển</span></c:forEach>
       </div>
-      <div class="about-story__text reveal" style="--i:1">
-        <p>Saltair lấy cảm hứng từ không khí mặn mòi của biển: nhẹ, thoáng và tự do. Chúng tôi tin rằng một chiếc áo thun đẹp không cần nhiều chi tiết, chỉ cần vải mềm, form dễ mặc và một màu bạn thấy thoải mái.</p>
-        <p>Vì vậy mỗi bộ sưu tập chỉ có một số mẫu chọn lọc, đủ để bạn phối cả tuần mà không phải mở tủ đồ rồi phân vân. Đồ của Saltair là unisex, mặc đi biển, đi làm hay dạo phố đều hợp.</p>
+    </div>
+
+    <%-- 3. Ảnh vuông + chữ: ba điều Saltair theo đuổi --%>
+    <section class="about-tm" aria-labelledby="about-make-title">
+      <div class="about-tm__media reveal">
+        <div class="about-tm__brand"><span><img src="${ctx}/assets/brand/saltair-logo.png" alt="Saltair"></span></div>
+      </div>
+      <div class="about-tm__text reveal" style="--i:1">
+        <h2 class="about-tm__title" id="about-make-title">Chúng tôi làm đồ basic nhẹ, thoáng và dễ phối theo mọi cách có thể.</h2>
+        <p><strong>Ở chất liệu.</strong><br>Cotton và nỉ mềm trên da, giặt nhiều vẫn giữ form, mặc cả ngày không thấy nặng.</p>
+        <p><strong>Ở màu sắc.</strong><br>Trắng ngà, đen, navy, xanh biển nhạt, xám và be cát: món nào cũng mặc chung được với nhau.</p>
+        <p><strong>Ở số lượng.</strong><br>Ít mẫu nhưng kỹ, chọn lọc theo từng mùa để tủ đồ của bạn gọn mà vẫn đủ dùng.</p>
+      </div>
+    </section>
+
+    <%-- 4. Ảnh phủ màu có câu lớn --%>
+    <section class="about-statement">
+      <div class="about-statement__media"><t:img src="${aboutImage}" alt="" dark="true"/></div>
+      <p class="about-statement__text reveal">Thứ đầu tiên bạn mặc vào mỗi sáng nên thật dễ chịu.</p>
+    </section>
+
+    <%-- 5. Ảnh vuông + chữ: câu chuyện --%>
+    <section class="about-tm" aria-labelledby="about-story-title">
+      <div class="about-tm__media reveal"><div class="media"><t:img src="${aboutImage}" alt="Đồ basic của Saltair"/></div></div>
+      <div class="about-tm__text reveal" style="--i:1">
+        <h2 class="about-tm__title" id="about-story-title">Giữ mọi thứ đơn giản.</h2>
+        <p>Saltair lấy cảm hứng từ không khí mặn mòi của biển: nhẹ, thoáng và tự do. Một chiếc áo thun đẹp không cần nhiều chi tiết, chỉ cần vải mềm, form dễ mặc và một màu bạn thấy thoải mái.</p>
+        <p>Mỗi món đồ đều đi qua cùng một câu hỏi: bạn có muốn mặc nó vào buổi sáng nhiều nắng không? Nếu câu trả lời là có, nó mới được vào bộ sưu tập.</p>
         <p>Saltair là dự án học tập của nhóm sinh viên, nên mọi sản phẩm và đơn hàng trên trang này chỉ để minh họa.</p>
       </div>
     </section>
 
-    <%-- 3. Ba giá trị --%>
-    <section class="about-values" data-stagger aria-label="Giá trị của Saltair">
-      <div class="about-value reveal">
-        <t:icon name="shirt"/>
-        <h2 class="h-2">Chất liệu mềm</h2>
-        <p>Cotton và nỉ mềm trên da, giặt nhiều vẫn giữ form, mặc cả ngày không thấy nặng.</p>
-      </div>
-      <div class="about-value reveal">
-        <t:icon name="palette"/>
-        <h2 class="h-2">Màu dễ phối</h2>
-        <p>Trắng ngà, đen, navy, xanh biển nhạt, xám và be cát: món nào cũng mặc chung được với nhau.</p>
-      </div>
-      <div class="about-value reveal">
-        <t:icon name="package"/>
-        <h2 class="h-2">Bộ sưu tập nhỏ</h2>
-        <p>Ít mẫu nhưng kỹ, chọn lọc theo từng mùa để tủ đồ của bạn gọn mà vẫn đủ dùng.</p>
-      </div>
-    </section>
+    <%-- 6. Dòng chữ đậm --%>
+    <p class="about-line reveal">Nếu một món đồ không đủ mềm, đủ thoáng và đủ dễ phối, chúng tôi không làm.</p>
 
-    <%-- 4. Khối ảnh và chữ --%>
-    <section class="about-split" data-stagger>
-      <div class="media media--4x5 reveal"><t:img src="${aboutImage}" alt="Saltair bên bờ biển"/></div>
-      <div class="about-split__text reveal">
-        <span class="t-label">Cách chúng tôi làm</span>
-        <h2 class="h-1">Giữ mọi thứ đơn giản.</h2>
-        <p>Mỗi món đồ đều đi qua cùng một câu hỏi: bạn có muốn mặc nó vào buổi sáng nhiều nắng không? Nếu câu trả lời là có, nó mới được vào bộ sưu tập.</p>
-        <p>Chúng tôi chọn form rộng vừa phải, đường may gọn và màu trung tính, để bạn tự thêm phong cách của riêng mình.</p>
-      </div>
-    </section>
-
-    <%-- 5. Kêu gọi hành động --%>
-    <section class="dark-text reveal">
-      <span class="dark-text__label">Sẵn sàng cho ngày nắng</span>
-      <h2 class="h-1 dark-text__title">Chọn cho mình món đồ đầu tiên.</h2>
-      <p class="dark-text__body">Xem toàn bộ sản phẩm của Saltair, từ áo thun, hoodie, áo khoác đến quần.</p>
-      <a class="btn btn--white mt-32" href="${ctx}/products">Xem sản phẩm <t:icon name="arrow-right"/></a>
+    <%-- 7. Kêu gọi hành động --%>
+    <section class="about-statement about-statement--solid">
+      <p class="about-statement__text reveal">Chọn cho mình món đồ đầu tiên.</p>
+      <a class="btn btn--white reveal" href="${ctx}/products">Xem sản phẩm</a>
     </section>
 
   </jsp:body>

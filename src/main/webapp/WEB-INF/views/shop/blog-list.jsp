@@ -9,8 +9,8 @@
     blogs   List<Blog>   bài viết đã xuất bản, mới nhất trước (dùng title, slug, summary, content, coverImage, createdAt)
   Không có form.
 --%>
-<t:layout title="Blog" nav="blog" description="Gợi ý phối đồ, chọn size và bảo quản quần áo từ Saltair.">
-  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/catalog.css"></jsp:attribute>
+<t:layout title="Blog" nav="blog" bodyClass="blog-page" description="Gợi ý phối đồ, chọn size và bảo quản quần áo từ Saltair.">
+  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/catalog.css?v=6"></jsp:attribute>
   <jsp:body>
 
     <header class="page-head cat-enter">
@@ -25,7 +25,7 @@
             <%-- Ước lượng thời gian đọc: khoảng 1.100 ký tự mỗi phút, tối thiểu 1 phút --%>
             <c:set var="readMinutes" value="${fn:length(b.content) / 1100 + 1}"/>
             <a class="blog-card reveal" href="${ctx}/blog/detail?slug=${fn:escapeXml(b.slug)}">
-              <div class="media media--4x5"><t:img src="${b.coverImage}" alt="${b.title}"/></div>
+              <div class="media blog-card__media"><t:img src="${b.coverImage}" alt="${b.title}"/></div>
               <div class="blog-card__body">
                 <div class="blog-card__meta">
                   <span><fmt:formatDate value="${b.createdAt}" pattern="dd/MM/yyyy"/></span>

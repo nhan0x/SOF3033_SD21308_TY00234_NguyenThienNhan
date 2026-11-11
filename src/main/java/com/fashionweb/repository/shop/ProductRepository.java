@@ -33,7 +33,9 @@ public class ProductRepository {
             + "(SELECT COUNT(*) FROM reviews r WHERE r.product_id = p.id AND r.is_hidden = 0) AS review_count, "
             + "COALESCE((SELECT SUM(od.quantity) FROM order_details od JOIN orders o ON o.id = od.order_id "
             + "  WHERE od.product_id = p.id AND o.status <> 'CANCELLED'), 0) AS sold_count, "
-            + "COALESCE((SELECT SUM(v.stock) FROM product_variants v WHERE v.product_id = p.id), 0) AS stock_total "
+            + "COALESCE((SELECT SUM(v.stock) FROM product_variants v WHERE v.product_id = p.id), 0) AS stock_total, "
+            // Ảnh thứ hai trong khung ảnh (#82), thẻ sản phẩm hiện khi rê chuột (#89)
+            + "(SELECT pi.image FROM product_images pi WHERE pi.product_id = p.id ORDER BY pi.sort_order, pi.id LIMIT 1 OFFSET 1) AS hover_image "
             + "FROM products p JOIN categories c ON c.id = p.category_id ";
 
     /** Chỉ sản phẩm đang bán: chưa xóa mềm và danh mục chưa xóa mềm. */
@@ -248,6 +250,26 @@ public class ProductRepository {
         } catch (SQLException e) {
             throw new DataAccessException("Lỗi đọc sản phẩm theo id", e);
         }
+    }
+
+    /**
+     * Ảnh của khung ảnh trang chi tiết (bảng product_images), theo sort_order. Rỗng nếu sản phẩm chưa có ảnh phụ.
+     */
+    public List<String> findImages(int productId) {
+        List<String> list = new ArrayList<>();
+        try (Connection con = DBContext.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                     "SELECT image FROM product_images WHERE product_id = ? ORDER BY sort_order, id")) {
+            ps.setInt(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(rs.getString("image"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Lỗi đọc ảnh sản phẩm", e);
+        }
+        return list;
     }
 
     /**
@@ -583,6 +605,7 @@ public class ProductRepository {
         p.setReviewCount(rs.getInt("review_count"));
         p.setSoldCount(rs.getInt("sold_count"));
         p.setStockTotal(rs.getInt("stock_total"));
+        p.setHoverImage(rs.getString("hover_image"));
         return p;
     }
 }

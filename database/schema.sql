@@ -5,7 +5,7 @@ USE saltair;
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS blogs, banners, reviews, order_details, orders, vouchers,
-                     wishlists, cart_items, carts, product_variants, products,
+                     wishlists, cart_items, carts, product_variants, product_images, products,
                      sizes, colors, categories, addresses, login_codes, password_resets, users;
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -102,6 +102,16 @@ CREATE TABLE products (
   INDEX (price),
   CHECK (price > 0),
   FOREIGN KEY (category_id) REFERENCES categories (id)
+) ENGINE=InnoDB;
+
+CREATE TABLE product_images (
+  id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  product_id  INT UNSIGNED NOT NULL,
+  image       VARCHAR(255) NOT NULL,
+  sort_order  INT          NOT NULL DEFAULT 0,
+  PRIMARY KEY (id),
+  INDEX (product_id, sort_order),
+  FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE product_variants (

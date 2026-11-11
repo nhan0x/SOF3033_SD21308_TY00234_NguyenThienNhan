@@ -13,7 +13,7 @@
   Form (POST /cart): action=update (itemId, quantity) | action=remove (itemId)
 --%>
 <t:layout title="Giỏ hàng" nav="shop">
-  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/shopping.css"></jsp:attribute>
+  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/shopping.css?v=5"></jsp:attribute>
   <jsp:attribute name="scripts"><script src="${ctx}/assets/js/pages/shopping.js" defer></script></jsp:attribute>
   <jsp:body>
     <c:set var="cartEmpty" value="${empty cart or empty cart.items}"/>

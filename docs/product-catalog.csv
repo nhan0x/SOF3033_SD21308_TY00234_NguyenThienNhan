@@ -1,0 +1,25 @@
+id,slug,name,category_slug,category_name,price,colors,main_color,item_en,image_file,status
+1,ao-thun-co-tron,Áo thun cổ tròn,ao-thun-polo,Áo thun và Polo,199000,trang-nga|den|xanh-navy,trang-nga,classic crew-neck cotton t-shirt with short sleeves,ao-thun-co-tron.jpg,done
+2,ao-thun-oversize,Áo thun oversize,ao-thun-polo,Áo thun và Polo,249000,trang-nga|xam|be-cat,trang-nga,oversized boxy-fit cotton t-shirt with dropped shoulders,ao-thun-oversize.jpg,done
+3,ao-thun-ke-soc-ngang,Áo thun kẻ sọc ngang,ao-thun-polo,Áo thun và Polo,279000,xanh-navy|xanh-bien-nhat,xanh-navy,crew-neck cotton t-shirt with thin off-white horizontal stripes,ao-thun-ke-soc-ngang.jpg,done
+4,ao-polo,Áo polo,ao-thun-polo,Áo thun và Polo,329000,trang-nga|xanh-navy|xanh-bien-nhat,trang-nga,short-sleeve pique polo shirt with a small collar and two-button placket,ao-polo.jpg,done
+5,ao-ba-lo,Áo ba lỗ,ao-thun-polo,Áo thun và Polo,199000,trang-nga|den|be-cat,trang-nga,ribbed cotton tank top,ao-ba-lo.jpg,done
+6,ao-thun-dai-tay,Áo thun dài tay,ao-thun-polo,Áo thun và Polo,349000,den|xam|be-cat,den,long-sleeve crew-neck cotton t-shirt,ao-thun-dai-tay.jpg,done
+7,hoodie-co-ban,Hoodie cơ bản,ao-ni-hoodie,Áo nỉ và Hoodie,499000,xam|den|be-cat,xam,classic pullover hoodie with drawstring and kangaroo pocket,hoodie-co-ban.jpg,done
+8,ao-ni-co-tron,Áo nỉ cổ tròn,ao-ni-hoodie,Áo nỉ và Hoodie,429000,xam|xanh-navy|trang-nga,xam,crew-neck sweatshirt in brushed fleece with ribbed cuffs and hem,ao-ni-co-tron.jpg,done
+9,hoodie-zip,Hoodie khóa kéo,ao-ni-hoodie,Áo nỉ và Hoodie,549000,den|xam|xanh-navy,den,full-zip hoodie with drawstring and two front pockets,hoodie-zip.jpg,done
+10,ao-len-mong,Áo len mỏng,ao-ni-hoodie,Áo nỉ và Hoodie,399000,be-cat|xanh-bien-nhat|xam,be-cat,lightweight fine-knit crew-neck sweater,ao-len-mong.jpg,done
+11,ao-ni-co-lo,Áo nỉ cổ lọ,ao-ni-hoodie,Áo nỉ và Hoodie,459000,den|trang-nga|be-cat,den,mock-neck sweatshirt with ribbed cuffs and hem,ao-ni-co-lo.jpg,done
+12,hoodie-oversize,Hoodie oversize,ao-ni-hoodie,Áo nỉ và Hoodie,599000,trang-nga|xanh-bien-nhat|xam,trang-nga,oversized pullover hoodie with dropped shoulders,hoodie-oversize.jpg,done
+13,ao-khoac-gio,Áo khoác gió,ao-khoac,Áo khoác,599000,xanh-navy|den|xanh-bien-nhat,xanh-navy,lightweight windbreaker jacket with zip front and hood,ao-khoac-gio.jpg,done
+14,ao-khoac-bomber,Áo khoác bomber,ao-khoac,Áo khoác,699000,den|xanh-navy|be-cat,den,classic bomber jacket with ribbed collar cuffs and hem,ao-khoac-bomber.jpg,done
+15,ao-khoac-jeans,Áo khoác jeans,ao-khoac,Áo khoác,799000,xanh-bien-nhat|xanh-navy,xanh-bien-nhat,denim trucker jacket with button front and chest pockets,ao-khoac-jeans.jpg,done
+16,ao-khoac-linen,Áo khoác linen,ao-khoac,Áo khoác,749000,be-cat|trang-nga,be-cat,relaxed linen overshirt jacket with button front and chest pockets,ao-khoac-linen.jpg,done
+17,ao-khoac-du,Áo khoác dù,ao-khoac,Áo khoác,549000,den|xam|xanh-navy,den,lightweight nylon parachute jacket with zip front and stand collar,ao-khoac-du.jpg,done
+18,ao-khoac-chong-nang,Áo khoác chống nắng,ao-khoac,Áo khoác,499000,xam|xanh-bien-nhat|be-cat,xam,thin lightweight UV-protection zip jacket with hood,ao-khoac-chong-nang.jpg,done
+19,quan-short,Quần short,quan,Quần,299000,be-cat|den|xanh-navy,be-cat,casual cotton chino shorts that end above the knee,quan-short.jpg,done
+20,quan-ong-suong,Quần dài ống suông,quan,Quần,449000,den|xam|be-cat,den,straight-leg relaxed trousers in cotton twill,quan-ong-suong.jpg,done
+21,quan-jogger,Quần jogger,quan,Quần,429000,xam|den|xanh-navy,xam,jogger sweatpants with elastic cuffs and drawstring waist,quan-jogger.jpg,done
+22,quan-kaki,Quần kaki,quan,Quần,499000,be-cat|xanh-navy|xam,be-cat,slim-straight khaki chino trousers,quan-kaki.jpg,done
+23,quan-short-bien,Quần short biển,quan,Quần,349000,xanh-bien-nhat|xanh-navy|trang-nga,xanh-bien-nhat,quick-dry board shorts with drawstring waist,quan-short-bien.jpg,done
+24,quan-linen,Quần linen,quan,Quần,549000,be-cat|trang-nga|xanh-bien-nhat,be-cat,relaxed linen trousers with drawstring waist,quan-linen.jpg,done

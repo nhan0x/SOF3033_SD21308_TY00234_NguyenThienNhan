@@ -11,15 +11,15 @@
     baseUrl      : String              - "/orders?status=..." không có page (cho t:pagination)
     status       : String              - PENDING | SHIPPING | COMPLETED | CANCELLED, rỗng = tất cả
     statusCounts : Map<String,Integer> - số đơn theo trạng thái, khóa: ALL, PENDING, SHIPPING, COMPLETED, CANCELLED
+    welcomeProducts : List<Product>    - chỉ có khi khách chưa có đơn nào: sản phẩm cho dải ảnh ở thẻ chào mừng (#85)
   Form (đều gửi tới /order, xử lý ở OrderDetailServlet):
     POST /order action=cancel          fields: orderCode, cancelReason, returnTo=orders   (hộp thoại dùng chung)
     POST /order action=confirmReceived fields: orderCode, returnTo=orders
 --%>
-<t:layout title="Đơn hàng của tôi">
-  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/shopping.css"></jsp:attribute>
+<t:account-layout title="Đơn hàng" active="orders">
+  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/shopping.css?v=5"></jsp:attribute>
   <jsp:attribute name="scripts"><script src="${ctx}/assets/js/pages/shopping.js" defer></script></jsp:attribute>
   <jsp:body>
-    <c:set var="accountActive" value="orders"/>
     <c:set var="dialogReturn" value="orders"/>
     <c:choose>
       <c:when test="${status == 'PENDING'}"><c:set var="statusName" value="Chờ xác nhận"/></c:when>
@@ -29,13 +29,31 @@
       <c:otherwise><c:set var="statusName" value=""/></c:otherwise>
     </c:choose>
 
-    <div class="account">
-      <%@ include file="/WEB-INF/views/common/account-nav.jspf" %>
+    <c:set var="noOrders" value="${statusCounts['ALL'] == 0}"/>
+        <div class="acct-head sh-enter">
+          <h1 class="acct-title">Đơn hàng</h1>
+        </div>
+        <%@ include file="/WEB-INF/views/common/flash.jspf" %>
 
-      <div>
-        <h1 class="h-1 sh-enter">Đơn hàng của tôi</h1>
-        <div class="mt-16"><%@ include file="/WEB-INF/views/common/flash.jspf" %></div>
+        <c:if test="${noOrders}">
+          <%-- Chưa có đơn nào: thẻ chào mừng kèm dải ảnh sản phẩm xếp nghiêng --%>
+          <section class="acct-card acct-welcome sh-enter" style="--d:1" aria-labelledby="acct-welcome-title">
+            <div class="acct-welcome__text">
+              <h2 class="acct-welcome__title" id="acct-welcome-title">Chào mừng, sẵn sàng mua sắm?</h2>
+              <p>Khi bạn đặt hàng, đơn sẽ xuất hiện ở đây để bạn theo dõi.</p>
+              <a class="btn btn--primary" href="${ctx}/products">Mua sắm ngay</a>
+            </div>
+            <c:if test="${not empty welcomeProducts}">
+              <div class="acct-welcome__strip" aria-hidden="true">
+                <c:forEach items="${welcomeProducts}" var="p" varStatus="s">
+                  <a class="acct-welcome__tile" style="--i:${s.index}" href="${ctx}/product?slug=${fn:escapeXml(p.slug)}" tabindex="-1"><t:img src="${empty p.imageThumb ? p.image : p.imageThumb}" alt="" eager="true"/></a>
+                </c:forEach>
+              </div>
+            </c:if>
+          </section>
+        </c:if>
 
+        <c:if test="${not noOrders}">
         <nav class="sh-filters sh-enter" style="--d:1" aria-label="Lọc đơn hàng theo trạng thái">
           <a class="chip${empty status ? ' is-active' : ''}" href="${ctx}/orders"<c:if test="${empty status}"> aria-current="page"</c:if>>Tất cả <span class="sh-chip-count">${statusCounts['ALL']}</span></a>
           <a class="chip${status == 'PENDING' ? ' is-active' : ''}" href="${ctx}/orders?status=PENDING"<c:if test="${status == 'PENDING'}"> aria-current="page"</c:if>>Chờ xác nhận <span class="sh-chip-count">${statusCounts['PENDING']}</span></a>
@@ -46,20 +64,11 @@
 
         <c:choose>
           <c:when test="${empty orders}">
-            <div class="empty-state sh-enter" style="--d:2">
+            <div class="acct-card empty-state sh-enter" style="--d:2">
               <t:icon name="package"/>
-              <c:choose>
-                <c:when test="${empty status}">
-                  <h2 class="h-2">Bạn chưa có đơn hàng nào</h2>
-                  <p>Khi đặt hàng, đơn của bạn sẽ xuất hiện ở đây để bạn theo dõi.</p>
-                  <a class="btn btn--primary" href="${ctx}/products">Bắt đầu mua sắm</a>
-                </c:when>
-                <c:otherwise>
-                  <h2 class="h-2">Chưa có đơn nào ở trạng thái “<c:out value="${statusName}"/>”</h2>
-                  <p>Thử chọn trạng thái khác hoặc xem tất cả đơn hàng của bạn.</p>
-                  <a class="btn btn--outline" href="${ctx}/orders">Xem tất cả đơn</a>
-                </c:otherwise>
-              </c:choose>
+              <h2 class="h-2">Chưa có đơn nào ở trạng thái “<c:out value="${statusName}"/>”</h2>
+              <p>Thử chọn trạng thái khác hoặc xem tất cả đơn hàng của bạn.</p>
+              <a class="btn btn--outline" href="${ctx}/orders">Xem tất cả đơn</a>
             </div>
           </c:when>
 
@@ -125,9 +134,8 @@
             <t:pagination page="${orderPage.page}" totalPages="${orderPage.totalPages}" baseUrl="${baseUrl}"/>
           </c:otherwise>
         </c:choose>
-      </div>
-    </div>
+        </c:if>
 
     <%@ include file="/WEB-INF/views/order/_order-cancel-dialog.jspf" %>
   </jsp:body>
-</t:layout>
+</t:account-layout>

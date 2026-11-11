@@ -16,8 +16,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Bắt buộc đăng nhập cho các trang của khách hàng: /cart, /checkout, /order, /orders, /order-success,
- * /profile, /addresses, /wishlist. Khai báo và thứ tự chạy nằm trong web.xml.
+ * Bắt buộc đăng nhập cho các trang của khách hàng: /order, /orders, /profile, /addresses, /wishlist.
+ * /cart, /checkout, /order-success mở được khi chưa đăng nhập (giỏ lưu trong session). Khai báo nằm trong web.xml.
  *
  * <p>Chưa đăng nhập thì chuyển sang /login?redirect=&lt;trang cần quay lại&gt;. Với GET là chính trang đang mở;
  * với POST (ví dụ bấm "Thêm vào giỏ" ở trang sản phẩm) là trang trước đó (Referer) để khách quay lại đúng chỗ.

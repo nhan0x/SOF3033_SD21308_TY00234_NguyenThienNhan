@@ -5,6 +5,7 @@ import com.fashionweb.exception.ValidationException;
 import com.fashionweb.model.User;
 import com.fashionweb.service.cart.CartService;
 import com.fashionweb.service.shop.ProductService;
+import com.fashionweb.util.WebUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,8 +17,13 @@ import java.io.IOException;
 import java.net.URI;
 
 /**
- * GET /cart : giỏ hàng của khách đang đăng nhập (AuthFilter bắt buộc đăng nhập).
+ * GET /cart : giỏ hàng. Khách đã đăng nhập dùng giỏ trong DB; khách chưa đăng nhập dùng giỏ trong session
+ * (WebUtil.guestCart, itemId chính là variantId), đăng nhập thì được gộp vào giỏ trong DB.
  * JSP: /WEB-INF/views/cart/cart.jsp. Thuộc tính: cart (Cart), shippingFee (long), suggestions (List&lt;Product&gt;).
+ * <p>GET /cart?fragment=drawer : chỉ trả phần ruột của khung giỏ hàng trượt (#84), JSP /WEB-INF/views/cart/_cart-drawer.jsp.
+ * <p>POST có header Accept: application/json (gọi bằng fetch từ khung giỏ hàng): không redirect, trả
+ * {"ok": true|false, "message": "...", "count": số dòng trong giỏ}.
+ * <p>POST action=note (note): lưu ghi chú đơn hàng vào session (AppConstant.SESSION_CART_NOTE), trang thanh toán điền sẵn.
  * <p>POST (PRG, cập nhật session cartCount sau mỗi thay đổi):
  * <ul>
  *   <li>action=add (variantId, quantity): thêm vào giỏ, quay lại trang sản phẩm (Referer) kèm thông báo.</li>
@@ -36,10 +42,15 @@ public class CartServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = (User) req.getSession().getAttribute(AppConstant.SESSION_USER);
-        var cart = cartService.getCart(user.getId());
+        var cart = user != null ? cartService.getCart(user.getId()) : cartService.getGuestCart(WebUtil.guestCart(req));
         req.getSession().setAttribute(AppConstant.SESSION_CART_COUNT, cart.getItemCount());
         req.setAttribute("cart", cart);
         req.setAttribute("shippingFee", AppConstant.SHIPPING_FEE);
+        if ("drawer".equals(req.getParameter("fragment"))) {
+            resp.setHeader("Cache-Control", "no-store");
+            req.getRequestDispatcher("/WEB-INF/views/cart/_cart-drawer.jsp").forward(req, resp);
+            return;
+        }
         req.setAttribute("suggestions", productService.bestSellers(SUGGESTION_COUNT));
         req.getRequestDispatcher("/WEB-INF/views/cart/cart.jsp").forward(req, resp);
     }
@@ -50,6 +61,10 @@ public class CartServlet extends HttpServlet {
         User user = (User) session.getAttribute(AppConstant.SESSION_USER);
         String action = req.getParameter("action");
         String back = "/cart";
+        String accept = req.getHeader("Accept");
+        boolean json = accept != null && accept.contains("application/json");
+        String message = null;
+        boolean ok = true;
         try {
             switch (action == null ? "" : action) {
                 case "add" -> {
@@ -58,14 +73,37 @@ public class CartServlet extends HttpServlet {
                     if (variantId <= 0) {
                         throw new ValidationException(null, "Vui lòng chọn màu và size.");
                     }
-                    cartService.addItem(user.getId(), variantId, parseInt(req.getParameter("quantity"), 1));
-                    flash(session, "Đã thêm vào giỏ hàng.", "success");
+                    int quantity = parseInt(req.getParameter("quantity"), 1);
+                    if (user != null) {
+                        cartService.addItem(user.getId(), variantId, quantity);
+                    } else {
+                        cartService.addGuestItem(WebUtil.guestCart(req), variantId, quantity);
+                    }
+                    message = "Đã thêm vào giỏ hàng.";
                 }
-                case "update" -> cartService.updateQuantity(user.getId(),
-                        parseInt(req.getParameter("itemId"), 0), parseInt(req.getParameter("quantity"), 1));
+                case "update" -> {
+                    int itemId = parseInt(req.getParameter("itemId"), 0);
+                    int quantity = parseInt(req.getParameter("quantity"), 1);
+                    if (user != null) {
+                        cartService.updateQuantity(user.getId(), itemId, quantity);
+                    } else {
+                        cartService.updateGuestQuantity(WebUtil.guestCart(req), itemId, quantity);
+                    }
+                }
                 case "remove" -> {
-                    cartService.removeItem(user.getId(), parseInt(req.getParameter("itemId"), 0));
-                    flash(session, "Đã xóa sản phẩm khỏi giỏ hàng.", "success");
+                    int itemId = parseInt(req.getParameter("itemId"), 0);
+                    if (user != null) {
+                        cartService.removeItem(user.getId(), itemId);
+                    } else {
+                        WebUtil.guestCart(req).remove(itemId);
+                    }
+                    message = "Đã xóa sản phẩm khỏi giỏ hàng.";
+                }
+                case "note" -> {
+                    String note = req.getParameter("note");
+                    note = note == null ? "" : note.trim();
+                    session.setAttribute(AppConstant.SESSION_CART_NOTE, note.length() > 500 ? note.substring(0, 500) : note);
+                    message = "Đã lưu ghi chú.";
                 }
                 default -> {
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -73,9 +111,20 @@ public class CartServlet extends HttpServlet {
                 }
             }
         } catch (ValidationException e) {
-            flash(session, e.getMessage(), "error");
+            ok = false;
+            message = e.getMessage();
         }
-        session.setAttribute(AppConstant.SESSION_CART_COUNT, cartService.countItems(user.getId()));
+        int count = user != null ? cartService.countItems(user.getId()) : WebUtil.guestCart(req).size();
+        session.setAttribute(AppConstant.SESSION_CART_COUNT, count);
+        if (json) {
+            resp.setContentType("application/json;charset=UTF-8");
+            resp.setHeader("Cache-Control", "no-store");
+            resp.getWriter().write("{\"ok\":" + ok + ",\"count\":" + count + ",\"message\":\"" + jsonEscape(message) + "\"}");
+            return;
+        }
+        if (message != null) {
+            flash(session, message, ok ? "success" : "error");
+        }
         resp.sendRedirect(req.getContextPath() + back);
     }
 
@@ -96,6 +145,30 @@ public class CartServlet extends HttpServlet {
             }
         }
         return "/cart";
+    }
+
+    private static String jsonEscape(String s) {
+        if (s == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(s.length() + 8);
+        for (char ch : s.toCharArray()) {
+            switch (ch) {
+                case '"' -> sb.append("\\\"");
+                case '\\' -> sb.append("\\\\");
+                case '\n' -> sb.append("\\n");
+                case '\r' -> sb.append("\\r");
+                case '\t' -> sb.append("\\t");
+                default -> {
+                    if (ch < 0x20 || ch == '<' || ch == '>' || ch == '&') {
+                        sb.append(String.format("\\u%04x", (int) ch));
+                    } else {
+                        sb.append(ch);
+                    }
+                }
+            }
+        }
+        return sb.toString();
     }
 
     private static int parseInt(String s, int fallback) {

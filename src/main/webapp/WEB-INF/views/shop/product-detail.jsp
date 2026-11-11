@@ -7,7 +7,7 @@
   CHI TIẾT SẢN PHẨM  (GET /product?slug=... -> ProductDetailServlet; POST /product action=review | deleteReview cũng do Servlet này xử lý)
   Thuộc tính request:
     product          Product            sản phẩm kèm colors, sizes, variants (không tìm thấy thì Servlet trả 404)
-    galleryImages    List<String>       danh sách ảnh (hiện 0 hoặc 1 phần tử; nhiều ảnh thì tự thêm ô)
+    galleryImages    List<String>       ảnh khung ảnh, tối đa 4: 2 ảnh sản phẩm rồi 2 ảnh người mẫu mặc (chưa có ảnh phụ thì 0 hoặc 1 phần tử)
     reviews          List<Review>       đánh giá hiển thị, mới nhất trước
     relatedProducts  List<Product>      sản phẩm cùng danh mục
     canReview        boolean            true khi được viết đánh giá (khách có đơn Hoàn thành chứa sản phẩm)
@@ -25,19 +25,13 @@
 --%>
 <c:set var="soldOut" value="${product.stockTotal == 0}"/>
 <t:layout title="${product.name}" nav="shop" bodyClass="pdp-page" description="${product.description}">
-  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/catalog.css"></jsp:attribute>
-  <jsp:attribute name="scripts"><script src="${ctx}/assets/js/pages/catalog.js" defer></script></jsp:attribute>
+  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/catalog.css?v=6"></jsp:attribute>
+  <jsp:attribute name="scripts"><script src="${ctx}/assets/js/pages/catalog.js?v=2" defer></script></jsp:attribute>
   <jsp:body>
-
-    <nav class="breadcrumb" aria-label="Đường dẫn">
-      <a href="${ctx}/home">Trang chủ</a><span aria-hidden="true">/</span>
-      <a href="${ctx}/products?category=${fn:escapeXml(product.categorySlug)}"><c:out value="${product.categoryName}"/></a><span aria-hidden="true">/</span>
-      <span aria-current="page"><c:out value="${product.name}"/></span>
-    </nav>
 
     <div class="pdp">
       <%-- Cột trái: ảnh --%>
-      <div class="pdp__gallery cat-enter">
+      <div class="pdp__gallery${fn:length(galleryImages) > 1 ? ' pdp__gallery--grid' : ''} cat-enter">
         <c:choose>
           <c:when test="${not empty galleryImages}">
             <c:forEach items="${galleryImages}" var="img" varStatus="s">
@@ -84,12 +78,9 @@
             </div>
           </div>
 
-          <%-- Size --%>
+          <%-- Size: nhãn hiện size đang chọn, bảng size mở ngay bên dưới (giống trang tham chiếu) --%>
           <div>
-            <p class="pdp__label" id="pdp-size-label">
-              <span>Size</span>
-              <button type="button" class="link-plain t-small" data-dialog-open="size-guide">Bảng size</button>
-            </p>
+            <p class="pdp__label" id="pdp-size-label"><span>Size: <b data-selected-size></b></span></p>
             <div class="pill-options" role="radiogroup" aria-labelledby="pdp-size-label">
               <c:forEach items="${product.sizes}" var="sz">
                 <label class="pill-option">
@@ -101,44 +92,84 @@
             <p class="pdp__stock" data-stock-hint aria-live="polite"><c:choose><c:when test="${soldOut}">Sản phẩm tạm hết hàng.</c:when><c:otherwise>Chọn size để xem số lượng còn lại.</c:otherwise></c:choose></p>
           </div>
 
-          <%-- Số lượng, thêm vào giỏ, yêu thích --%>
-          <div class="pdp__actions">
-            <div class="qty">
-              <button type="button" data-qty-minus aria-label="Giảm số lượng"${soldOut ? ' disabled' : ''}><t:icon name="minus"/></button>
-              <input type="number" name="quantity" value="1" min="1" max="10" inputmode="numeric" aria-label="Số lượng"${soldOut ? ' disabled' : ''}>
-              <button type="button" data-qty-plus aria-label="Tăng số lượng"${soldOut ? ' disabled' : ''}><t:icon name="plus"/></button>
+          <details class="size-guide" data-size-guide>
+            <summary>
+              <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 17L17 4L20 7L7 20L4 17Z" stroke="currentColor" stroke-width="1.8"/><path d="M14 7L17 10" stroke="currentColor" stroke-width="1.5"/><path d="M11 10L13 12" stroke="currentColor" stroke-width="1.5"/><path d="M8 13L11 16" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="size-guide__link">Bảng size</span>
+            </summary>
+            <div class="size-guide__content">
+              <p class="size-guide__note">Số đo tính bằng cm, có thể lệch 1 đến 2 cm. Thích mặc rộng thì chọn lên một size.</p>
+              <c:choose>
+                <c:when test="${product.categorySlug == 'quan'}">
+                  <table class="size-guide__table">
+                    <tbody>
+                      <tr><th>Size</th><th>S</th><th>M</th><th>L</th><th>XL</th></tr>
+                      <tr><td>Vòng eo</td><td>72 - 76</td><td>77 - 81</td><td>82 - 86</td><td>87 - 91</td></tr>
+                      <tr><td>Dài quần</td><td>98</td><td>100</td><td>102</td><td>104</td></tr>
+                    </tbody>
+                  </table>
+                </c:when>
+                <c:otherwise>
+                  <table class="size-guide__table">
+                    <tbody>
+                      <tr><th>Size</th><th>S</th><th>M</th><th>L</th><th>XL</th></tr>
+                      <tr><td>Vòng ngực</td><td>96</td><td>100</td><td>104</td><td>108</td></tr>
+                      <tr><td>Dài áo</td><td>66</td><td>68</td><td>70</td><td>72</td></tr>
+                    </tbody>
+                  </table>
+                </c:otherwise>
+              </c:choose>
             </div>
+          </details>
+
+          <%-- Thêm vào giỏ: nút rộng hết cột. Số lượng mặc định 1, đổi trong khung giỏ hàng (#84) --%>
+          <input type="hidden" name="quantity" value="1">
+          <div class="pdp__buy">
             <c:choose>
               <c:when test="${soldOut}">
-                <button type="button" class="btn btn--primary" disabled>Hết hàng</button>
+                <button type="button" class="btn btn--primary btn--block" disabled>Hết hàng</button>
               </c:when>
               <c:otherwise>
-                <button type="submit" class="btn btn--primary" data-add-main><t:icon name="bag"/> <span data-add-label>Thêm vào giỏ</span></button>
+                <button type="submit" class="btn btn--primary btn--block" data-add-main><span data-add-label>Thêm vào giỏ</span></button>
               </c:otherwise>
             </c:choose>
-            <button type="button" class="heart-btn${inWishlist ? ' is-on' : ''}" data-wish data-wish-url="${ctx}/wishlist" data-product-id="${product.id}" aria-pressed="${inWishlist}" aria-label="Yêu thích"><t:icon name="heart" size="md"/></button>
           </div>
         </form>
 
-        <div class="note-box">
-          <t:icon name="truck" size="md"/>
-          <p class="t-small">Phí ship cố định <strong><t:price value="${shippingFee}"/></strong>, thanh toán khi nhận hàng. Nhập mã giảm giá hợp lệ ở bước thanh toán để được miễn phí ship.</p>
+        <div class="pdp__meta">
+          <p>Phí ship cố định <t:price value="${shippingFee}"/> · Miễn phí khi dùng mã giảm giá</p>
+          <button type="button" class="pdp__wish${inWishlist ? ' is-on' : ''}" data-wish data-wish-url="${ctx}/wishlist" data-product-id="${product.id}" aria-pressed="${inWishlist}"><t:icon name="heart"/><span>Yêu thích</span></button>
         </div>
 
-        <div class="accordion-group">
-          <details class="accordion" open>
-            <summary><span class="bold">Mô tả</span><t:icon name="chevron-down"/></summary>
+        <div class="accordion-group pdp__accordions">
+          <details class="accordion">
+            <summary><span>Mô tả</span><svg class="accordion__arrow" aria-hidden="true" width="11" height="7" viewBox="0 0 11 7" fill="none"><path stroke="currentColor" stroke-width="1.5" d="M10 1 5.5 5.5 1 1"/></svg></summary>
             <div class="accordion__body"><p><c:out value="${product.description}"/></p></div>
           </details>
           <details class="accordion">
-            <summary><span class="bold">Chất liệu và bảo quản</span><t:icon name="chevron-down"/></summary>
+            <summary><span>Chất liệu</span><svg class="accordion__arrow" aria-hidden="true" width="11" height="7" viewBox="0 0 11 7" fill="none"><path stroke="currentColor" stroke-width="1.5" d="M10 1 5.5 5.5 1 1"/></svg></summary>
             <div class="accordion__body">
               <p>Vải cotton mềm, thoáng và dễ chịu khi mặc cả ngày. Thành phần chi tiết ghi trên nhãn của từng sản phẩm.</p>
-              <p>Giặt với nước mát, lộn trái khi giặt, không dùng chất tẩy mạnh. Phơi nơi thoáng, tránh nắng gắt để giữ màu. Ủi ở nhiệt độ thấp.</p>
             </div>
           </details>
           <details class="accordion">
-            <summary><span class="bold">Vận chuyển</span><t:icon name="chevron-down"/></summary>
+            <summary><span>Hướng dẫn bảo quản</span><svg class="accordion__arrow" aria-hidden="true" width="11" height="7" viewBox="0 0 11 7" fill="none"><path stroke="currentColor" stroke-width="1.5" d="M10 1 5.5 5.5 1 1"/></svg></summary>
+            <div class="accordion__body">
+              <p>Giặt với nước mát, lộn trái khi giặt, không dùng chất tẩy mạnh.</p>
+              <p>Phơi nơi thoáng, tránh nắng gắt để giữ màu. Ủi ở nhiệt độ thấp.</p>
+            </div>
+          </details>
+          <details class="accordion">
+            <summary><span>Giao hàng và đổi trả</span><svg class="accordion__arrow" aria-hidden="true" width="11" height="7" viewBox="0 0 11 7" fill="none"><path stroke="currentColor" stroke-width="1.5" d="M10 1 5.5 5.5 1 1"/></svg></summary>
+            <div class="accordion__body">
+              <p>Phí ship cố định <t:price value="${shippingFee}"/> cho mỗi đơn, giao tận nơi và thanh toán khi nhận hàng. Đơn dùng mã giảm giá hợp lệ được miễn phí ship.</p>
+              <p>Bạn có thể hủy đơn khi đơn còn ở trạng thái Chờ xác nhận, trong mục Đơn hàng của tài khoản.</p>
+            </div>
+          </details>
+        </div>
+          </details>
+          <details class="accordion">
+            <summary><span>Vận chuyển</span><svg class="accordion__arrow" aria-hidden="true" width="11" height="7" viewBox="0 0 11 7" fill="none"><path stroke="currentColor" stroke-width="1.5" d="M10 1 5.5 5.5 1 1"/></svg></summary>
             <div class="accordion__body">
               <p>Phí ship cố định <t:price value="${shippingFee}"/> cho mỗi đơn, giao tận nơi và thanh toán khi nhận hàng.</p>
               <p>Đơn dùng mã giảm giá hợp lệ được miễn phí ship.</p>
@@ -275,41 +306,6 @@
       </div>
     </c:if>
 
-    <%-- Bảng size tham khảo --%>
-    <dialog class="dialog" id="size-guide" aria-labelledby="size-guide-title">
-      <div class="dialog__head">
-        <h2 class="h-2" id="size-guide-title">Bảng size tham khảo</h2>
-        <button type="button" class="icon-btn" data-dialog-close aria-label="Đóng"><t:icon name="x" size="md"/></button>
-      </div>
-      <div class="dialog__body">
-        <p class="t-small t-muted mb-16">Đây là bảng size tham khảo, số đo thực tế có thể lệch 1 đến 2 cm. Đồ unisex thường rộng hơn đồ thông thường, nếu thích mặc rộng hãy chọn lên một size.</p>
-        <c:choose>
-          <c:when test="${product.categorySlug == 'quan'}">
-            <table class="table size-table">
-              <thead><tr><th>Size</th><th>Vòng eo (cm)</th><th>Dài quần (cm)</th></tr></thead>
-              <tbody>
-                <tr><td>S</td><td>72 - 76</td><td>98</td></tr>
-                <tr><td>M</td><td>77 - 81</td><td>100</td></tr>
-                <tr><td>L</td><td>82 - 86</td><td>102</td></tr>
-                <tr><td>XL</td><td>87 - 91</td><td>104</td></tr>
-              </tbody>
-            </table>
-          </c:when>
-          <c:otherwise>
-            <table class="table size-table">
-              <thead><tr><th>Size</th><th>Vòng ngực (cm)</th><th>Dài áo (cm)</th></tr></thead>
-              <tbody>
-                <tr><td>S</td><td>96</td><td>66</td></tr>
-                <tr><td>M</td><td>100</td><td>68</td></tr>
-                <tr><td>L</td><td>104</td><td>70</td></tr>
-                <tr><td>XL</td><td>108</td><td>72</td></tr>
-              </tbody>
-            </table>
-          </c:otherwise>
-        </c:choose>
-      </div>
-      <div class="dialog__foot"><button type="button" class="btn btn--primary" data-dialog-close>Đã hiểu</button></div>
-    </dialog>
 
   </jsp:body>
 </t:layout>

@@ -65,22 +65,35 @@
     start();
   });
 
-  /* ---------- Header: sticky; như a-dam: cuộn xuống thì ẩn, cuộn lên thì hiện; có nền khi đã cuộn ---------- */
+  /* ---------- Header (#87, đo trên a-dam): luôn dính trên cùng, không ẩn khi cuộn, cao cố định.
+     Header trong suốt trên banner chuyển sang nền trắng khi cuộn quá 200px. ---------- */
   const header = $('.header');
   if (header) {
-    let lastY = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      header.classList.toggle('is-scrolled', y > 8);
-      const menuOpen = header.matches(':focus-within') || $('.has-dropdown.is-open', header);
-      const hide = y > header.offsetHeight + 120 && y > lastY + 4 && !menuOpen;
-      const show = y < lastY - 4 || y <= header.offsetHeight;
-      if (hide) header.classList.add('is-hidden');
-      else if (show) header.classList.toggle('is-hidden', false);
-      lastY = y;
-    };
+    const SOLID_AT = 200;
+    const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > SOLID_AT);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+
+    /* Menu điện thoại: khung phủ phần dưới header; nút ba gạch đổi thành dấu X */
+    const menuBtn = $('[data-menu-toggle]', header);
+    const menu = $('#mobile-nav', header);
+    if (menuBtn && menu) {
+      const setMenu = (open) => {
+        if (open) document.documentElement.style.setProperty('--menu-top', Math.max(0, Math.round(header.getBoundingClientRect().bottom)) + 'px');
+        header.classList.toggle('is-menu-open', open);
+        menu.setAttribute('aria-hidden', String(!open));
+        menuBtn.setAttribute('aria-expanded', String(open));
+        menuBtn.setAttribute('aria-label', open ? 'Đóng menu' : 'Mở menu');
+        document.body.style.overflow = open ? 'hidden' : '';
+      };
+      const isOpen = () => header.classList.contains('is-menu-open');
+      menuBtn.addEventListener('click', () => setMenu(!isOpen()));
+      menu.addEventListener('click', (e) => { if (e.target === menu) setMenu(false); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) { setMenu(false); menuBtn.focus(); } });
+      // Mở tìm kiếm hoặc giỏ hàng từ header thì đóng menu trước; quay ngang hoặc kéo rộng cửa sổ cũng đóng
+      $$('[data-search-open], [data-cart-open]', header).forEach((b) => b.addEventListener('click', () => { if (isOpen()) setMenu(false); }, true));
+      window.matchMedia('(min-width: 991px)').addEventListener('change', (e) => { if (e.matches && isOpen()) setMenu(false); });
+    }
   }
 
   /* ---------- Nút: bọc chữ để có hiệu ứng chữ cuộn lên khi rê chuột (như a-dam) ----------
@@ -125,6 +138,12 @@
   const overlay = $('#overlay');
   const searchDrawer = $('#search-drawer');
   const searchOpenBtns = $$('[data-search-open]');
+  const cartDrawer = $('#cart-drawer');
+  const cartOpenBtns = $$('[data-cart-open]');
+  // Hai khung trượt từ phải dùng chung hiệu ứng, lớp phủ và focus trap
+  const slideDrawers = [searchDrawer, cartDrawer].filter(Boolean);
+  const drawerBtns = (d) => (d === searchDrawer ? searchOpenBtns : cartOpenBtns);
+  const openSlideDrawer = () => slideDrawers.find((d) => d.classList.contains('is-open'));
   const lockScroll = (lock) => { document.body.style.overflow = lock ? 'hidden' : ''; };
   let lastTrigger = null;
   let willChangeTimer = null;
@@ -142,22 +161,22 @@
   }
 
   function closeAllPanels() {
-    const wasSearchOpen = searchDrawer?.classList.contains('is-open');
-    const anyOpen = wasSearchOpen || $$('.drawer.is-open').length > 0;
+    const slide = openSlideDrawer();
+    const anyOpen = slide || $$('.drawer.is-open').length > 0;
     if (!anyOpen) return;
 
-    if (wasSearchOpen) {
-      markDrawerAnimating(searchDrawer);
-      searchDrawer.classList.remove('is-open');
-      searchDrawer.setAttribute('aria-hidden', 'true');
-      searchOpenBtns.forEach((b) => b.setAttribute('aria-expanded', 'false'));
+    if (slide) {
+      markDrawerAnimating(slide);
+      slide.classList.remove('is-open');
+      slide.setAttribute('aria-hidden', 'true');
+      drawerBtns(slide).forEach((b) => b.setAttribute('aria-expanded', 'false'));
     }
     $$('.drawer.is-open').forEach((p) => p.classList.remove('is-open'));
     overlay?.classList.remove('is-open');
     lockScroll(false);
 
-    if (wasSearchOpen) {
-      const target = lastTrigger || searchOpenBtns[0];
+    if (slide) {
+      const target = lastTrigger || drawerBtns(slide)[0];
       target?.focus();
       lastTrigger = null;
     }
@@ -168,10 +187,10 @@
     closeAccount(false);
     closeAllPanels();
     lastTrigger = triggerEl || null;
-    if (panel === searchDrawer) {
-      markDrawerAnimating(searchDrawer);
-      searchDrawer.setAttribute('aria-hidden', 'false');
-      searchOpenBtns.forEach((b) => b.setAttribute('aria-expanded', 'true'));
+    if (slideDrawers.includes(panel)) {
+      markDrawerAnimating(panel);
+      panel.setAttribute('aria-hidden', 'false');
+      drawerBtns(panel).forEach((b) => b.setAttribute('aria-expanded', 'true'));
     }
     panel.classList.add('is-open');
     overlay?.classList.add('is-open');
@@ -192,24 +211,173 @@
       closeAllPanels();
       return;
     }
-    // Focus trap trong khung tìm kiếm khi đang mở
-    if (e.key === 'Tab' && searchDrawer?.classList.contains('is-open')) {
+    // Focus trap trong khung tìm kiếm hoặc khung giỏ hàng khi đang mở
+    const trap = openSlideDrawer();
+    if (e.key === 'Tab' && trap) {
       const focusables = $$(
         'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-        searchDrawer
+        trap
       ).filter((el) => !el.closest('[hidden]') && el.offsetParent !== null);
       if (!focusables.length) return;
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
-      if (e.shiftKey && (document.activeElement === first || !searchDrawer.contains(document.activeElement))) {
+      if (e.shiftKey && (document.activeElement === first || !trap.contains(document.activeElement))) {
         e.preventDefault();
         last.focus();
-      } else if (!e.shiftKey && (document.activeElement === last || !searchDrawer.contains(document.activeElement))) {
+      } else if (!e.shiftKey && (document.activeElement === last || !trap.contains(document.activeElement))) {
         e.preventDefault();
         first.focus();
       }
     }
   });
+
+  /* ---------- Khung giỏ hàng trượt từ phải (#84) ---------- */
+  if (cartDrawer && !DEMO) {
+    const cartUrl = cartDrawer.dataset.cartUrl;
+    const slot = $('[data-cart-content]', cartDrawer);
+    const countEls = $$('[data-cart-count]', cartDrawer);
+
+    const setCount = (n) => {
+      countEls.forEach((el) => { el.textContent = String(n); });
+      $$('.cart-badge').forEach((b) => {
+        const changed = b.textContent !== String(n);
+        b.textContent = String(n);
+        b.hidden = n <= 0;
+        if (changed && n > 0) { b.classList.remove('is-bump'); void b.offsetWidth; b.classList.add('is-bump'); }
+      });
+    };
+
+    /** Nạp lại ruột khung giỏ từ server. keepErrors: Map itemId -> thông báo lỗi cần hiện lại sau khi nạp. */
+    const refresh = async (keepErrors) => {
+      slot.classList.add('is-loading');
+      try {
+        const res = await fetch(cartUrl + '?fragment=drawer', { headers: { 'X-Requested-With': 'fetch' }, credentials: 'same-origin' });
+        if (!res.ok) throw new Error(String(res.status));
+        slot.innerHTML = await res.text();
+        const root = $('.cart-drawer__content', slot);
+        setCount(Number(root?.dataset.count) || 0);
+        keepErrors?.forEach((msg, id) => {
+          const box = $('[data-cart-line][data-item-id="' + id + '"] [data-cart-error]', slot);
+          if (box) { box.textContent = msg; box.hidden = false; }
+        });
+      } catch (err) {
+        slot.innerHTML = '<div class="cart-drawer__body cart-drawer__body--empty"><p class="cart-drawer__empty-title">Không tải được giỏ hàng</p><a class="btn btn--primary" href="' + cartUrl + '">Mở trang giỏ hàng</a></div>';
+      } finally {
+        slot.classList.remove('is-loading');
+      }
+    };
+
+    /** Gửi một thao tác giỏ hàng, trả {ok, message, count}. */
+    const post = async (params) => {
+      const res = await fetch(cartUrl, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        credentials: 'same-origin',
+        body: new URLSearchParams(params).toString(),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      return res.json();
+    };
+
+    const closePops = () => {
+      $$('[data-cart-pop]', slot).forEach((p) => { p.classList.remove('is-open'); p.setAttribute('aria-hidden', 'true'); });
+      $('.cart-pop-overlay', slot)?.classList.remove('is-open');
+      $$('[data-cart-pop-open]', slot).forEach((b) => b.setAttribute('aria-expanded', 'false'));
+    };
+
+    const openCart = (trigger) => {
+      openPanel(cartDrawer, '[data-panel-close]', trigger);
+      refresh();
+    };
+    cartOpenBtns.forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); openCart(b); }));
+
+    const change = async (line, params) => {
+      const id = line.dataset.itemId;
+      slot.classList.add('is-loading');
+      try {
+        const data = await post(Object.assign({ itemId: id }, params));
+        await refresh(data.ok ? null : new Map([[id, data.message]]));
+      } catch (err) {
+        slot.classList.remove('is-loading');
+        toast('Không cập nhật được giỏ hàng, vui lòng thử lại.');
+      }
+    };
+
+    slot.addEventListener('click', (e) => {
+      const line = e.target.closest('[data-cart-line]');
+      const step = e.target.closest('[data-cart-qty]');
+      if (step && line) {
+        const input = $('[data-cart-input]', line);
+        const next = (Number(input.value) || 1) + Number(step.dataset.cartQty);
+        // Giảm về 0 thì xóa dòng (giống trang tham chiếu)
+        change(line, next <= 0 ? { action: 'remove' } : { action: 'update', quantity: next });
+        return;
+      }
+      if (e.target.closest('[data-cart-remove]') && line) {
+        change(line, { action: 'remove' });
+        return;
+      }
+      const popOpen = e.target.closest('[data-cart-pop-open]');
+      if (popOpen) {
+        const target = document.getElementById(popOpen.dataset.cartPopOpen);
+        const wasOpen = target.classList.contains('is-open');
+        closePops();
+        if (!wasOpen) {
+          target.classList.add('is-open');
+          target.setAttribute('aria-hidden', 'false');
+          $('.cart-pop-overlay', slot)?.classList.add('is-open');
+          popOpen.setAttribute('aria-expanded', 'true');
+          setTimeout(() => $('textarea, button', target)?.focus(), reduceMotion ? 20 : 150);
+        }
+        return;
+      }
+      if (e.target.closest('[data-cart-pop-close]')) closePops();
+    });
+    slot.addEventListener('change', (e) => {
+      const input = e.target.closest('[data-cart-input]');
+      const line = input?.closest('[data-cart-line]');
+      if (!line) return;
+      const q = Math.floor(Number(input.value));
+      change(line, !Number.isFinite(q) || q <= 0 ? { action: 'remove' } : { action: 'update', quantity: q });
+    });
+    slot.addEventListener('submit', async (e) => {
+      const form = e.target.closest('[data-cart-note]');
+      if (!form) return;
+      e.preventDefault();
+      try {
+        const data = await post({ action: 'note', note: form.elements.note.value });
+        toast(data.message || 'Đã lưu ghi chú.');
+        closePops();
+      } catch (err) {
+        toast('Không lưu được ghi chú, vui lòng thử lại.');
+      }
+    });
+
+    // Thêm vào giỏ ở bất kỳ trang nào: không chuyển trang, mở khung giỏ hàng
+    document.addEventListener('submit', async (e) => {
+      const form = e.target;
+      if (!(form instanceof HTMLFormElement) || form.method.toLowerCase() !== 'post') return;
+      if (!form.elements.action || form.elements.action.value !== 'add' || !/\/cart$/.test(form.getAttribute('action') || '')) return;
+      e.preventDefault();
+      const btns = $$('button[type="submit"]', form).concat($$('button[form="' + form.id + '"]'));
+      const fields = Object.fromEntries(new FormData(form));
+      const wasDisabled = btns.map((b) => b.disabled);
+      btns.forEach((b) => { b.disabled = true; });
+      try {
+        const data = await post(fields);
+        if (data.ok) {
+          setCount(data.count);
+          openCart(e.submitter || btns[0]);
+        } else {
+          toast(data.message || 'Không thêm được vào giỏ hàng.');
+        }
+      } catch (err) {
+        toast('Không thêm được vào giỏ hàng, vui lòng thử lại.');
+      } finally {
+        btns.forEach((b, i) => { b.disabled = wasDisabled[i]; });
+      }
+    });
+  }
 
   /* ---------- Khung tài khoản (#75): popover trồi lên, đăng nhập bằng email ---------- */
   const accountPop = $('#account-pop');

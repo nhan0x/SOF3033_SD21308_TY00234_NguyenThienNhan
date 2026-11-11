@@ -30,17 +30,16 @@
         3. AdminFilter     chỉ ADMIN vào /admin
     -->
     <filter><filter-name>EncodingFilter</filter-name><filter-class>com.fashionweb.filter.EncodingFilter</filter-class></filter>
+    <filter><filter-name>StaticCacheFilter</filter-name><filter-class>com.fashionweb.filter.StaticCacheFilter</filter-class></filter>
     <filter><filter-name>AuthFilter</filter-name><filter-class>com.fashionweb.filter.AuthFilter</filter-class></filter>
     <filter><filter-name>AdminFilter</filter-name><filter-class>com.fashionweb.filter.AdminFilter</filter-class></filter>
 
     <filter-mapping><filter-name>EncodingFilter</filter-name><url-pattern>/*</url-pattern></filter-mapping>
+    <filter-mapping><filter-name>StaticCacheFilter</filter-name><url-pattern>/assets/*</url-pattern></filter-mapping>
     <filter-mapping>
         <filter-name>AuthFilter</filter-name>
-        <url-pattern>/cart</url-pattern>
-        <url-pattern>/checkout</url-pattern>
         <url-pattern>/order</url-pattern>
         <url-pattern>/orders</url-pattern>
-        <url-pattern>/order-success</url-pattern>
         <url-pattern>/profile</url-pattern>
         <url-pattern>/addresses</url-pattern>
         <url-pattern>/wishlist</url-pattern>

@@ -15,7 +15,7 @@ import java.io.IOException;
 
 /**
  * GET /profile : thông tin tài khoản (Customer, AuthFilter bắt buộc đăng nhập).
- * <p>JSP: /WEB-INF/views/account/profile.jsp. Request attributes: user, orderCount, wishlistCount, errors.
+ * <p>JSP: /WEB-INF/views/account/profile.jsp. Request attributes: user, addresses, errors.
  * <p>POST action=updateProfile (fullName, phone; email và role không sửa được). Xong redirect kèm flash, lỗi thì hiện lại form.
  * Không còn đổi mật khẩu: đăng nhập bằng email + mã 6 số (#74).
  */
@@ -54,8 +54,7 @@ public class ProfileServlet extends HttpServlet {
     private void show(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         int userId = WebUtil.currentUser(req).getId();
         req.setAttribute("user", accountService.findUser(userId));
-        req.setAttribute("orderCount", accountService.countOrders(userId));
-        req.setAttribute("wishlistCount", accountService.countWishlist(userId));
+        req.setAttribute("addresses", accountService.findAddresses(userId));
         req.getRequestDispatcher("/WEB-INF/views/account/profile.jsp").forward(req, resp);
     }
 }

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Saltair - Nhóm account: đăng nhập, đăng ký, quên/đặt lại mật khẩu, hồ sơ, sổ địa chỉ, yêu thích.
+   Saltair - Nhóm account: đăng nhập, trang nhập mã, khung khu vực tài khoản (#85), hồ sơ, sổ địa chỉ, yêu thích.
    Chỉ bổ sung cho style.css (không sửa file dùng chung). Phẳng, không box-shadow, chỉ dùng biến màu có sẵn.
    Điểm ngắt dùng chung: 990px và 750px.
    ========================================================================== */
@@ -27,24 +27,25 @@
 
 /* ---------- Trang nhập mã 6 số (#75) ---------- */
 .code-page { background: var(--white); min-height: 100vh; }
-.code-page__logo { display: flex; justify-content: center; padding-top: 56px; }
-.code-page__logo img { height: 48px; width: auto; }
-.code-page__main { width: min(526px, 100% - 32px); margin: 56px auto 64px; text-align: center; }
-.code-page__title { font-size: 28px; line-height: 34px; font-weight: 700; margin: 0 0 8px; }
-.code-page__sub { margin: 0 0 32px; color: var(--navy-60); font-size: 15px; }
-.code-page__sub strong { color: var(--navy); font-weight: 700; }
-.code-page__link { color: var(--navy); font-weight: 700; text-decoration: underline; }
+.code-page__logo { display: flex; justify-content: center; padding-top: 48px; }
+.code-page__logo img { height: 56px; width: auto; }
+.code-page__main { width: min(526px, 100% - 32px); margin: clamp(72px, 16vh, 180px) auto 64px; text-align: left; }
+.code-page__title { font-size: 28px; line-height: 34px; font-weight: 800; margin: 0 0 10px; }
+.code-page__sub { margin: 0 0 28px; color: var(--navy-60); font-size: 16px; }
+.code-page__sub strong { color: var(--navy-60); font-weight: 500; }
+.code-page__link { color: var(--cobalt); font-weight: 500; margin-left: 10px; }
+.code-page__link:hover { text-decoration: underline; }
 .code-page .alert { text-align: left; }
 
 .otp { display: grid; gap: 14px; }
-.otp__boxes { position: relative; display: grid; grid-template-columns: repeat(6, minmax(0, 78px)); justify-content: center; gap: 12px; }
+.otp__boxes { position: relative; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
 .otp__box {
-  width: 100%; height: 98px; border-radius: 12px; border: 1px solid #d9dbdd; background: var(--white);
-  text-align: center; font: inherit; font-size: 32px; font-weight: 700; color: var(--navy);
+  width: 100%; height: 100px; border-radius: 16px; border: 1px solid var(--line-2); background: var(--white);
+  text-align: center; font: inherit; font-size: 32px; font-weight: 600; color: var(--navy);
   font-variant-numeric: tabular-nums; caret-color: var(--navy); outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, opacity .2s ease;
 }
-.otp__box:focus { border-color: var(--navy); box-shadow: 0 0 0 1px var(--navy); }
+.otp__box:focus { border-color: var(--cobalt); box-shadow: 0 0 0 1px var(--cobalt); }
 .otp__spinner { position: absolute; left: 50%; top: 50%; margin: -12px 0 0 -12px; width: 24px; height: 24px; display: none; color: var(--navy); }
 .otp.is-busy .otp__box { opacity: .3; }
 .otp.is-busy .otp__spinner { display: block; }
@@ -55,16 +56,17 @@
 .otp__msg { margin: 0; font-size: 14px; color: var(--danger); }
 .otp__msg a { color: inherit; font-weight: 700; text-decoration: underline; }
 
-.code-page__resend { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 28px; font-size: 15px; color: var(--navy-60); }
-.code-page__resend button { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; color: var(--navy); cursor: pointer; text-decoration: underline; }
-.code-page__resend button:disabled { color: var(--navy-50); text-decoration: none; cursor: default; }
-.code-page__terms { margin-top: 40px; font-size: 13px; color: var(--navy-60); }
+.code-page__resend { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 24px; font-size: 15px; color: var(--navy-60); }
+.code-page__resend button { background: none; border: 0; padding: 0; font: inherit; font-weight: 500; color: var(--cobalt); cursor: pointer; }
+.code-page__resend button:disabled { color: var(--navy-50); cursor: default; }
+.code-page__terms { margin-top: 40px; font-size: 14px; text-align: center; color: var(--navy-60); }
+.code-page__terms u { color: var(--navy-60); }
 
 @media (max-width: 560px) {
   .code-page__logo { padding-top: 32px; }
-  .code-page__main { margin-top: 32px; }
+  .code-page__main { margin-top: 48px; }
   .otp__boxes { gap: 8px; }
-  .otp__box { height: 64px; font-size: 26px; border-radius: 10px; }
+  .otp__box { height: 64px; font-size: 26px; border-radius: 12px; }
 }
 
 /* Khối dev: chỉ hiện khi demoMode = true */
@@ -84,33 +86,89 @@
 .state-icon--ok { color: var(--success); }
 .state-icon--warn { color: var(--danger); }
 
-/* ---------- Khu vực tài khoản ---------- */
-.account__main { display: grid; gap: 32px; min-width: 0; align-content: start; }
-.account__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-.account__head p { margin-top: 8px; }
-.account .card { padding: 32px; }
-.card__head { display: grid; gap: 6px; margin-bottom: 24px; }
+/* ==========================================================================
+   Khu vực tài khoản (#85): trang riêng, nền xám nhạt, header tối giản.
+   Cột trái là các mục điều hướng chữ lớn (mục đang mở màu đen, mục khác màu xám),
+   cột phải là nội dung nằm trong thẻ trắng bo góc lớn, viền mảnh.
+   ========================================================================== */
+.acct-page { background: #f5f5f5; }
+.acct-header { position: sticky; top: 0; z-index: 100; height: 72px; padding: 0 var(--gutter); display: flex; align-items: center; justify-content: space-between; gap: 16px; background: var(--white); border-bottom: 1px solid var(--line); }
+.acct-header__logo img { height: 40px; width: auto; }
+.acct-header__user { width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; transition: border-color var(--t) var(--ease), background-color var(--t) var(--ease); }
+.acct-header__user:hover, .acct-header__user[aria-expanded="true"] { border-color: var(--navy); background: var(--bg); }
+.acct-page .account-pop { top: 84px; }
+
+.acct { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 72px; width: 100%; max-width: 1240px; min-height: calc(100vh - 72px - 69px); margin: 0 auto; padding: 56px var(--gutter) 96px; align-items: start; align-content: start; }
+.acct__nav { position: sticky; top: 128px; display: grid; justify-items: start; gap: 8px; }
+.acct__link { font-size: 32px; line-height: 40px; font-weight: 800; letter-spacing: -.01em; color: rgba(0, 14, 31, .32); transition: color .25s var(--ease); }
+.acct__link:hover { color: var(--navy-60); }
+.acct__link.is-active { color: var(--navy); }
+.acct__logout { margin-top: 24px; font-size: 14px; font-weight: 500; color: var(--navy-60); text-decoration: underline; text-underline-offset: 3px; transition: color var(--t) var(--ease); }
+.acct__logout:hover { color: var(--navy); }
+.acct__main { display: grid; gap: 20px; min-width: 0; align-content: start; }
+.acct__main > .alert { margin-bottom: 0; }
+
+.acct-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; min-height: 40px; }
+.acct-head p { margin-top: 6px; font-size: 14px; }
+.acct-title { font-size: 24px; line-height: 32px; font-weight: 700; }
+
+.acct-card { background: var(--white); border: 1px solid var(--line); border-radius: 20px; padding: 32px; min-width: 0; }
+.acct-card__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.acct-card__title { font-size: 18px; line-height: 24px; font-weight: 700; }
+.acct-edit { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 50%; color: var(--navy-60); transition: background-color var(--t) var(--ease), color var(--t) var(--ease); }
+.acct-edit:hover { background: var(--bg); color: var(--navy); }
+.acct-add { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: var(--pill); font-size: 14px; font-weight: 700; transition: background-color var(--t) var(--ease); }
+.acct-add:hover { background: var(--bg); }
+.acct-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 32px; }
+.acct-field dt { margin-bottom: 4px; font-size: 13px; line-height: 18px; color: var(--navy-60); }
+.acct-field dd { font-weight: 500; overflow-wrap: anywhere; }
+.acct-note { color: var(--navy-60); }
+.acct-addresses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.acct-address { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; transition: border-color var(--t) var(--ease); }
+.acct-address:hover { border-color: var(--line-2); }
+.acct-address__text { display: grid; gap: 2px; min-width: 0; color: var(--navy-60); overflow-wrap: anywhere; }
+.acct-address__tag { margin-bottom: 6px; font-size: 13px; line-height: 18px; color: var(--navy-60); }
+.acct-address__name { color: var(--navy); font-weight: 700; }
+.acct-more { display: inline-block; margin-top: 20px; font-size: 14px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; transition: opacity var(--t) var(--ease); }
+.acct-more:hover { opacity: .6; }
+
+/* Thẻ chào mừng khi chưa có đơn hàng: chữ bên trái, dải ảnh sản phẩm xếp nghiêng bên phải */
+.acct-welcome { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(0, 1.15fr); align-items: center; gap: 32px; padding: 48px 40px; overflow: hidden; }
+.acct-welcome__text { display: grid; justify-items: start; gap: 12px; }
+.acct-welcome__text p { color: var(--navy-60); margin-bottom: 12px; }
+.acct-welcome__title { font-size: 28px; line-height: 34px; font-weight: 800; letter-spacing: -.01em; }
+.acct-welcome__strip { display: flex; align-items: center; min-width: 0; padding: 16px 0 16px 28px; }
+.acct-welcome__tile { flex: none; width: 124px; aspect-ratio: 3 / 4; margin-left: -28px; overflow: hidden; border-radius: 14px; border: 3px solid var(--white); background: #ededed; box-shadow: 0 8px 24px rgba(0, 14, 31, .12); rotate: -6deg; transition: rotate .35s var(--ease), translate .35s var(--ease); animation: acct-tile-in .6s var(--ease) both; animation-delay: calc(var(--i, 0) * 80ms + 120ms); }
+.acct-welcome__tile:nth-child(2n) { rotate: 5deg; translate: 0 10px; }
+.acct-welcome__tile:nth-child(3n) { rotate: -3deg; translate: 0 -8px; }
+.acct-welcome__tile:hover { rotate: 0deg; translate: 0 -10px; z-index: 1; }
+.acct-welcome__tile img, .acct-welcome__tile .ph { width: 100%; height: 100%; object-fit: cover; }
+@keyframes acct-tile-in { from { opacity: 0; transform: translateY(24px); } }
+
+/* Danh sách đơn, chi tiết đơn, sổ địa chỉ, yêu thích đặt trong khung tài khoản: thẻ trắng trên nền xám */
+.acct .sh-filters { margin: 0; }
+.acct .sh-filters .chip { background: var(--white); }
+.acct .sh-filters .chip.is-active { background: var(--navy); }
+.acct .sh-order { background: var(--white); border-radius: 20px; }
+.acct .empty-state { background: var(--white); border: 1px solid var(--line); border-radius: 20px; padding: 72px 24px; }
+.acct-order .sh-detail-head { margin: 16px 0 32px; }
+.acct-order .h-1 { font-size: 24px; line-height: 32px; }
+.acct-order .sh-info, .acct-order .summary { border-radius: 14px; }
+.acct .wish-grid { background: var(--white); border: 1px solid var(--line); border-radius: 20px; padding: 20px; }
+.acct .pagination { margin-top: 12px; }
+
+.acct-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding: 24px var(--gutter); border-top: 1px solid var(--line); background: var(--white); font-size: 13px; color: var(--navy-60); }
+.acct-footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.acct-footer a { transition: color var(--t) var(--ease); }
+.acct-footer a:hover { color: var(--navy); }
+
 .form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
 .input[readonly] { background: var(--bg); color: var(--navy-60); cursor: not-allowed; }
 .input[readonly]:hover { border-color: var(--line); }
 
-.profile-head { display: flex; align-items: center; gap: 20px; }
-.profile-head > div { min-width: 0; }
-.profile-head h1, .profile-head p { overflow-wrap: anywhere; }
-.avatar { width: 72px; height: 72px; flex: none; border-radius: 50%; background: var(--navy); color: var(--white); display: grid; place-items: center; font-size: 28px; line-height: 1; font-weight: 700; transition: transform var(--t) ease; }
-.profile-head:hover .avatar { transform: scale(1.05); }
-
-.stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.stat { border: 1px solid var(--line); padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; transition: border-color var(--t) var(--ease), background-color var(--t) var(--ease); }
-.stat:hover { border-color: var(--navy); background: var(--bg); }
-.stat__label { display: block; color: var(--navy-60); font-size: 13px; line-height: 18.2px; margin-bottom: 4px; }
-.stat__value { display: flex; align-items: center; min-height: 41px; }
-.stat > .icon { transition: translate var(--t) ease; }
-.stat:hover > .icon { translate: 4px 0; }
-
 /* ---------- Sổ địa chỉ ---------- */
 .address-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.address-card { border: 1px solid var(--line); padding: 24px; display: flex; flex-direction: column; gap: 16px; transition: border-color var(--t) var(--ease), opacity .6s var(--ease), transform .6s var(--ease); transition-delay: 0s, calc(var(--i, 0) * 70ms), calc(var(--i, 0) * 70ms); }
+.address-card { background: var(--white); border: 1px solid var(--line); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 16px; transition: border-color var(--t) var(--ease), opacity .6s var(--ease), transform .6s var(--ease); transition-delay: 0s, calc(var(--i, 0) * 70ms), calc(var(--i, 0) * 70ms); }
 .address-card:hover { border-color: var(--line-2); }
 .address-card.is-default { border-color: var(--navy); }
 .address-card__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -139,15 +197,32 @@ dialog.dialog .dialog__body { flex: 1; min-height: 0; display: grid; gap: 20px; 
 /* ---------- Responsive ---------- */
 @media (max-width: 990px) {
   .auth__form { padding: 40px var(--gutter) 64px; }
+  /* Cột trái xếp lên trên thành một hàng, cuộn ngang được khi không đủ chỗ */
+  .acct { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-top: 32px; }
+  .acct__nav { position: static; display: flex; align-items: baseline; gap: 6px 24px; flex-wrap: wrap; }
+  .acct__link { font-size: 26px; line-height: 34px; }
+  .acct__logout { margin: 0 0 0 auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .acct-welcome__tile { animation: none; transition: none; }
 }
 
 @media (max-width: 750px) {
   .auth__form { padding-block: 32px 56px; }
   .auth-card { padding: 36px 24px; }
-  .account .card { padding: 20px; }
-  .profile-head { gap: 14px; }
-  .avatar { width: 56px; height: 56px; font-size: 22px; }
-  .stat-row { grid-template-columns: 1fr; }
+  .acct-header { height: 64px; }
+  .acct-header__logo img { height: 34px; }
+  .acct-page .account-pop { top: 16px; }
+  .acct { padding: 24px var(--gutter) 64px; min-height: calc(100vh - 64px - 69px); }
+  .acct__link { font-size: 22px; line-height: 30px; }
+  .acct-card { padding: 20px; border-radius: 16px; }
+  .acct-fields, .acct-addresses { grid-template-columns: 1fr; }
+  .acct-welcome { grid-template-columns: 1fr; padding: 28px 20px 8px; gap: 8px; }
+  .acct-welcome__title { font-size: 24px; line-height: 30px; }
+  .acct-welcome__strip { margin: 0 -20px; padding: 24px 0 28px 42px; }
+  .acct-welcome__tile { width: 96px; margin-left: -22px; }
+  .acct .sh-order, .acct .empty-state, .acct .wish-grid, .address-card { border-radius: 16px; }
+  .acct .sh-filters { margin-inline: calc(var(--gutter) * -1); }
   .address-grid { grid-template-columns: 1fr; }
   .address-card { padding: 20px; }
   .wish-grid.product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding-inline: 0; }

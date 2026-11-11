@@ -47,8 +47,8 @@
   </c:otherwise>
 </c:choose>
 
-<t:layout title="${heading}" nav="${navKey}" description="${intro}">
-  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/catalog.css"></jsp:attribute>
+<t:layout title="${heading}" nav="${navKey}" description="${intro}" bodyClass="plp-page">
+  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/catalog.css?v=6"></jsp:attribute>
   <jsp:attribute name="scripts"><script src="${ctx}/assets/js/pages/catalog.js" defer></script></jsp:attribute>
   <jsp:body>
 
@@ -68,7 +68,7 @@
             <button type="button" class="is-active" data-view="dense" aria-pressed="true" aria-label="Hiển thị nhiều cột"><t:icon name="grid-3"/></button>
           </div>
         </c:if>
-        <button type="button" class="btn btn--outline btn--sm" data-drawer-open="filter-drawer" aria-haspopup="dialog" aria-controls="filter-drawer">
+        <button type="button" class="toolbar__filter" data-drawer-open="filter-drawer" aria-haspopup="dialog" aria-controls="filter-drawer">
           <t:icon name="sliders"/> Lọc và sắp xếp<c:if test="${fn:length(activeFilters) > 0}"> <span class="filter-count" aria-label="${fn:length(activeFilters)} bộ lọc đang bật">${fn:length(activeFilters)}</span></c:if>
         </button>
       </div>

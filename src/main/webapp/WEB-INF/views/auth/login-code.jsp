@@ -30,8 +30,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="${ctx}/assets/css/style.css">
-  <link rel="stylesheet" href="${ctx}/assets/css/pages/account.css">
+  <link rel="stylesheet" href="${ctx}/assets/css/style.css?v=2">
+  <link rel="stylesheet" href="${ctx}/assets/css/pages/account.css?v=4">
 </head>
 <body class="code-page">
 <%@ include file="/WEB-INF/views/common/icons.jspf" %>
@@ -70,7 +70,7 @@
     <button type="submit" data-resend-wait="${resendWait}">Gửi lại</button>
   </form>
 
-  <p class="code-page__terms">Khi tiếp tục, bạn đồng ý với Điều khoản sử dụng của Saltair.</p>
+  <p class="code-page__terms">Khi tiếp tục, bạn đồng ý với <u>Điều khoản sử dụng</u> của Saltair.</p>
 </main>
 
 <script>

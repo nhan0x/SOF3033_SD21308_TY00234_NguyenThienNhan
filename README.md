@@ -3,6 +3,10 @@
 > Giảng viên hướng dẫn: **ThS. Trần Quang Bình (binhtq7 - Thầy Mười Giáo)**  
 > 📖 [Xem Cẩm nang hướng dẫn chi tiết từng tuần (Tuần 1 đến Tuần 6)](./docs/HUONG_DAN_CHI_TIET_6_TUAN.md)
 
+
+> 🛍️ **Dự án thực hiện: Saltair - website bán quần áo basic** (Java 17, Jakarta Servlet/JSP, MySQL 8, Tomcat 11).
+> Bối cảnh dự án: [`docs/SPECIFICATIONS.md`](docs/SPECIFICATIONS.md) · Nghiệp vụ chi tiết: [`project.md`](project.md) · Quy trình phát triển: [`docs/HUONG_DAN_QUY_TRINH_PHAT_TRIEN.md`](docs/HUONG_DAN_QUY_TRINH_PHAT_TRIEN.md) · Danh sách yêu cầu: [`docs/requirements/`](docs/requirements/README.md)
+
 ---
 
 ## 📌 PHẦN I. SƠ ĐỒ LUỒNG THỰC HIỆN (TIMELINE FLOW)

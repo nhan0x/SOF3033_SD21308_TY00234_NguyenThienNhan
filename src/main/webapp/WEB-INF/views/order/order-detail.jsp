@@ -12,18 +12,14 @@
     POST /order action=cancel          fields: orderCode, cancelReason, returnTo=detail   (hộp thoại dùng chung)
     POST /order action=confirmReceived fields: orderCode, returnTo=detail
 --%>
-<t:layout title="Đơn hàng ${order.orderCode}">
-  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/shopping.css"></jsp:attribute>
+<t:account-layout title="Đơn hàng ${order.orderCode}" active="orders">
+  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/shopping.css?v=5"></jsp:attribute>
   <jsp:attribute name="scripts"><script src="${ctx}/assets/js/pages/shopping.js" defer></script></jsp:attribute>
   <jsp:body>
-    <c:set var="accountActive" value="orders"/>
     <c:set var="dialogReturn" value="detail"/>
     <c:set var="st" value="${order.status}"/>
 
-    <div class="account">
-      <%@ include file="/WEB-INF/views/common/account-nav.jspf" %>
-
-      <div>
+      <div class="acct-card acct-order">
         <a class="sh-back sh-enter" href="${ctx}/orders"><t:icon name="arrow-left"/> Quay lại danh sách đơn hàng</a>
 
         <div class="sh-detail-head sh-enter" style="--d:1">
@@ -173,8 +169,7 @@
           <div class="summary__row summary__total"><span>Tổng cộng</span><span><t:price value="${order.totalAmount}"/></span></div>
         </aside>
       </div>
-    </div>
 
     <%@ include file="/WEB-INF/views/order/_order-cancel-dialog.jspf" %>
   </jsp:body>
-</t:layout>
+</t:account-layout>

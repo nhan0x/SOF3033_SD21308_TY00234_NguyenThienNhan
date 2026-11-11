@@ -15,7 +15,7 @@
 --%>
 <c:set var="isAdmin" value="${mode eq 'admin'}"/>
 <t:layout title="${isAdmin ? 'Đăng nhập quản trị' : 'Đăng nhập'}" description="Đăng nhập hoặc tạo tài khoản Saltair bằng email, không cần mật khẩu.">
-  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/account.css"></jsp:attribute>
+  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/account.css?v=4"></jsp:attribute>
   <jsp:body>
     <div class="auth">
       <div class="auth__media${empty authImage ? '' : ' auth__media--photo'}">

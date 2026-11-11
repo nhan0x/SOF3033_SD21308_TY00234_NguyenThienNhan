@@ -56,7 +56,18 @@ public class OrderService {
      * shippingFee = AppConstant.SHIPPING_FEE, bằng 0 khi có voucher hợp lệ. total = subtotal - discount + shippingFee. Tạo orderCode dạng SAyyyyMMddNNN.
      */
     public Order placeOrder(int userId, Address shippingAddress, String voucherCode, String note) {
-        Cart cart = cartService.getCart(userId);
+        return placeOrder(userId, cartService.getCart(userId), true, shippingAddress, voucherCode, note);
+    }
+
+    /**
+     * Đặt hàng cho khách chưa đăng nhập: giỏ lấy từ session (CartService.getGuestCart), đơn gắn vào tài khoản userId
+     * (tài khoản của email khách nhập). Không đụng tới giỏ trong DB của tài khoản đó.
+     */
+    public Order placeGuestOrder(int userId, Cart guestCart, Address shippingAddress, String voucherCode, String note) {
+        return placeOrder(userId, guestCart, false, shippingAddress, voucherCode, note);
+    }
+
+    private Order placeOrder(int userId, Cart cart, boolean clearDbCart, Address shippingAddress, String voucherCode, String note) {
         if (cart.getItems().isEmpty()) {
             throw new ValidationException(null, "Giỏ hàng đang trống, không thể đặt hàng.");
         }
@@ -128,7 +139,9 @@ public class OrderService {
                 if (voucher != null && !voucherRepository.increaseUsed(con, voucher.getId())) {
                     throw new ValidationException("voucherCode", "Mã giảm giá " + voucher.getCode() + " vừa hết lượt sử dụng.");
                 }
-                cartRepository.deleteAllItemsOfUser(con, userId);
+                if (clearDbCart) {
+                    cartRepository.deleteAllItemsOfUser(con, userId);
+                }
                 con.commit();
             } catch (SQLException | RuntimeException e) {
                 con.rollback();

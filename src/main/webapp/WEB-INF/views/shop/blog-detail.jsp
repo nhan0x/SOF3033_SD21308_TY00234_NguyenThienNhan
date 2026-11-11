@@ -13,7 +13,7 @@
 --%>
 <c:set var="paragraphs" value="${fn:split(blog.content, lineBreaks)}"/>
 <t:layout title="${blog.title}" nav="blog" description="${blog.summary}">
-  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/catalog.css"></jsp:attribute>
+  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/catalog.css?v=6"></jsp:attribute>
   <jsp:attribute name="scripts"><script src="${ctx}/assets/js/pages/catalog.js" defer></script></jsp:attribute>
   <jsp:body>
 

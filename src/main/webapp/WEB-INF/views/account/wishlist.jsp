@@ -12,18 +12,12 @@
   Forms:
     POST /wishlist  action=remove  fields=productId
 --%>
-<t:layout title="Yêu thích" description="Những sản phẩm Saltair bạn đã lưu lại.">
-  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/account.css"></jsp:attribute>
+<t:account-layout title="Yêu thích" active="wishlist" description="Những sản phẩm Saltair bạn đã lưu lại.">
   <jsp:attribute name="scripts"><script src="${ctx}/assets/js/pages/account.js" defer></script></jsp:attribute>
   <jsp:body>
-    <c:set var="accountActive" value="wishlist"/>
-    <div class="account">
-      <%@ include file="/WEB-INF/views/common/account-nav.jspf" %>
-
-      <div class="account__main">
-        <div class="account__head acc-enter">
+        <div class="acct-head acc-enter">
           <div>
-            <h1 class="h-1">Yêu thích</h1>
+            <h1 class="acct-title">Yêu thích</h1>
             <p class="t-muted"><span data-demo-count>${fn:length(wishlistProducts)}</span> sản phẩm bạn đã lưu lại.</p>
           </div>
           <a class="btn btn--outline" href="${ctx}/products">Tiếp tục mua sắm</a>
@@ -52,7 +46,5 @@
           <p>Bấm vào biểu tượng trái tim trên sản phẩm bạn thích để lưu lại và xem sau.</p>
           <a class="btn btn--primary" href="${ctx}/products">Khám phá sản phẩm</a>
         </div>
-      </div>
-    </div>
   </jsp:body>
-</t:layout>
+</t:account-layout>

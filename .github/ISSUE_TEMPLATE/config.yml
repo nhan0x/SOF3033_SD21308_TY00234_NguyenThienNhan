@@ -1,0 +1,6 @@
+blank_issues_enabled: true
+contact_links:
+  # Riêng dự án: sang repo mới thì đổi đường dẫn bên dưới
+  - name: Quy trình phát triển (đọc trước khi tạo issue)
+    url: https://github.com/nhan0x/SOF3033_SD21308_TY00234_NguyenThienNhan/blob/main/docs/HUONG_DAN_QUY_TRINH_PHAT_TRIEN.md
+    about: Nhận yêu cầu → Phân tích → Tạo issue → Code → Test → PR → Merge

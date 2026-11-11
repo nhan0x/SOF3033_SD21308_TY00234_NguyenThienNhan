@@ -23,6 +23,15 @@ public final class AppConstant {
     /** Tên thuộc tính Session lưu số loại sản phẩm trong giỏ để hiện trên menu. */
     public static final String SESSION_CART_COUNT = "cartCount";
 
+    /** Giỏ của khách chưa đăng nhập: Map&lt;variantId, số lượng&gt; giữ thứ tự thêm. Đăng nhập thì gộp vào giỏ trong DB. */
+    public static final String SESSION_GUEST_CART = "guestCart";
+
+    /** Ghi chú đơn hàng khách nhập ở khung giỏ hàng, điền sẵn vào ô ghi chú ở trang thanh toán. */
+    public static final String SESSION_CART_NOTE = "cartNote";
+
+    /** Mã đơn khách chưa đăng nhập vừa đặt trong phiên này, để mở được trang đặt hàng thành công. */
+    public static final String SESSION_GUEST_ORDER = "guestOrderCode";
+
     /** Email đang chờ nhập mã ở luồng khách (#74). Lưu trong session, không đặt lên URL. */
     public static final String SESSION_LOGIN_EMAIL = "loginEmail";
 
