@@ -139,7 +139,6 @@ public class AdminLoginServlet extends HttpServlet {
         req.setAttribute("email", email);
         req.setAttribute("devCode", req.getSession().getAttribute(AppConstant.SESSION_DEV_CODE));
         req.setAttribute("resendWait", authService.resendWaitSeconds(email));
-        req.setAttribute("authImage", LoginServlet.AUTH_IMAGE);
         req.getRequestDispatcher("/WEB-INF/views/auth/login-code.jsp").forward(req, resp);
     }
 }
