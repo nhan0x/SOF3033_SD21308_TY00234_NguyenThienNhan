@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 /**
  * Mã giảm giá: kiểm tra, tính giảm giá, quản lý của Admin.
  *
- * <p>Luồng gọi: Servlet -> Service -> Repository -> MySQL. Quy tắc theo mục "Quy tắc voucher và phí ship" trong project.md.
+ * <p>Luồng gọi: Servlet -> Service -> Repository -> MySQL. Quy tắc theo docs/SPECIFICATIONS.md mục 2.5.
  */
 public class VoucherService {
 
@@ -32,7 +32,7 @@ public class VoucherService {
     private final CategoryRepository categoryRepository = new CategoryRepository();
 
     /**
-     * Kiểm tra theo đúng thứ tự 7 bước trong project.md. Hợp lệ trả Voucher; sai ném VoucherException
+     * Kiểm tra theo đúng thứ tự 7 bước trong docs/SPECIFICATIONS.md mục 2.5. Hợp lệ trả Voucher; sai ném VoucherException
      * với thông báo tiếng Việt riêng cho từng bước.
      */
     public Voucher validate(String code, int userId, Cart cart) throws VoucherException {
