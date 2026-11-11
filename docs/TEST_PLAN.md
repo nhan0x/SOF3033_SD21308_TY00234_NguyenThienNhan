@@ -48,6 +48,6 @@
 7. Tài khoản bị khóa không xin được mã đăng nhập.
 
 ## 6. TIÊU CHÍ HOÀN THÀNH
-* `mvn test`: 100% Pass; GitHub Actions trên `main` báo **xanh**.
+* `mvn test`: 100% Pass; GitHub Actions trên `develop` và `main` báo **xanh**.
 * Các ca trong `TEST_CASES.md` liên quan tới đợt thay đổi đều Pass.
 * 7 luồng ở mục 5 đều chạy được, log Tomcat không có `SEVERE`/`Exception`.
