@@ -29,7 +29,7 @@ Closes #
 
 ## Checklist
 
-- [ ] Nhánh tách từ nhánh phát triển chính, PR vào nhánh đó, đã cập nhật nhánh chính trước khi mở PR
+- [ ] Nhánh tách từ `develop`, PR vào `develop` (chỉ PR `develop` → `main` khi đưa bản ổn định lên), đã `git pull origin develop` trước khi mở PR
 - [ ] Đổi quy tắc nghiệp vụ thì đã cập nhật `docs/SPECIFICATIONS.md`
 - [ ] Ca kiểm thử liên quan trong `docs/TEST_CASES.md` đã điền Pass/Fail, luồng chính trong `docs/TEST_PLAN.md` vẫn chạy
 - [ ] Dùng AI thì đã ghi vào `docs/ai-logs/`

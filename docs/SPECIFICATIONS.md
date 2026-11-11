@@ -76,7 +76,13 @@
 | Voucher lỗi | `HETHAN20` (hết hạn), `HETLUOT` (hết lượt), `TAMDUNG` (vô hiệu hóa) |
 
 ## 4. QUY ƯỚC LÀM VIỆC TRÊN GITHUB
-* Nhánh chính `main` (giảng viên chấm, GitHub Actions chạy). Mọi việc qua nhánh riêng + Pull Request, chỉ merge khi Actions **xanh**.
-* Tên nhánh: `feature/<số-issue>-<tên>`, `fix/...`, `test/...` (bài kiểm thử), `docs/...`.
+* **`main`**: bản ổn định, giảng viên chấm. Chỉ nhận PR từ `develop` khi xong một đợt (cuối tuần / nộp bài), không code trực tiếp.
+* **`develop`**: nhánh phát triển. Nhận feature hoặc bug thì tách nhánh từ `develop`, xong mở PR **vào `develop`**:
+  ```bash
+  git checkout develop && git pull origin develop
+  git checkout -b feature/<số-issue>-<tên>
+  ```
+* Tên nhánh: `feature/<số-issue>-<tên>` (tính năng), `fix/<số-issue>-<tên>` (sửa lỗi), `test/<số-issue>-<tên>` (bài kiểm thử), `docs/<tên>`.
+* GitHub Actions chạy khi push hoặc mở PR vào `develop` và `main`; chỉ merge khi Actions **xanh**.
 * Commit: `<loại>(<phạm vi>): <việc đã làm> (#<số-issue>)`, loại `feat`, `fix`, `test`, `refactor`, `docs`, `chore`.
 * Nhãn issue: `logic`, `giao-dien`, `test`, `chore`, mảng (`auth`, `cart`...), `sof309-y1` → `sof309-y6`.
