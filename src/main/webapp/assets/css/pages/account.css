@@ -1,0 +1,156 @@
+/* ==========================================================================
+   Saltair - Nhóm account: đăng nhập, đăng ký, quên/đặt lại mật khẩu, hồ sơ, sổ địa chỉ, yêu thích.
+   Chỉ bổ sung cho style.css (không sửa file dùng chung). Phẳng, không box-shadow, chỉ dùng biến màu có sẵn.
+   Điểm ngắt dùng chung: 990px và 750px.
+   ========================================================================== */
+
+/* ---------- Hiệu ứng vào trang (phần nằm trên màn hình đầu tiên; phần bên dưới dùng .reveal) ---------- */
+.acc-enter { animation: acc-enter .6s var(--ease) both; animation-delay: calc(var(--d, 0) * 70ms + 40ms); }
+@keyframes acc-enter { from { opacity: 0; transform: translateY(16px); } }
+
+/* ---------- Đăng nhập / đăng ký: nửa trái là ảnh ---------- */
+.auth__media { overflow: hidden; min-height: 520px; }
+.auth__media > .ph, .auth__media > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.auth__media > .ph .icon { width: 56px; height: 56px; }
+.auth__media > img { transform: scale(1.04); animation: hero-zoom 1.6s var(--ease) forwards; }
+.auth__caption { position: absolute; left: var(--gutter); right: var(--gutter); bottom: 48px; z-index: 1; display: grid; gap: 12px; max-width: 440px; animation: acc-enter .7s .3s var(--ease) both; }
+.auth__media--photo { color: var(--white); }
+.auth__media--photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--navy-60), transparent 55%); }
+
+.auth__box--wide { max-width: 460px; }
+.auth__intro { display: grid; gap: 8px; }
+.auth-form { display: grid; gap: 20px; }
+.auth__alt { text-align: center; font-size: 14px; color: var(--navy-60); }
+.auth__alt a { color: var(--navy); font-weight: 700; }
+
+.auth__devcode { padding: 10px 14px; border-radius: 8px; background: #fff6e0; font-size: 13px; margin: 0 0 16px; }
+
+/* ---------- Trang nhập mã 6 số (#75) ---------- */
+.code-page { background: var(--white); min-height: 100vh; }
+.code-page__logo { display: flex; justify-content: center; padding-top: 56px; }
+.code-page__logo img { height: 48px; width: auto; }
+.code-page__main { width: min(526px, 100% - 32px); margin: 56px auto 64px; text-align: center; }
+.code-page__title { font-size: 28px; line-height: 34px; font-weight: 700; margin: 0 0 8px; }
+.code-page__sub { margin: 0 0 32px; color: var(--navy-60); font-size: 15px; }
+.code-page__sub strong { color: var(--navy); font-weight: 700; }
+.code-page__link { color: var(--navy); font-weight: 700; text-decoration: underline; }
+.code-page .alert { text-align: left; }
+
+.otp { display: grid; gap: 14px; }
+.otp__boxes { position: relative; display: grid; grid-template-columns: repeat(6, minmax(0, 78px)); justify-content: center; gap: 12px; }
+.otp__box {
+  width: 100%; height: 98px; border-radius: 12px; border: 1px solid #d9dbdd; background: var(--white);
+  text-align: center; font: inherit; font-size: 32px; font-weight: 700; color: var(--navy);
+  font-variant-numeric: tabular-nums; caret-color: var(--navy); outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, opacity .2s ease;
+}
+.otp__box:focus { border-color: var(--navy); box-shadow: 0 0 0 1px var(--navy); }
+.otp__spinner { position: absolute; left: 50%; top: 50%; margin: -12px 0 0 -12px; width: 24px; height: 24px; display: none; color: var(--navy); }
+.otp.is-busy .otp__box { opacity: .3; }
+.otp.is-busy .otp__spinner { display: block; }
+.otp.is-error .otp__box { border-color: var(--danger); box-shadow: 0 0 0 1px var(--danger); }
+.otp.is-error .otp__boxes { animation: otp-shake 300ms ease-in-out; }
+.otp.no-shake .otp__boxes { animation: none; }
+@keyframes otp-shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+.otp__msg { margin: 0; font-size: 14px; color: var(--danger); }
+.otp__msg a { color: inherit; font-weight: 700; text-decoration: underline; }
+
+.code-page__resend { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 28px; font-size: 15px; color: var(--navy-60); }
+.code-page__resend button { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; color: var(--navy); cursor: pointer; text-decoration: underline; }
+.code-page__resend button:disabled { color: var(--navy-50); text-decoration: none; cursor: default; }
+.code-page__terms { margin-top: 40px; font-size: 13px; color: var(--navy-60); }
+
+@media (max-width: 560px) {
+  .code-page__logo { padding-top: 32px; }
+  .code-page__main { margin-top: 32px; }
+  .otp__boxes { gap: 8px; }
+  .otp__box { height: 64px; font-size: 26px; border-radius: 10px; }
+}
+
+/* Khối dev: chỉ hiện khi demoMode = true */
+.dev-box { border: 1px dashed var(--line-2); border-radius: 20px; padding: 16px 20px; display: grid; gap: 12px; }
+.dev-box__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.dev-box__links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ---------- Quên / đặt lại mật khẩu: thẻ ở giữa ---------- */
+.auth--single { grid-template-columns: 1fr; background: var(--bg); }
+.auth-card { background: var(--white); padding: 48px 40px; max-width: 480px; text-align: center; }
+.auth-card .auth-form, .auth-card .field { text-align: left; }
+.auth-card .btn-row { display: grid; gap: 12px; }
+.auth-card .dev-box { text-align: left; }
+.auth-card > .link-underline { justify-self: center; }
+.state-icon { width: 72px; height: 72px; margin-inline: auto; border-radius: 50%; background: var(--bg); display: grid; place-items: center; animation: pop .5s .2s ease both; }
+.state-icon .icon { width: 28px; height: 28px; }
+.state-icon--ok { color: var(--success); }
+.state-icon--warn { color: var(--danger); }
+
+/* ---------- Khu vực tài khoản ---------- */
+.account__main { display: grid; gap: 32px; min-width: 0; align-content: start; }
+.account__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.account__head p { margin-top: 8px; }
+.account .card { padding: 32px; }
+.card__head { display: grid; gap: 6px; margin-bottom: 24px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+.input[readonly] { background: var(--bg); color: var(--navy-60); cursor: not-allowed; }
+.input[readonly]:hover { border-color: var(--line); }
+
+.profile-head { display: flex; align-items: center; gap: 20px; }
+.profile-head > div { min-width: 0; }
+.profile-head h1, .profile-head p { overflow-wrap: anywhere; }
+.avatar { width: 72px; height: 72px; flex: none; border-radius: 50%; background: var(--navy); color: var(--white); display: grid; place-items: center; font-size: 28px; line-height: 1; font-weight: 700; transition: transform var(--t) ease; }
+.profile-head:hover .avatar { transform: scale(1.05); }
+
+.stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.stat { border: 1px solid var(--line); padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; transition: border-color var(--t) var(--ease), background-color var(--t) var(--ease); }
+.stat:hover { border-color: var(--navy); background: var(--bg); }
+.stat__label { display: block; color: var(--navy-60); font-size: 13px; line-height: 18.2px; margin-bottom: 4px; }
+.stat__value { display: flex; align-items: center; min-height: 41px; }
+.stat > .icon { transition: translate var(--t) ease; }
+.stat:hover > .icon { translate: 4px 0; }
+
+/* ---------- Sổ địa chỉ ---------- */
+.address-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.address-card { border: 1px solid var(--line); padding: 24px; display: flex; flex-direction: column; gap: 16px; transition: border-color var(--t) var(--ease), opacity .6s var(--ease), transform .6s var(--ease); transition-delay: 0s, calc(var(--i, 0) * 70ms), calc(var(--i, 0) * 70ms); }
+.address-card:hover { border-color: var(--line-2); }
+.address-card.is-default { border-color: var(--navy); }
+.address-card__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.address-card__name { font-size: 16.26px; font-weight: 700; line-height: 22px; }
+.address-card__meta { display: grid; gap: 8px; color: var(--navy-60); }
+.address-card__row { display: flex; align-items: flex-start; gap: 10px; }
+.address-card__row .icon { margin-top: 3px; flex: none; }
+.address-card__row span { min-width: 0; overflow-wrap: anywhere; }
+.address-card__name { overflow-wrap: anywhere; }
+.address-card__actions { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px; }
+.address-card__actions form { display: contents; }
+.badge--solid { background: var(--navy); color: var(--white); }
+
+dialog.dialog form { display: flex; flex-direction: column; max-height: min(90vh, 760px); }
+dialog.dialog .dialog__body { flex: 1; min-height: 0; display: grid; gap: 20px; }
+
+/* ---------- Yêu thích ---------- */
+.wish-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); padding-inline: 0; gap: 12px; }
+.wish-item { position: relative; }
+.wish-item .product-card__wish { opacity: 1; top: 10px; right: 10px; }
+.wish-item__btn { background: var(--white); }
+.wish-item__btn:hover { background: var(--navy); color: var(--white); }
+.wish-item__btn .icon { fill: currentColor; }
+.wish-item.is-removing, .address-card.is-removing { opacity: 0; transform: scale(.96); pointer-events: none; transition: opacity .25s var(--ease), transform .25s var(--ease); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 990px) {
+  .auth__form { padding: 40px var(--gutter) 64px; }
+}
+
+@media (max-width: 750px) {
+  .auth__form { padding-block: 32px 56px; }
+  .auth-card { padding: 36px 24px; }
+  .account .card { padding: 20px; }
+  .profile-head { gap: 14px; }
+  .avatar { width: 56px; height: 56px; font-size: 22px; }
+  .stat-row { grid-template-columns: 1fr; }
+  .address-grid { grid-template-columns: 1fr; }
+  .address-card { padding: 20px; }
+  .wish-grid.product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding-inline: 0; }
+  .form-actions .btn { flex: 1; }
+  dialog.dialog .dialog__head, dialog.dialog .dialog__body, dialog.dialog .dialog__foot { padding-inline: 20px; }
+}

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_1.xsd"
+         version="6.1">
+
+    <display-name>Saltair</display-name>
+
+    <!--
+        demoMode = true: các form còn gắn data-demo chỉ hiện thông báo "chế độ giao diện" (dùng khi dựng giao diện).
+        Mọi chức năng đã có logic thật nên để false.
+    -->
+    <context-param>
+        <param-name>demoMode</param-name>
+        <param-value>false</param-value>
+    </context-param>
+
+    <session-config>
+        <session-timeout>60</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+
+    <!--
+        Bộ lọc khai báo ở đây (không dùng @WebFilter) để cố định THỨ TỰ chạy:
+        1. EncodingFilter  đọc form bằng UTF-8
+        2. AuthFilter      bắt buộc đăng nhập cho trang của khách hàng
+        3. AdminFilter     chỉ ADMIN vào /admin
+    -->
+    <filter><filter-name>EncodingFilter</filter-name><filter-class>com.fashionweb.filter.EncodingFilter</filter-class></filter>
+    <filter><filter-name>AuthFilter</filter-name><filter-class>com.fashionweb.filter.AuthFilter</filter-class></filter>
+    <filter><filter-name>AdminFilter</filter-name><filter-class>com.fashionweb.filter.AdminFilter</filter-class></filter>
+
+    <filter-mapping><filter-name>EncodingFilter</filter-name><url-pattern>/*</url-pattern></filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/cart</url-pattern>
+        <url-pattern>/checkout</url-pattern>
+        <url-pattern>/order</url-pattern>
+        <url-pattern>/orders</url-pattern>
+        <url-pattern>/order-success</url-pattern>
+        <url-pattern>/profile</url-pattern>
+        <url-pattern>/addresses</url-pattern>
+        <url-pattern>/wishlist</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AdminFilter</filter-name>
+        <url-pattern>/admin</url-pattern>
+        <url-pattern>/admin/*</url-pattern>
+    </filter-mapping>
+
+    <!-- Mọi file JSP, JSPF (phần nhúng) và TAG đều đọc bằng UTF-8, nếu không chữ tiếng Việt trong file nhúng bị lỗi font -->
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+            <url-pattern>*.jspf</url-pattern>
+            <url-pattern>*.tag</url-pattern>
+            <page-encoding>UTF-8</page-encoding>
+        </jsp-property-group>
+    </jsp-config>
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <error-page>
+        <error-code>403</error-code>
+        <location>/WEB-INF/views/error/403.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/views/error/404.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/WEB-INF/views/error/500.jsp</location>
+    </error-page>
+</web-app>

@@ -1,0 +1,16 @@
+<%--
+  Thông báo sau khi thực hiện một thao tác (thành công/lỗi). Cách dùng trong Servlet:
+    - Hiện ngay trong lần forward:  req.setAttribute("message", "..."); req.setAttribute("messageType", "success|error|info");
+    - Sau khi redirect (PRG):       session.setAttribute("flashMessage", "..."); session.setAttribute("flashType", "success|error|info");
+  Include trong JSP: <%@ include file="/WEB-INF/views/common/flash.jspf" %> (trang phải khai báo taglib c và t)
+--%>
+<c:set var="flashMsg" value="${not empty message ? message : sessionScope.flashMessage}"/>
+<c:set var="flashKind" value="${not empty messageType ? messageType : (empty sessionScope.flashType ? 'info' : sessionScope.flashType)}"/>
+<c:if test="${not empty flashMsg}">
+  <div class="alert alert--${flashKind} mb-24" role="status">
+    <t:icon name="${flashKind == 'error' ? 'alert' : (flashKind == 'success' ? 'check-circle' : 'info')}"/>
+    <span><c:out value="${flashMsg}"/></span>
+  </div>
+</c:if>
+<c:remove var="flashMessage" scope="session"/>
+<c:remove var="flashType" scope="session"/>

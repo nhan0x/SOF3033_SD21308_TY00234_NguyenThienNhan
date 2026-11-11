@@ -1,0 +1,199 @@
+/* ==========================================================================
+   Saltair - Nhóm "shopping": giỏ hàng, thanh toán, đặt hàng thành công, đơn hàng.
+   Chỉ dùng biến màu trong style.css, không đổ bóng, hiệu ứng 0.15s - 0.3s (trừ chuyển cảnh vào trang).
+   Tiền tố .sh- để không đụng class của nhóm khác. Điểm ngắt: 990px và 750px.
+   ========================================================================== */
+
+/* ---------- Chuyển cảnh vào trang (phần nằm trên màn hình đầu tiên) ---------- */
+@keyframes sh-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes sh-pop { 0% { opacity: 0; transform: scale(.6); } 60% { opacity: 1; transform: scale(1.08); } 100% { opacity: 1; transform: none; } }
+@keyframes sh-ring { from { opacity: .45; transform: scale(.92); } to { opacity: 0; transform: scale(1.55); } }
+@keyframes sh-tick { from { opacity: .4; } to { opacity: 1; } }
+
+.sh-enter { animation: sh-rise .45s var(--ease) both; animation-delay: calc(var(--d, 0) * 60ms); }
+
+/* ---------- Đầu trang, thông báo ---------- */
+.sh-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 16px; padding: 48px var(--gutter) 0; }
+.sh-head__count { font-size: 15px; }
+.sh-head + .two-col { padding-top: 32px; }
+.sh-flash { padding: 24px var(--gutter) 0; }
+.sh-flash:not(:has(.alert)) { display: none; }
+.sh-flash .alert { margin-bottom: 0; }
+
+.thumb .ph { min-height: 0; }
+.textarea.is-invalid { border-color: var(--danger); }
+a.thumb { transition: opacity var(--t) var(--ease); }
+a.thumb:hover { opacity: .85; }
+
+/* ---------- Giỏ hàng ---------- */
+.sh-lines { border-top: 1px solid var(--line); }
+.sh-line.is-removing { overflow: hidden; max-height: 0 !important; opacity: 0; padding-block: 0; border-bottom-width: 0; transition: max-height .3s var(--ease), opacity .2s var(--ease), padding .3s var(--ease); }
+.sh-line__info { display: grid; gap: 6px; min-width: 0; justify-items: start; }
+.sh-line__info .h-3 { font-size: 16.26px; line-height: 20px; }
+.sh-line__form { margin-top: 10px; }
+.sh-line .qty { height: 40px; }
+.sh-line .qty button { width: 38px; }
+.sh-line .qty input { width: 36px; }
+.sh-line__side { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+.sh-line__total { font-size: 16px; font-weight: 700; }
+.sh-line__total.is-updated { animation: sh-tick .35s var(--ease); }
+.sh-link-quiet { font-size: 13px; color: var(--navy-60); text-decoration: underline; text-underline-offset: 3px; transition: color var(--t) var(--ease); }
+.sh-link-quiet:hover { color: var(--navy); }
+.sh-warn { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; font-size: 13px; line-height: 18px; color: var(--danger); }
+.sh-warn .icon { margin-top: 1px; }
+
+.sh-summary { position: sticky; top: calc(var(--header-h-small) + 24px); }
+.sh-summary__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.sh-summary .summary__row > :last-child { text-align: right; }
+.sh-summary__hint { font-size: 13px; line-height: 18px; color: var(--navy-60); margin-top: -8px; }
+.sh-summary__discount { color: var(--success); }
+.sh-summary__actions { display: grid; gap: 14px; justify-items: center; }
+.sh-summary__actions .link-underline { font-size: 14px; }
+.sh-perks { display: grid; gap: 10px; padding-top: 16px; border-top: 1px solid var(--line-2); font-size: 13px; line-height: 18px; color: var(--navy-60); }
+.sh-perks li { display: flex; align-items: flex-start; gap: 10px; }
+.sh-perks .icon { margin-top: 1px; color: var(--navy); }
+
+.sh-suggest .product-grid { margin-top: 0; }
+
+/* ---------- Thanh toán ---------- */
+.sh-steps { display: grid; }
+.sh-step { display: grid; gap: 20px; padding: 36px 0; border-top: 1px solid var(--line); }
+.sh-step:first-child { padding-top: 0; border-top: 0; }
+.sh-step__head { display: flex; align-items: center; gap: 14px; }
+.sh-step__head .link-underline { margin-left: auto; font-size: 14px; }
+.sh-step__num { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--navy); color: var(--white); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+
+.sh-options { display: grid; gap: 12px; }
+.sh-option { display: flex; align-items: flex-start; gap: 14px; width: 100%; padding: 18px 20px; border: 1px solid var(--line); border-radius: 20px; transition: border-color var(--t) var(--ease), background-color var(--t) var(--ease); }
+.sh-option:hover { border-color: var(--line-2); }
+.sh-option:has(input:checked) { border-color: var(--navy); }
+.sh-option:has(input:focus-visible) { outline: 2px solid var(--navy); outline-offset: 3px; }
+.sh-option__body { display: grid; gap: 4px; min-width: 0; flex: 1; }
+.sh-option__title { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-weight: 700; }
+.sh-option__text { color: var(--navy-60); font-size: 14px; line-height: 20px; }
+.sh-option--static { cursor: default; background: var(--bg); border-color: var(--line); }
+.sh-option--static:hover { border-color: var(--line); }
+.sh-option--static input { opacity: .7; cursor: default; }
+.sh-option__icon { margin-left: auto; color: var(--navy-60); }
+.sh-option__icon .icon { width: 24px; height: 24px; }
+
+.sh-newaddr { display: grid; gap: 20px; padding: 24px; border: 1px dashed var(--line-2); border-radius: 20px; }
+.sh-newaddr:not([hidden]) { animation: fade-down .25s var(--ease); }
+
+.sh-voucher-form { display: flex; gap: 12px; align-items: flex-start; }
+.sh-voucher-form .field { flex: 1; min-width: 0; }
+.sh-voucher-form .btn { flex: none; min-height: 48px; }
+.sh-voucher-form .input:not(:placeholder-shown) { text-transform: uppercase; }
+.sh-voucher-applied { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 16px 20px; border: 1px solid var(--success); border-radius: 20px; background: color-mix(in srgb, var(--success) 8%, var(--white)); animation: sh-pop .4s var(--ease) both; }
+.sh-voucher-applied__main { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.sh-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.sh-voucher-chip { height: auto; min-height: 36px; padding: 8px 16px; text-align: left; line-height: 1.3; border-style: dashed; }
+.sh-voucher-chip .icon { color: var(--navy-60); }
+.sh-voucher-chip span { color: var(--navy-60); font-size: 13px; }
+
+.sh-mini { display: grid; gap: 16px; }
+.sh-mini__item { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 14px; align-items: start; }
+.sh-mini__media { position: relative; }
+.sh-mini__qty { position: absolute; top: -6px; right: -6px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--navy); color: var(--white); font-size: 11px; font-weight: 700; line-height: 20px; text-align: center; }
+.sh-mini__name { display: block; font-size: 14px; line-height: 19px; font-weight: 500; }
+.sh-mini__meta { font-size: 13px; line-height: 18px; color: var(--navy-60); }
+.sh-mini__price { font-size: 14px; white-space: nowrap; }
+.sh-summary hr { border: 0; border-top: 1px solid var(--line-2); margin: 0; width: 100%; }
+.sh-summary__note { font-size: 13px; line-height: 18px; color: var(--navy-60); text-align: center; }
+
+/* ---------- Đặt hàng thành công ---------- */
+.sh-success { max-width: 640px; margin-inline: auto; padding: 72px var(--gutter) 96px; display: grid; justify-items: center; gap: 20px; text-align: center; }
+.sh-success__icon { position: relative; width: 88px; height: 88px; border-radius: 50%; display: grid; place-items: center; color: var(--success); background: color-mix(in srgb, var(--success) 12%, var(--white)); animation: sh-pop .6s var(--ease) both; }
+.sh-success__icon::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--success); animation: sh-ring 1.2s .5s var(--ease) both; }
+.sh-success__icon .icon { width: 40px; height: 40px; stroke-width: 1.5; }
+.sh-success__lead { max-width: 460px; color: var(--navy-60); }
+.sh-success__card { width: 100%; display: grid; gap: 14px; margin-top: 12px; padding: 28px 32px; background: var(--bg); text-align: left; }
+.sh-kv { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.sh-kv > :first-child { color: var(--navy-60); flex: none; }
+.sh-kv > :last-child { text-align: right; min-width: 0; }
+.sh-kv--total { padding-top: 14px; border-top: 1px solid var(--line-2); font-size: 20.2px; font-weight: 700; }
+.sh-kv--total > :first-child { color: var(--navy); }
+.sh-code { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+.sh-success__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 12px; }
+
+/* ---------- Danh sách đơn hàng ---------- */
+.sh-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 32px; }
+.sh-chip-count { font-size: 12px; opacity: .6; }
+.sh-order-list { display: grid; gap: 16px; }
+.sh-order { display: grid; gap: 20px; padding: 24px; border: 1px solid var(--line); transition: border-color var(--t) var(--ease); }
+.sh-order:hover { border-color: var(--line-2); }
+.sh-order.reveal { transition: opacity .6s var(--ease), transform .6s var(--ease), border-color var(--t) var(--ease); transition-delay: calc(var(--i, 0) * 70ms), calc(var(--i, 0) * 70ms), 0s; }
+.sh-order__head { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.sh-order__code { display: inline-block; font-size: 16px; font-weight: 700; }
+.sh-order__date { display: block; margin-top: 2px; }
+.sh-order__body { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+.sh-thumbs { display: flex; align-items: center; gap: 8px; }
+.sh-thumbs .thumb { width: 56px; height: 72px; }
+.sh-thumbs__more { width: 56px; height: 72px; display: grid; place-items: center; background: var(--bg); color: var(--navy-60); font-size: 13px; font-weight: 700; }
+.sh-order__sum { display: grid; gap: 2px; text-align: right; }
+.sh-order__total { font-size: 20.2px; line-height: 22.2px; font-weight: 700; }
+.sh-order__foot { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; padding-top: 20px; border-top: 1px solid var(--line); }
+.sh-inline-form { display: inline-flex; margin: 0; }
+
+/* ---------- Chi tiết đơn hàng ---------- */
+.sh-back { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--navy-60); transition: color var(--t) var(--ease); }
+.sh-back:hover { color: var(--navy); }
+.sh-back .icon { transition: translate var(--t) ease; }
+.sh-back:hover .icon { translate: -3px 0; }
+.sh-detail-head { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin: 20px 0 40px; }
+.sh-detail-title { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; }
+.sh-detail-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.sh-detail-meta { margin-top: 8px; }
+
+.timeline--3 { grid-template-columns: repeat(3, 1fr); }
+.timeline--2 { grid-template-columns: repeat(2, 1fr); }
+.timeline__step { transition: color var(--t) var(--ease); }
+.timeline__step b { display: block; font-weight: 700; }
+.timeline__step small { display: block; margin-top: 2px; font-size: 12px; color: var(--navy-60); }
+.timeline__step.is-current::before { background: linear-gradient(90deg, var(--navy) 50%, var(--line) 50%); }
+.timeline__step.is-current:first-child::before { background: var(--line); }
+.timeline__step.is-current:last-child::before { background: var(--navy); }
+.timeline__step.is-current::after { outline: 4px solid var(--navy-10); }
+.timeline__step.is-cancelled::before { background: var(--danger); }
+.timeline__step.is-cancelled small { color: var(--danger); }
+
+.sh-notice { margin-top: 32px; }
+.sh-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 40px; }
+.sh-info { display: grid; align-content: start; gap: 8px; padding: 24px; background: var(--bg); }
+.sh-info__title { font-size: 12px; font-weight: 500; color: var(--navy-60); }
+.sh-info__name { font-weight: 700; }
+.sh-info__note { font-size: 14px; color: var(--navy-60); }
+.sh-pay-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.sh-section-title { margin: 48px 0 16px; }
+.sh-detail-summary { max-width: 420px; margin: 32px 0 0 auto; }
+.sh-items { border-top: 1px solid var(--line); }
+.sh-items .line-item:last-child { border-bottom: 0; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 990px) {
+  .sh-head { padding-top: 32px; }
+  .sh-summary { position: static; }
+  .sh-detail-summary { max-width: none; }
+}
+
+@media (max-width: 750px) {
+  .sh-head + .two-col { padding-top: 20px; }
+  .sh-line__side { flex-direction: row-reverse; align-items: center; justify-content: space-between; }
+  .sh-voucher-form { flex-direction: column; }
+  .sh-voucher-form .btn { width: 100%; }
+  .sh-newaddr { padding: 16px; }
+  .sh-order { padding: 16px; }
+  .sh-order__body { align-items: flex-start; flex-direction: column; }
+  .sh-order__sum { text-align: left; }
+  .sh-order__foot > *, .sh-detail-actions > * { flex: 1 1 auto; }
+  .sh-inline-form .btn { width: 100%; }
+  .sh-filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); scrollbar-width: none; }
+  .sh-filters::-webkit-scrollbar { display: none; }
+  .sh-filters .chip { flex: none; }
+  .sh-info-grid { grid-template-columns: 1fr; }
+  .sh-detail-actions { width: 100%; }
+  .sh-success { padding-top: 48px; }
+  .sh-success__card { padding: 20px; }
+  .sh-kv--total { font-size: 18px; }
+  .timeline__step small { display: none; }
+}

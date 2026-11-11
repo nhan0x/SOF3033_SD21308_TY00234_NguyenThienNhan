@@ -1,0 +1,13 @@
+# Dùng để gửi mã đăng nhập 6 số (#74). Không có file này thì bật auth.devCode=true để đăng nhập thử.
+# Sao chép thành mail.properties (cùng thư mục) rồi điền thông tin. File mail.properties đã nằm trong .gitignore.
+# mail.password là "Mật khẩu ứng dụng" 16 ký tự của Gmail (không phải mật khẩu đăng nhập Gmail), do trưởng nhóm gửi riêng.
+# Không ghi mật khẩu vào code, issue, comment hay chat chung.
+mail.host=smtp.gmail.com
+mail.port=587
+mail.username=
+mail.password=
+mail.from.name=Saltair
+
+# Chế độ thử: true thì KHÔNG gửi mail, mã đăng nhập được ghi vào log Tomcat và hiện trên trang nhập mã.
+# Cần bật để đăng nhập các tài khoản mẫu trong data.sql (email giả). Không bật trên máy chấm/triển khai thật.
+auth.devCode=false

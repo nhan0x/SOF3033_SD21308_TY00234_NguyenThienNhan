@@ -1,0 +1,12 @@
+# Lưu ảnh tải lên (danh mục, sản phẩm, banner, ảnh bìa blog) trên Cloudinary.
+# Sao chép file này thành cloudinary.properties (cùng thư mục) rồi điền 3 thông tin ở trang Dashboard của Cloudinary.
+# File cloudinary.properties đã nằm trong .gitignore. Không ghi api_secret vào code, issue, comment hay chat chung.
+#
+# Không có cloudinary.properties (hoặc để trống) thì ảnh vẫn lưu vào thư mục assets/images của bản web đang chạy như trước,
+# nhưng sẽ mất khi deploy lại. Có cloudinary.properties thì ảnh lên mây, máy nào cũng thấy, không mất khi deploy lại.
+cloudinary.cloud_name=
+cloudinary.api_key=
+cloudinary.api_secret=
+
+# Thư mục gốc trên Cloudinary; ảnh nằm ở saltair/products, saltair/banners... Có thể để nguyên.
+cloudinary.folder=saltair

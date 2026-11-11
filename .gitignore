@@ -33,3 +33,10 @@ HUONG_DAN_TRIEN_KHAI_ASSIGNMENT_GITHUB.md
 03-lecture-materials/
 05-ai-prompt-library/
 SOF304*
+
+# Saltair - cấu hình chứa mật khẩu/khóa bí mật (tuyệt đối không commit, repo Public)
+src/main/resources/db.properties
+src/main/resources/mail.properties
+src/main/resources/cloudinary.properties
+.smarttomcat/
+uploads/

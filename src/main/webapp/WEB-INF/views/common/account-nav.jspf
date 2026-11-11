@@ -1,0 +1,8 @@
+<%-- Menu bên của khu vực tài khoản. Trước khi include: <c:set var="accountActive" value="profile|orders|wishlist|addresses"/> --%>
+<nav class="account__nav" aria-label="Tài khoản">
+  <a class="${accountActive == 'profile' ? 'is-active' : ''}" href="${ctx}/profile"><t:icon name="user"/> Thông tin tài khoản</a>
+  <a class="${accountActive == 'orders' ? 'is-active' : ''}" href="${ctx}/orders"><t:icon name="package"/> Đơn hàng của tôi</a>
+  <a class="${accountActive == 'wishlist' ? 'is-active' : ''}" href="${ctx}/wishlist"><t:icon name="heart"/> Yêu thích</a>
+  <a class="${accountActive == 'addresses' ? 'is-active' : ''}" href="${ctx}/addresses"><t:icon name="map-pin"/> Sổ địa chỉ</a>
+  <a href="${ctx}/logout"><t:icon name="log-out"/> Đăng xuất</a>
+</nav>

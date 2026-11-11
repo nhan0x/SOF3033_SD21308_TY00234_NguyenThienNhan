@@ -1,0 +1,173 @@
+/* ==========================================================================
+   Saltair - Admin vận hành: đơn hàng, người dùng, banner, blog, voucher, bình luận.
+   Chỉ bổ sung cho admin.css; dùng biến màu trong style.css. Phẳng, không box-shadow.
+   Hiệu ứng nhẹ 0.2 - 0.3s, tắt khi người dùng chọn giảm chuyển động (đã có ở style.css).
+   ========================================================================== */
+
+/* ---------- Hiệu ứng vào trang ---------- */
+@keyframes ops-enter { from { opacity: 0; transform: translateY(10px); } }
+@keyframes ops-row { from { opacity: 0; transform: translateY(6px); } }
+@keyframes ops-fill { from { width: 0; } }
+@keyframes ops-line { from { scale: 0 1; } }
+@keyframes ops-dot { from { scale: 0; } 60% { scale: 1.25; } }
+
+.ops-enter, .ops-stagger > * { animation: ops-enter .3s var(--ease) both; }
+.ops-stagger > :nth-child(2) { animation-delay: .06s; }
+.ops-stagger > :nth-child(3) { animation-delay: .12s; }
+.ops-stagger > :nth-child(4) { animation-delay: .18s; }
+.ops-stagger > :nth-child(5) { animation-delay: .24s; }
+
+.ops-table tbody tr { animation: ops-row .25s var(--ease) both; }
+.ops-table tbody tr:nth-child(2) { animation-delay: .03s; }
+.ops-table tbody tr:nth-child(3) { animation-delay: .06s; }
+.ops-table tbody tr:nth-child(4) { animation-delay: .09s; }
+.ops-table tbody tr:nth-child(5) { animation-delay: .12s; }
+.ops-table tbody tr:nth-child(6) { animation-delay: .15s; }
+.ops-table tbody tr:nth-child(7) { animation-delay: .18s; }
+.ops-table tbody tr:nth-child(8) { animation-delay: .21s; }
+.ops-table tbody tr:nth-child(9) { animation-delay: .24s; }
+.ops-table tbody tr:nth-child(n+10) { animation-delay: .27s; }
+
+/* ---------- Thanh công cụ, chip lọc ---------- */
+.admin-toolbar .btn { flex: none; }
+.chip-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 24px; border-bottom: 1px solid var(--line); }
+.chip__count { font-size: 12px; color: var(--navy-60); transition: color var(--t) var(--ease); }
+.chip.is-active .chip__count { color: var(--white); opacity: .7; }
+.search-field { position: relative; display: inline-flex; align-items: center; }
+.search-field .icon { position: absolute; left: 16px; color: var(--navy-50); pointer-events: none; }
+.admin-toolbar .search-field .input { padding-left: 42px; min-width: 260px; }
+
+/* ---------- Ô trong bảng ---------- */
+.cell-stack { display: grid; gap: 2px; min-width: 0; }
+.cell-stack small { font-size: 13px; color: var(--navy-60); }
+.cell-user { display: flex; align-items: center; gap: 12px; min-width: 200px; }
+.cell-user .admin-avatar { flex: none; }
+.cell-user .admin-avatar--muted { background: var(--bg); color: var(--navy); }
+.cell-clamp { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 360px; min-width: 220px; }
+.cell-nowrap { white-space: nowrap; }
+.thumb--wide { width: 96px; height: 54px; }
+.thumb .ph { min-height: 0; }
+.cell-actions form { margin: 0; display: inline-flex; }
+.cell-actions > span { display: inline-flex; }
+.icon-btn[disabled] { opacity: .35; pointer-events: none; cursor: not-allowed; }
+.icon-btn--sm { width: 28px; height: 28px; }
+.link-code { font-weight: 700; letter-spacing: .02em; }
+.table td .badge + .badge { margin-left: 6px; }
+.table .t-id { font-variant-numeric: tabular-nums; }
+
+/* ---------- Danh sách khóa - giá trị ---------- */
+.kv { display: grid; gap: 14px; margin: 0; }
+.kv > div { display: grid; gap: 2px; }
+.kv dt { font-size: 13px; color: var(--navy-60); }
+.kv dd { margin: 0; overflow-wrap: anywhere; }
+.kv a { text-decoration: underline; text-underline-offset: 3px; }
+.kv a:hover { text-decoration-thickness: 2px; }
+
+/* ---------- Chi tiết đơn ---------- */
+.order-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.order-head__meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.order-head__meta .t-small { display: inline-flex; align-items: center; gap: 6px; }
+.order-stack { display: grid; gap: 16px; align-content: start; }
+.timeline--2 { grid-template-columns: repeat(2, 1fr); }
+.timeline--3 { grid-template-columns: repeat(3, 1fr); }
+.timeline__label { display: block; }
+.timeline__step.is-done .timeline__label, .timeline__step.is-cancelled .timeline__label { font-weight: 700; }
+.timeline__time { display: block; margin-top: 4px; font-size: 12px; color: var(--navy-60); }
+.timeline__step.is-cancelled .timeline__time { color: var(--danger); }
+.timeline__step.is-done::before { transform-origin: left center; animation: ops-line .5s var(--ease) both; }
+.timeline__step.is-done::after, .timeline__step.is-cancelled::after { animation: ops-dot .35s ease both; }
+.timeline__step:nth-child(2).is-done::before { animation-delay: .15s; }
+.timeline__step:nth-child(2).is-done::after, .timeline__step:nth-child(2).is-cancelled::after { animation-delay: .3s; }
+.timeline__step:nth-child(3).is-done::before { animation-delay: .35s; }
+.timeline__step:nth-child(3).is-done::after { animation-delay: .5s; }
+.admin-card .summary { margin: 0 24px 24px; padding: 24px; }
+.summary__row .t-muted { display: inline-flex; align-items: center; gap: 8px; }
+.action-stack { display: grid; gap: 12px; }
+.action-stack form { margin: 0; }
+.action-note { font-size: 13px; color: var(--navy-60); }
+.cancel-info { display: grid; gap: 10px; }
+.cancel-info .alert { border-radius: 20px; }
+
+/* ---------- Biểu mẫu trong trang quản trị ---------- */
+.field__label .req { color: var(--danger); margin-left: 2px; }
+.field .input[readonly] { background: var(--bg); color: var(--navy-60); cursor: not-allowed; }
+.field .input:disabled { background: var(--bg); color: var(--navy-50); cursor: not-allowed; }
+.input--upper { text-transform: uppercase; letter-spacing: .04em; }
+.textarea--lg { min-height: 360px; line-height: 1.6; }
+.switch-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.switch-row__text { display: grid; gap: 2px; }
+.switch-form { margin: 0; display: inline-flex; }
+.switch input:hover:not(:checked) { background: var(--navy-50); }
+.switch input:focus-visible { outline: 2px solid var(--navy); outline-offset: 3px; }
+
+/* ---------- Khung tải ảnh có xem trước ---------- */
+.upload-box { position: relative; overflow: hidden; }
+.upload-box:focus-within { border-color: var(--navy); }
+.upload-box__preview { width: 100%; aspect-ratio: 16 / 9; background: var(--bg); position: relative; }
+.upload-box__preview img { width: 100%; height: 100%; object-fit: cover; animation: ops-enter .3s var(--ease) both; }
+.upload-box__change { font-size: 13px; color: var(--navy-60); }
+.upload-box.has-image { padding: 0; gap: 0; min-height: 0; align-items: stretch; justify-content: flex-start; }
+.upload-box.has-image .upload-box__empty { display: none; }
+.upload-box.has-image .upload-box__change { display: block; padding: 10px 12px; }
+.upload-box:not(.has-image) .upload-box__change { display: none; }
+.upload-box__empty { display: grid; gap: 8px; justify-items: center; }
+.upload-box--cover .upload-box__preview { aspect-ratio: 4 / 3; }
+
+/* ---------- Voucher ---------- */
+.rule-box { margin-bottom: 16px; }
+.rule-box .rule-list { display: grid; gap: 6px; font-size: 13px; line-height: 18px; }
+.rule-box .rule-list li { display: flex; gap: 8px; align-items: flex-start; }
+.rule-box .rule-list .icon { margin-top: 2px; }
+.code-chip { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; letter-spacing: .04em; white-space: nowrap; }
+.usage { display: grid; gap: 6px; min-width: 120px; }
+.usage .progress-row__bar span { animation: ops-fill .6s var(--ease) both; }
+.usage .t-small { white-space: nowrap; }
+dialog.dialog > form { display: flex; flex-direction: column; max-height: 90vh; margin: 0; }
+dialog.dialog .dialog__body { flex: 1; min-height: 0; overflow-y: auto; }
+dialog.dialog--wide { width: min(720px, 94vw); }
+.dialog__body .field + .field { margin-top: 20px; }
+.dialog__body .form-grid + .field, .dialog__body .field + .form-grid, .dialog__body .form-grid + .form-grid { margin-top: 20px; }
+
+/* ---------- Bình luận ---------- */
+.review-stars { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.ops-table tr.is-muted td { color: var(--navy-60); }
+.ops-table tr.is-muted .thumb { opacity: .55; }
+.ops-table tr.is-muted .stars { opacity: .55; }
+.ops-table .thumb, .ops-table .stars, .ops-table td { transition: opacity var(--t) var(--ease), color var(--t) var(--ease); }
+
+/* ---------- Điện thoại ---------- */
+@media (max-width: 990px) {
+  .admin-toolbar .search-field .input { min-width: 220px; }
+}
+@media (max-width: 750px) {
+  .chip-row { padding: 12px 16px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .chip-row::-webkit-scrollbar { display: none; }
+  .chip-row .chip { flex: none; }
+  .admin-toolbar .search-field { flex: 1 1 100%; }
+  .admin-toolbar .search-field .input { min-width: 0; width: 100%; }
+  .admin-toolbar__left { width: 100%; }
+  .admin-toolbar__left > * { flex: 1 1 140px; }
+  .admin-toolbar__left > .search-field { flex-basis: 100%; }
+  .admin-table-wrap .table.responsive tr { padding: 14px 16px; }
+  .admin-table-wrap .table.responsive td,
+  .admin-table-wrap .table.responsive td:first-child,
+  .admin-table-wrap .table.responsive td:last-child { padding: 5px 0; align-items: center; text-align: right; }
+  .table.responsive td::before { flex: none; text-align: left; }
+  .admin-table-wrap .table.responsive td.cell-lead:first-child { justify-content: flex-start; text-align: left; }
+  .table.responsive td.cell-lead::before { display: none; }
+  .admin-table-wrap .table.responsive td.cell-block:first-child,
+  .admin-table-wrap .table.responsive td.cell-block { display: block; text-align: left; }
+  .table.responsive td.cell-block::before { display: block; margin-bottom: 4px; }
+  .table.responsive .cell-user, .table.responsive .cell-product { min-width: 0; text-align: left; }
+  .table.responsive .cell-clamp { min-width: 0; text-align: right; }
+  .table.responsive .cell-actions { justify-content: flex-end; flex-wrap: wrap; }
+  .table.responsive .usage { min-width: 0; justify-items: end; }
+  .table.responsive .usage .progress-row__bar { width: 120px; }
+  .admin-card .summary { margin: 0 16px 16px; padding: 16px; }
+  .order-head .btn { width: 100%; }
+  .textarea--lg { min-height: 260px; }
+  dialog.dialog--wide .form-grid { grid-template-columns: 1fr; }
+  .dialog__head, .dialog__foot { padding-inline: 20px; }
+  .dialog__body { padding: 20px; }
+  .timeline__time { font-size: 11px; }
+}
