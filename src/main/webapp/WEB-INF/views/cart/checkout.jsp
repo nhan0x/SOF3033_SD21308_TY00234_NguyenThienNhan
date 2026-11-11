@@ -27,15 +27,15 @@
     POST /checkout action=removeVoucher : các field trên
 --%>
 <t:layout title="Thanh toán" nav="shop" chrome="checkout" bodyClass="co-page">
-  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/shopping.css?v=5"></jsp:attribute>
-  <jsp:attribute name="scripts"><script src="${ctx}/assets/js/pages/shopping.js?v=3" defer></script></jsp:attribute>
+  <jsp:attribute name="head"><link rel="stylesheet" href="${ctx}/assets/css/pages/shopping.css?v=6"></jsp:attribute>
+  <jsp:attribute name="scripts"><script src="${ctx}/assets/js/pages/shopping.js?v=4" defer></script></jsp:attribute>
   <jsp:body>
     <c:set var="posted" value="${not empty param.action}"/>
     <c:set var="pickNew" value="${guest or param.addressId == 'new' or empty addresses}"/>
     <c:set var="pickId" value="${empty param.addressId ? defaultAddress.id : param.addressId}"/>
     <c:set var="me" value="${sessionScope.currentUser}"/>
 
-    <form class="co" id="checkout-form" method="post" action="${ctx}/checkout" data-checkout-form data-success-url="${ctx}/order-success">
+    <form class="co" id="checkout-form" method="post" action="${ctx}/checkout" data-checkout-form data-success-url="${ctx}/order-success" novalidate>
       <input type="hidden" name="paymentMethod" value="COD">
       <c:if test="${not empty appliedVoucher}"><input type="hidden" name="voucherCode" value="${fn:escapeXml(appliedVoucher.code)}"></c:if>
 
@@ -85,7 +85,7 @@
 
             <c:if test="${guest}"><input type="hidden" name="addressId" value="new"></c:if>
             <c:if test="${not guest}">
-              <div class="co-choices" role="radiogroup" aria-labelledby="co-delivery">
+              <div class="co-choices${empty errors.addressId ? '' : ' is-invalid'}" role="radiogroup" aria-labelledby="co-delivery">
                 <c:forEach items="${addresses}" var="a">
                   <label class="co-choice">
                     <input type="radio" name="addressId" value="${a.id}"<c:if test="${not pickNew and fn:trim(a.id) == fn:trim(pickId)}"> checked</c:if>>
@@ -100,7 +100,7 @@
                   <span class="co-choice__body"><span class="co-choice__title">Dùng địa chỉ khác</span></span>
                 </label>
               </div>
-              <c:if test="${not empty errors.addressId}"><p class="co-error"><c:out value="${errors.addressId}"/></p></c:if>
+              <c:if test="${not empty errors.addressId}"><p class="co-error" role="alert"><c:out value="${errors.addressId}"/></p></c:if>
             </c:if>
 
             <div class="co-grid" data-new-address<c:if test="${not pickNew}"> hidden</c:if>>

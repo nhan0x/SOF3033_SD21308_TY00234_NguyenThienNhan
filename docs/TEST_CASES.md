@@ -45,4 +45,15 @@
 | **TC_ORDER_03** | Đơn hàng | Khách chỉ còn đơn đã hủy | Negative | 1. Hủy hết đơn của khách<br>2. Mở `/orders` | `duc.vo@example.com` | Tab Tất cả 0, báo "Không có đơn đang xử lý", có nút "Xem đơn đã hủy" | Pass |
 | **TC_ORDER_04** | Đơn hàng | Khách chưa từng đặt hàng | Positive | 1. Đăng nhập email mới<br>2. Mở `/orders` | `newbie4@x.vn` | Hiện thẻ "Chào mừng, sẵn sàng mua sắm?", không có các tab | Pass |
 
-> Các chức năng còn lại (giỏ hàng, voucher, đặt hàng, CRUD quản trị) sẽ bổ sung ở Y2 theo [HUONG_DAN_CHI_TIET_6_TUAN.md](HUONG_DAN_CHI_TIET_6_TUAN.md).
+## 3. THANH TOÁN & ĐẶT HÀNG (mục 2.4 trong SPECIFICATIONS)
+
+| Test Case ID | Chức năng | Mô tả ca kiểm thử | Loại test (Pos/Neg) | Các bước thực hiện | Dữ liệu kiểm thử (Test Data) | Kết quả mong đợi | Trạng thái (Pass/Fail) |
+| :---: | :---: | :--- | :---: | :--- | :--- | :--- | :---: |
+| **TC_CHECKOUT_01** | Thanh toán | Bấm Đặt hàng khi để trống trường bắt buộc | Negative | 1. Mở `/checkout`<br>2. Bấm "Đặt hàng" mà không nhập thông tin | Để trống họ tên, số điện thoại, địa chỉ | Không gửi form, cuộn và focus ô lỗi đầu tiên, ô viền đỏ, hiện thông báo lỗi | Pass |
+| **TC_CHECKOUT_02** | Thanh toán | Nhập email sai định dạng | Negative | 1. Mở `/checkout` với khách vãng lai<br>2. Nhập email sai định dạng | `invalid-email` | Báo "Nhập email hợp lệ để nhận thông tin đơn hàng.", ô viền đỏ | Pass |
+| **TC_CHECKOUT_03** | Thanh toán | Nhập số điện thoại sai định dạng | Negative | 1. Nhập SĐT không đủ 10 số hoặc không bắt đầu bằng 0<br>2. Bấm Đặt hàng | `0912345` / `1234567890` | Báo "Số điện thoại gồm 10 chữ số, bắt đầu bằng 0." | Pass |
+| **TC_CHECKOUT_04** | Thanh toán | Nhập địa chỉ dưới 5 ký tự | Negative | 1. Nhập địa chỉ ngắn<br>2. Bấm Đặt hàng | `123` | Báo "Nhập số nhà và tên đường (ít nhất 5 ký tự)." | Pass |
+| **TC_CHECKOUT_05** | Thanh toán | Chọn địa chỉ khác sau khi có lỗi | Positive | 1. Đăng nhập tài khoản có nhiều địa chỉ<br>2. Để trống/chọn sai địa chỉ<br>3. Chọn một địa chỉ hợp lệ có sẵn | Địa chỉ có sẵn | Khung viền đỏ và thông báo lỗi của nhóm địa chỉ tự động biến mất | Pass |
+| **TC_CHECKOUT_06** | Thanh toán | Nhập đầy đủ thông tin hợp lệ | Positive | 1. Nhập đầy đủ thông tin hợp lệ<br>2. Bấm "Đặt hàng" | Họ tên ≥ 2 ký tự, SĐT 10 số, địa chỉ hợp lệ | Form được gửi bình thường, chuyển sang trang xác nhận đơn | Pass |
+
+> Các chức năng còn lại (voucher nâng cao, CRUD quản trị) sẽ bổ sung ở Y2 theo [HUONG_DAN_CHI_TIET_6_TUAN.md](HUONG_DAN_CHI_TIET_6_TUAN.md).

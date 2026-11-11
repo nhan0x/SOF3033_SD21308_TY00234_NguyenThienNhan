@@ -114,6 +114,100 @@
     $$('[data-req]', newBox).forEach((i) => { i.required = true; });
   }
 
+  // Lỗi checkout dùng chung một kiểu hiển thị cho kiểm tra tại trình duyệt và lỗi từ server.
+  const checkoutForm = $('[data-checkout-form]');
+  if (checkoutForm) {
+    const messages = {
+      email: 'Nhập email hợp lệ để nhận thông tin đơn hàng.',
+      receiverName: 'Nhập họ tên người nhận (ít nhất 2 ký tự).',
+      receiverPhone: 'Số điện thoại gồm 10 chữ số, bắt đầu bằng 0.',
+      addressLine: 'Nhập số nhà và tên đường (ít nhất 5 ký tự).',
+      city: 'Nhập tỉnh hoặc thành phố.',
+      note: 'Ghi chú tối đa 500 ký tự.'
+    };
+    let validationStarted = false;
+    $$('.co-field.is-invalid', checkoutForm).forEach((field) => {
+      const input = $('input, textarea', field);
+      const error = field.closest('.co-cell')?.querySelector('.co-error') || field.parentElement?.querySelector('.co-error');
+      if (input) {
+        input.setAttribute('aria-invalid', 'true');
+        if (error) {
+          error.classList.add('co-error--validation');
+          error.setAttribute('role', 'alert');
+          error.id ||= `${input.id || input.name}-error`;
+          input.setAttribute('aria-describedby', error.id);
+        }
+      }
+    });
+    const errorNode = (input) => {
+      if (input.id === 'f-email') return $('#f-email-hint');
+      const cell = input.closest('.co-cell') || input.closest('.co-field')?.parentElement;
+      return cell?.querySelector('.co-error') || null;
+    };
+    const paintError = (input, message) => {
+      const field = input.closest('.co-field');
+      let node = errorNode(input);
+      if (message && !node) {
+        node = document.createElement('p');
+        node.className = 'co-error';
+        node.setAttribute('role', 'alert');
+        (field?.closest('.co-cell') || field?.parentElement)?.appendChild(node);
+      }
+      if (node && message) {
+        node.textContent = message;
+        node.classList.add('co-error--validation');
+        node.id ||= `${input.id || input.name}-error`;
+        input.setAttribute('aria-describedby', node.id);
+      } else if (node?.classList.contains('co-error--validation')) {
+        if (input.id === 'f-email') {
+          node.textContent = 'Dùng để xem lại đơn hàng: đăng nhập bằng email này và mã 6 số.';
+          node.classList.remove('co-error--validation');
+          input.setAttribute('aria-describedby', 'f-email-hint');
+        } else node.remove();
+        if (input.id !== 'f-email') input.removeAttribute('aria-describedby');
+      }
+      field?.classList.toggle('is-invalid', !!message);
+      if (message) input.setAttribute('aria-invalid', 'true');
+      else input.removeAttribute('aria-invalid');
+      return !!message;
+    };
+    const validateField = (input) => {
+      if (!input || input.disabled || input.closest('[hidden]')) return false;
+      const value = input.value.trim();
+      let message = '';
+      if (input.required && !value) message = input.name === 'email' ? 'Vui lòng nhập email.' : 'Trường này không được để trống.';
+      else if (value && input.name === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) message = messages.email;
+      else if (value && input.name === 'receiverName' && value.length < 2) message = messages.receiverName;
+      else if (value && input.name === 'receiverPhone' && !/^0[0-9]{9}$/.test(value)) message = messages.receiverPhone;
+      else if (value && input.name === 'addressLine' && value.length < 5) message = messages.addressLine;
+      else if (input.name === 'note' && value.length > 500) message = messages.note;
+      return paintError(input, message);
+    };
+    checkoutForm.addEventListener('submit', (event) => {
+      const submitter = event.submitter;
+      if (submitter && submitter.value !== 'placeOrder') return; // Áp dụng/gỡ voucher không kiểm tra đơn hàng.
+      validationStarted = true;
+      const fields = $$('input[name="email"], [data-req], textarea[name="note"]', checkoutForm)
+        .filter((input) => !input.closest('[hidden]'));
+      const invalid = fields.filter(validateField);
+      if (invalid.length) {
+        event.preventDefault();
+        invalid[0].focus();
+        invalid[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+    checkoutForm.addEventListener('input', (event) => {
+      if (validationStarted && event.target.matches('input, textarea')) validateField(event.target);
+    });
+    checkoutForm.addEventListener('change', (event) => {
+      if (event.target.name === 'addressId') {
+        // Xóa trạng thái lỗi của nhóm địa chỉ khi người dùng chọn địa chỉ khác.
+        const err = checkoutForm.querySelector('.co-choices + .co-error');
+        if (err) err.remove();
+      }
+    });
+  }
+
   // Trang thanh toán mới (#86): chip gợi ý điền mã, gập mở tóm tắt trên điện thoại, chống bấm Đặt hàng hai lần
   const voucherInput = $('[data-voucher-input]');
   if (voucherInput) {
