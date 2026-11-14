@@ -55,5 +55,14 @@
 | **TC_CHECKOUT_04** | Thanh toán | Nhập địa chỉ dưới 5 ký tự | Negative | 1. Nhập địa chỉ ngắn<br>2. Bấm Đặt hàng | `123` | Báo "Nhập số nhà và tên đường (ít nhất 5 ký tự)." | Pass |
 | **TC_CHECKOUT_05** | Thanh toán | Chọn địa chỉ khác sau khi có lỗi | Positive | 1. Đăng nhập tài khoản có nhiều địa chỉ<br>2. Để trống/chọn sai địa chỉ<br>3. Chọn một địa chỉ hợp lệ có sẵn | Địa chỉ có sẵn | Khung viền đỏ và thông báo lỗi của nhóm địa chỉ tự động biến mất | Pass |
 | **TC_CHECKOUT_06** | Thanh toán | Nhập đầy đủ thông tin hợp lệ | Positive | 1. Nhập đầy đủ thông tin hợp lệ<br>2. Bấm "Đặt hàng" | Họ tên ≥ 2 ký tự, SĐT 10 số, địa chỉ hợp lệ | Form được gửi bình thường, chuyển sang trang xác nhận đơn | Pass |
+| **TC_CHECKOUT_07** | Vị trí hiện tại | Cho phép vị trí, tra được địa chỉ | Positive | 1. Mở `/checkout` trên HTTPS hoặc `localhost`<br>2. Bấm "Dùng vị trí hiện tại"<br>3. Cho phép trình duyệt | Vị trí thật có đường đi | Nút khóa kèm biểu tượng tải; sau đó chọn "địa chỉ mới" và điền số nhà + đường, phường, quận, tỉnh; hiện câu nhắc kiểm tra lại | Chưa chạy |
+| **TC_CHECKOUT_08** | Vị trí hiện tại | Từ chối quyền vị trí | Negative | 1. Bấm nút<br>2. Chọn "Chặn" | — | Báo "Quyền truy cập vị trí bị từ chối…" (màu lỗi); nút dùng lại được; form không bị đổi | Chưa chạy |
+| **TC_CHECKOUT_09** | Vị trí hiện tại | Không xác định được vị trí hoặc quá thời gian | Negative | 1. Tắt định vị hệ thống hoặc giả lập mất tín hiệu<br>2. Bấm nút | — | Báo lỗi "Không xác định được vị trí…" hoặc "Lấy vị trí quá lâu…" sau tối đa 12 giây | Chưa chạy |
+| **TC_CHECKOUT_10** | Vị trí hiện tại | Dịch vụ tra địa chỉ lỗi | Negative | 1. Chặn `nominatim.openstreetmap.org` (DevTools)<br>2. Bấm nút | — | Báo "Không tra được địa chỉ…", khách vẫn nhập tay và đặt hàng được | Chưa chạy |
+| **TC_CHECKOUT_11** | Vị trí hiện tại | Khu vực không có tên đường | Negative | 1. Bấm nút tại vị trí chưa có tên đường trên bản đồ | Vị trí ngoài đường | Báo "…chưa có tên đường…", ô địa chỉ không bị điền bừa | Chưa chạy |
+| **TC_CHECKOUT_12** | Vị trí hiện tại | Khách vãng lai dùng vị trí | Positive | 1. Mở `/checkout` khi chưa đăng nhập<br>2. Bấm nút | Vị trí thật | Các ô địa chỉ được điền, bấm Đặt hàng vẫn qua kiểm tra dữ liệu như TC_CHECKOUT_06 | Chưa chạy |
+| **TC_CHECKOUT_13** | Vị trí hiện tại | Giá trị dài quá giới hạn ô | Negative | 1. Dùng vị trí mà kết quả có phường/tỉnh dài hơn `maxlength` | — | Ô vượt giới hạn bị bỏ trống thay vì cắt cụt | Chưa chạy |
+
+> TC_CHECKOUT_07 đến 13 (vị trí hiện tại) chưa được chạy; cập nhật cột Trạng thái sau khi test.
 
 > Các chức năng còn lại (voucher nâng cao, CRUD quản trị) sẽ bổ sung ở Y2 theo [HUONG_DAN_CHI_TIET_6_TUAN.md](HUONG_DAN_CHI_TIET_6_TUAN.md).

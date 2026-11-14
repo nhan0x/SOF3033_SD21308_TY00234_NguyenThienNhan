@@ -83,6 +83,15 @@
               <c:if test="${not guest}"><a class="co-link" href="${ctx}/addresses">Sổ địa chỉ</a></c:if>
             </div>
 
+            <div class="co-location" data-co-location-box>
+              <button class="co-location__button" type="button" data-co-location>
+                <span data-co-location-label>Dùng vị trí hiện tại</span>
+                <span class="spinner" aria-hidden="true"></span>
+              </button>
+              <p class="co-location__notice">Trình duyệt sẽ hỏi quyền vị trí. Tọa độ được gửi tới <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> để tìm địa chỉ gần bạn. Dữ liệu © OpenStreetMap contributors. Hãy kiểm tra lại địa chỉ trước khi đặt hàng.</p>
+              <p class="co-location__status" data-co-location-status role="status" aria-live="polite" hidden></p>
+            </div>
+
             <c:if test="${guest}"><input type="hidden" name="addressId" value="new"></c:if>
             <c:if test="${not guest}">
               <div class="co-choices${empty errors.addressId ? '' : ' is-invalid'}" role="radiogroup" aria-labelledby="co-delivery">

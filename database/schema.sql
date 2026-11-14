@@ -43,9 +43,14 @@ CREATE TABLE addresses (
   ward          VARCHAR(100) NULL,
   district      VARCHAR(100) NULL,
   city          VARCHAR(100) NOT NULL,
+  latitude      DECIMAL(10,7) NULL,
+  longitude     DECIMAL(10,7) NULL,
   is_default    TINYINT(1)   NOT NULL DEFAULT 0,
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
+  CONSTRAINT chk_addresses_toa_do CHECK ((latitude IS NULL AND longitude IS NULL)
+    OR (latitude IS NOT NULL AND longitude IS NOT NULL
+        AND latitude BETWEEN -90 AND 90 AND longitude BETWEEN -180 AND 180)),
   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -191,6 +196,8 @@ CREATE TABLE orders (
   receiver_name    VARCHAR(100)  NOT NULL,
   receiver_phone   VARCHAR(15)   NOT NULL,
   shipping_address VARCHAR(300)  NOT NULL,
+  shipping_latitude  DECIMAL(10,7) NULL,
+  shipping_longitude DECIMAL(10,7) NULL,
   note             VARCHAR(500)  NULL,
   payment_method   ENUM('COD')   NOT NULL DEFAULT 'COD',
   payment_status   ENUM('UNPAID','PAID') NOT NULL DEFAULT 'UNPAID',
@@ -213,6 +220,9 @@ CREATE TABLE orders (
   CHECK (subtotal >= 0 AND discount_amount >= 0 AND shipping_fee >= 0),
   CHECK (discount_amount <= subtotal),
   CHECK (total_amount = subtotal - discount_amount + shipping_fee),
+  CONSTRAINT chk_orders_toa_do CHECK ((shipping_latitude IS NULL AND shipping_longitude IS NULL)
+    OR (shipping_latitude IS NOT NULL AND shipping_longitude IS NOT NULL
+        AND shipping_latitude BETWEEN -90 AND 90 AND shipping_longitude BETWEEN -180 AND 180)),
   FOREIGN KEY (user_id)    REFERENCES users (id),
   FOREIGN KEY (voucher_id) REFERENCES vouchers (id)
 ) ENGINE=InnoDB;

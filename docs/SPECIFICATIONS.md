@@ -43,6 +43,13 @@
 * Khách chưa đăng nhập: giỏ lưu trong session; khi đặt hàng **bắt buộc email**, đơn gắn vào tài khoản của email đó (chưa có thì tạo CUSTOMER), từ chối email Admin hoặc tài khoản bị khóa.
 * Đặt hàng COD trong một transaction: trừ tồn kho, lưu mã voucher, số tiền giảm và phí ship tại thời điểm đặt.
 * **Phí ship cố định 30.000đ**; dùng voucher hợp lệ thì phí ship = 0. `Tổng = tiền hàng − giảm giá + phí ship`.
+* **Dùng vị trí hiện tại (trang thanh toán):**
+  * Chỉ chạy khi khách bấm nút "Dùng vị trí hiện tại"; không tự lấy vị trí khi mở trang. Trình duyệt tự hỏi quyền, chỉ hoạt động trên HTTPS hoặc `localhost`.
+  * Tọa độ được gửi từ trình duyệt tới dịch vụ OpenStreetMap (Nominatim) để tra địa chỉ; trang có ghi chú nói rõ điều này kèm ghi nguồn "© OpenStreetMap contributors". Tối đa 1 lần tra mỗi 1,1 giây.
+  * Kết quả điền vào địa chỉ mới (số nhà + đường, phường, quận/huyện, tỉnh/thành); khách phải kiểm tra lại trước khi đặt hàng. Không tra được thì báo lỗi và khách nhập tay như bình thường.
+  * Thông báo lỗi riêng cho: từ chối quyền, không xác định được vị trí, quá 12 giây, trình duyệt không hỗ trợ, tra địa chỉ thất bại.
+  * Cơ sở dữ liệu: `addresses.latitude/longitude` và `orders.shipping_latitude/shipping_longitude` (`DECIMAL(10,7)`, cho phép NULL; cả hai cùng có hoặc cùng trống, vĩ độ ±90, kinh độ ±180). Địa chỉ nhập tay không có tọa độ.
+  * *Chưa làm:* phía server chưa đọc và lưu các cột tọa độ này; hiện tính năng mới chỉ điền hộ form.
 
 ### 2.5. Voucher (kiểm tra theo đúng thứ tự, gặp lỗi đầu tiên thì dừng)
 1. Mã không tồn tại → 2. Bị vô hiệu hóa → 3. Chưa đến hạn hoặc quá hạn → 4. Hết tổng lượt dùng → 5. Khách đã dùng đủ số lần cho phép → 6. Chưa đạt đơn tối thiểu → 7. Đơn không có sản phẩm thuộc danh mục áp dụng.
