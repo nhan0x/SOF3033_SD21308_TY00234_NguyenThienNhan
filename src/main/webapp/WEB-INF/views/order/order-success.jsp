@@ -28,6 +28,8 @@
         <div class="sh-kv"><span>Ngày đặt</span><span><fmt:formatDate value="${order.createdAt}" pattern="dd/MM/yyyy HH:mm"/></span></div>
         <div class="sh-kv"><span>Người nhận</span><span><c:out value="${order.receiverName}"/> · <c:out value="${order.receiverPhone}"/></span></div>
         <div class="sh-kv"><span>Giao đến</span><span><c:out value="${order.shippingAddress}"/></span></div>
+        <div class="sh-kv"><span>Trạng thái đơn hàng</span><span><c:out value="${order.status.label}"/></span></div>
+        <div class="sh-kv"><span>Trạng thái thanh toán</span><span><c:out value="${order.paymentStatus.label}"/></span></div>
         <div class="sh-kv"><span>Thanh toán</span><span><c:out value="${order.paymentMethod.label}"/></span></div>
         <div class="sh-kv sh-kv--total"><span>Tổng thanh toán</span><span><t:price value="${order.totalAmount}"/></span></div>
       </div>
