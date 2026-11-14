@@ -115,6 +115,9 @@ final class LoginSupport {
     static Map<String, Object> error(HttpServletRequest req, Map<String, String> errors, String fallback) {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("ok", false);
+        if (req.getAttribute("retryAfterSeconds") instanceof Integer seconds) {
+            m.put("retryAfterSeconds", seconds);
+        }
         m.put("error", errors.isEmpty() ? fallback : errors.values().iterator().next());
         if (errors.containsKey("admin")) {
             m.put("adminUrl", req.getContextPath() + "/admin/login");

@@ -36,6 +36,9 @@ public class EmailLoginServlet extends HttpServlet {
             email = authService.normalizeEmail(req.getParameter("email"));
             devCode = authService.requestCode(email, AuthService.Flow.CUSTOMER);
         } catch (ValidationException e) {
+            if (e instanceof com.fashionweb.exception.RetryAfterException retry) {
+                req.setAttribute("retryAfterSeconds", retry.getRetryAfterSeconds());
+            }
             if (LoginSupport.wantsJson(req)) {
                 LoginSupport.json(resp, LoginSupport.error(req, e.getErrors(), e.getMessage()));
                 return;
