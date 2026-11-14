@@ -9,5 +9,5 @@ mail.password=
 mail.from.name=Saltair
 
 # Chế độ thử: true thì KHÔNG gửi mail, mã đăng nhập được ghi vào log Tomcat và hiện trên trang nhập mã.
-# Cần bật để đăng nhập các tài khoản mẫu trong data.sql (email giả). Không bật trên máy chấm/triển khai thật.
+# Cần bật để đăng nhập các tài khoản mẫu (email giả). Không bật trên máy chấm/triển khai thật.
 auth.devCode=false

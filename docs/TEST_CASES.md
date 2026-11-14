@@ -1,7 +1,7 @@
 # BỘ KỊCH BẢN KIỂM THỬ (TEST CASES)
 
 * **Dự án:** Saltair · **Đặc tả:** [SPECIFICATIONS.md](SPECIFICATIONS.md) · **Kế hoạch:** [TEST_PLAN.md](TEST_PLAN.md)
-* **Môi trường:** dữ liệu sạch từ `schema.sql` + `data.sql`, `auth.devCode=true` · **Ngày chạy gần nhất:** 11/11/2026
+* **Môi trường:** DB test riêng dựng từ `schema.sql`, `auth.devCode=true` · **Ngày chạy gần nhất:** 11/11/2026
 
 ## 1. ĐĂNG NHẬP BẰNG EMAIL + MÃ 6 SỐ (mục 2.2 trong SPECIFICATIONS)
 

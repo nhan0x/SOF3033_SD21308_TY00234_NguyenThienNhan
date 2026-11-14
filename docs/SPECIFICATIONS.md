@@ -9,7 +9,7 @@
 * **Công nghệ:** Java 17, Jakarta Servlet 6.1 / JSP 4 / JSTL 3, JDBC `PreparedStatement`, MySQL 8, Apache Tomcat 11, Maven (WAR), HTML/CSS/JS thuần
 * **Kiến trúc:** MVC + Service + Repository. Luồng bắt buộc `Servlet -> Service -> Repository -> MySQL`; Servlet không viết SQL, JSP không gọi Service/Repository. Package chia theo tầng rồi theo chức năng (`auth`, `account`, `shop`, `cart`, `order`, `admin`).
 * **URL chạy local:** `http://localhost:8080/saltair/home` · Trang quản trị: `http://localhost:8080/saltair/admin`
-* **Chạy:** tạo DB bằng `database/schema.sql` rồi `database/data.sql`; chép `db.properties`, `mail.properties`, `cloudinary.properties` từ file `.example` trong `src/main/resources/` (không commit, repo Public); `mvn package` rồi deploy `target/saltair.war`.
+* **Chạy:** tạo DB bằng `database/schema.sql`; chép `db.properties`, `mail.properties`, `cloudinary.properties` từ file `.example` trong `src/main/resources/` (không commit, repo Public); `mvn package` rồi deploy `target/saltair.war`.
 * **Test:** `mvn test` (JUnit 5); GitHub Actions chạy `mvn clean test` khi push hoặc mở PR vào `main`.
 
 ## 2. QUY TẮC NGHIỆP VỤ (BUSINESS RULES)
@@ -74,14 +74,10 @@
 * **Thống kê:** tổng đơn, doanh thu (chỉ đơn Hoàn thành) theo khoảng ngày, top sản phẩm bán chạy.
 * **Không làm:** thanh toán online, đăng nhập Google, nhập kho riêng, đổi trả, xuất Excel.
 
-## 3. DỮ LIỆU MẪU ĐỂ KIỂM THỬ (`database/data.sql`)
-| Loại | Dữ liệu |
-| :--- | :--- |
-| Admin | `admin@saltair.vn` (đăng nhập ở `/admin/login`) |
-| Khách | `khach@saltair.vn` (có giỏ, đơn đủ trạng thái), `lan.tran@example.com`, `hoang.le@example.com`, `duc.vo@example.com` |
-| Khách bị khóa | `mai.pham@example.com` |
-| Voucher dùng được | `WELCOME10` (giảm 10%, tối đa 50.000đ, đơn từ 200.000đ), `GIAM50K` (giảm 50.000đ, đơn từ 500.000đ, một danh mục) |
-| Voucher lỗi | `HETHAN20` (hết hạn), `HETLUOT` (hết lượt), `TAMDUNG` (vô hiệu hóa) |
+## 3. DỮ LIỆU THẬT VÀ TÀI KHOẢN ADMIN ĐẦU TIÊN
+* Dự án không còn dữ liệu mẫu: sản phẩm, danh mục, voucher, banner, blog đều do Admin nhập qua trang quản trị.
+* `database/schema.sql` chỉ tạo bảng và **xóa sạch dữ liệu cũ** (có `DROP TABLE`), chỉ chạy trên DB mới hoặc DB dùng để thử.
+* Admin đầu tiên: chạy câu `INSERT INTO users ... 'ADMIN'` ở cuối `schema.sql` với email thật của bạn, rồi đăng nhập ở `/admin/login` bằng mã 6 số gửi qua email đó.
 
 ## 4. QUY ƯỚC LÀM VIỆC TRÊN GITHUB
 * **`main`**: bản ổn định, giảng viên chấm. Chỉ nhận PR từ `develop` khi xong một đợt (cuối tuần / nộp bài), không code trực tiếp.

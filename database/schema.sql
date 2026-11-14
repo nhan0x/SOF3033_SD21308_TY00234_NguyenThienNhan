@@ -291,3 +291,7 @@ CREATE TABLE blogs (
   INDEX (is_published, created_at),
   FOREIGN KEY (author_id) REFERENCES users (id)
 ) ENGINE=InnoDB;
+
+-- Tài khoản Admin đầu tiên (không có dữ liệu mẫu). Bỏ dấu comment, thay email thật của bạn
+-- (mã đăng nhập 6 số được gửi tới email này), rồi chạy riêng câu lệnh sau khi tạo xong các bảng:
+-- INSERT INTO users (email, full_name, role) VALUES ('email-cua-ban@example.com', 'Quản trị viên', 'ADMIN');
