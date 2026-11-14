@@ -1,6 +1,7 @@
 package com.fashionweb.controller.auth;
 
 import com.fashionweb.constant.AppConstant;
+import com.fashionweb.exception.RetryAfterException;
 import com.fashionweb.exception.ValidationException;
 import com.fashionweb.service.auth.AuthService;
 import jakarta.servlet.ServletException;
@@ -36,7 +37,7 @@ public class EmailLoginServlet extends HttpServlet {
             email = authService.normalizeEmail(req.getParameter("email"));
             devCode = authService.requestCode(email, AuthService.Flow.CUSTOMER);
         } catch (ValidationException e) {
-            if (e instanceof com.fashionweb.exception.RetryAfterException retry) {
+            if (e instanceof RetryAfterException retry) {
                 req.setAttribute("retryAfterSeconds", retry.getRetryAfterSeconds());
             }
             if (LoginSupport.wantsJson(req)) {

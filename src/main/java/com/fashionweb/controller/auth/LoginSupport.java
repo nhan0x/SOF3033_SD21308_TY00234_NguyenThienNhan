@@ -1,6 +1,7 @@
 package com.fashionweb.controller.auth;
 
 import com.fashionweb.constant.AppConstant;
+import com.fashionweb.constant.Role;
 import com.fashionweb.model.User;
 import com.fashionweb.service.cart.CartService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,7 +57,7 @@ final class LoginSupport {
         session.removeAttribute(AppConstant.SESSION_DEV_CODE);
         session.setAttribute(AppConstant.SESSION_USER, user);
         // Giỏ khách đã chọn lúc chưa đăng nhập được gộp vào giỏ của tài khoản (Admin không có giỏ)
-        if (user.getRole() == com.fashionweb.constant.Role.CUSTOMER
+        if (user.getRole() == Role.CUSTOMER
                 && session.getAttribute(AppConstant.SESSION_GUEST_CART) instanceof java.util.Map<?, ?> guest) {
             @SuppressWarnings("unchecked")
             java.util.Map<Integer, Integer> lines = (java.util.Map<Integer, Integer>) guest;

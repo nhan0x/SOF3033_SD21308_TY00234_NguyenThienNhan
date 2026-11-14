@@ -2,6 +2,7 @@ package com.fashionweb.controller.auth;
 
 import com.fashionweb.constant.AppConstant;
 import com.fashionweb.constant.Role;
+import com.fashionweb.exception.RetryAfterException;
 import com.fashionweb.exception.ValidationException;
 import com.fashionweb.model.User;
 import com.fashionweb.service.auth.AuthService;
@@ -64,7 +65,7 @@ public class AdminLoginServlet extends HttpServlet {
                 LoginSupport.rememberDevCode(req, authService.requestCode(email, AuthService.Flow.ADMIN));
                 WebUtil.flash(req, SENT_MESSAGE, "success");
             } catch (ValidationException e) {
-            if (e instanceof com.fashionweb.exception.RetryAfterException retry) {
+            if (e instanceof RetryAfterException retry) {
                 req.setAttribute("retryAfterSeconds", retry.getRetryAfterSeconds());
             }
                 WebUtil.flash(req, e.getMessage(), "error");
@@ -77,7 +78,7 @@ public class AdminLoginServlet extends HttpServlet {
         try {
             user = authService.verifyCode(email, LoginSupport.codeParam(req), AuthService.Flow.ADMIN);
         } catch (ValidationException e) {
-            if (e instanceof com.fashionweb.exception.RetryAfterException retry) {
+            if (e instanceof RetryAfterException retry) {
                 req.setAttribute("retryAfterSeconds", retry.getRetryAfterSeconds());
             }
             if (LoginSupport.wantsJson(req)) {
@@ -109,7 +110,7 @@ public class AdminLoginServlet extends HttpServlet {
             email = authService.normalizeEmail(req.getParameter("email"));
             devCode = authService.requestCode(email, AuthService.Flow.ADMIN);
         } catch (ValidationException e) {
-            if (e instanceof com.fashionweb.exception.RetryAfterException retry) {
+            if (e instanceof RetryAfterException retry) {
                 req.setAttribute("retryAfterSeconds", retry.getRetryAfterSeconds());
             }
             req.setAttribute("errors", e.getErrors());

@@ -1,9 +1,6 @@
 package com.fashionweb.controller.admin;
 
-import com.fashionweb.constant.AppConstant;
-import com.fashionweb.model.User;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 /**
  * Hàm đọc tham số an toàn dùng chung cho nhóm Servlet Admin vận hành (orders, users, banners, blogs, vouchers, reviews).

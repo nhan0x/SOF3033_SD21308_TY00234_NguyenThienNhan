@@ -1,6 +1,7 @@
 package com.fashionweb.service.auth;
 
 import com.fashionweb.constant.Role;
+import com.fashionweb.exception.RetryAfterException;
 import com.fashionweb.repository.auth.LoginCodeRepository;
 import com.fashionweb.repository.auth.LoginCodeRepository.RecentStats;
 import com.fashionweb.repository.auth.LoginCodeRepository.VerifyResult;
@@ -104,7 +105,7 @@ public class AuthService {
                     + " mã trong một giờ. Hãy dùng mã mới nhất đã nhận hoặc thử lại khi giới hạn một giờ được làm mới.");
         }
         if (stats.secondsSinceLast() >= 0 && stats.secondsSinceLast() < RESEND_SECONDS) {
-            throw new com.fashionweb.exception.RetryAfterException(RESEND_SECONDS - stats.secondsSinceLast());
+            throw new RetryAfterException(RESEND_SECONDS - stats.secondsSinceLast());
         }
 
         String code = String.format("%06d", RANDOM.nextInt(1_000_000));
