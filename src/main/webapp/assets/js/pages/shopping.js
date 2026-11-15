@@ -114,6 +114,97 @@
     $$('[data-req]', newBox).forEach((i) => { i.required = true; });
   }
 
+  // Lấy tọa độ chỉ sau thao tác chủ động của người dùng, rồi tra địa chỉ một lần.
+  const locateButton = $('[data-co-location]');
+  if (locateButton) {
+    const locateStatus = $('[data-co-location-status]');
+    let lastLookupAt = 0;
+    const setLocationStatus = (message, isError = false) => {
+      locateStatus.textContent = message;
+      locateStatus.classList.toggle('is-error', isError);
+      locateStatus.hidden = false;
+    };
+    const currentPosition = () => new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 12000,
+        maximumAge: 60000
+      });
+    });
+    const firstAddressValue = (address, keys) => {
+      for (const key of keys) if (address[key]) return address[key];
+      return '';
+    };
+    const fillAddressField = (name, value) => {
+      const input = checkoutForm?.querySelector(`[name="${name}"]`);
+      if (!input || !value || value.length > Number(input.maxLength || Infinity)) return false;
+      input.value = value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      return true;
+    };
+    locateButton.addEventListener('click', async () => {
+      if (!navigator.geolocation) {
+        setLocationStatus('Trình duyệt này không hỗ trợ lấy vị trí.', true);
+        return;
+      }
+      locateButton.disabled = true;
+      locateButton.classList.add('is-loading');
+      const label = $('[data-co-location-label]', locateButton);
+      if (label) label.textContent = 'Đang lấy vị trí…';
+      setLocationStatus('Hãy cho phép trình duyệt truy cập vị trí của bạn.');
+      try {
+        const position = await currentPosition();
+        const wait = Math.max(0, 1100 - (Date.now() - lastLookupAt));
+        if (wait) await new Promise((resolve) => setTimeout(resolve, wait));
+        lastLookupAt = Date.now();
+        const query = new URLSearchParams({
+          format: 'jsonv2',
+          lat: String(position.coords.latitude),
+          lon: String(position.coords.longitude),
+          zoom: '18',
+          addressdetails: '1',
+          'accept-language': 'vi'
+        });
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?${query}`, {
+          headers: { Accept: 'application/json' }
+        });
+        if (!response.ok) throw new Error('Không tra được địa chỉ từ vị trí hiện tại.');
+        const result = await response.json();
+        const address = result.address || {};
+        const street = firstAddressValue(address, ['road', 'pedestrian', 'residential', 'street', 'path']);
+        const house = address.house_number || '';
+        const addressLine = [house, street].filter(Boolean).join(' ');
+        const ward = firstAddressValue(address, ['ward', 'quarter', 'neighbourhood', 'suburb', 'hamlet']);
+        const district = firstAddressValue(address, ['city_district', 'district', 'county']);
+        const city = firstAddressValue(address, ['state', 'province', 'region', 'city']);
+
+        const newAddress = checkoutForm?.querySelector('input[type="radio"][name="addressId"][value="new"]');
+        if (newAddress) {
+          newAddress.checked = true;
+          newAddress.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        fillAddressField('addressLine', addressLine);
+        fillAddressField('ward', ward);
+        fillAddressField('district', district);
+        fillAddressField('city', city);
+        setLocationStatus(addressLine
+          ? 'Đã điền địa chỉ gần vị trí của bạn. Hãy kiểm tra và bổ sung số nhà nếu cần.'
+          : 'Đã lấy vị trí, nhưng bản đồ chưa có tên đường ở khu vực này. Vui lòng nhập địa chỉ chi tiết.');
+      } catch (error) {
+        const messages = {
+          1: 'Quyền truy cập vị trí bị từ chối. Hãy cho phép trong cài đặt trình duyệt rồi thử lại.',
+          2: 'Không xác định được vị trí. Hãy bật GPS hoặc kiểm tra kết nối rồi thử lại.',
+          3: 'Lấy vị trí quá lâu. Hãy thử lại ở nơi có tín hiệu tốt hơn.'
+        };
+        setLocationStatus(error?.code ? (messages[error.code] || 'Không lấy được vị trí hiện tại.') : (error.message || 'Không tra được địa chỉ. Bạn có thể nhập thủ công.'), true);
+      } finally {
+        locateButton.disabled = false;
+        locateButton.classList.remove('is-loading');
+        if (label) label.textContent = 'Dùng vị trí hiện tại';
+      }
+    });
+  }
+
   // Lỗi checkout dùng chung một kiểu hiển thị cho kiểm tra tại trình duyệt và lỗi từ server.
   const checkoutForm = $('[data-checkout-form]');
   if (checkoutForm) {

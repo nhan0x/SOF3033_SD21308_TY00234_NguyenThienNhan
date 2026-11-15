@@ -1,5 +1,6 @@
 package com.fashionweb.controller.auth;
 
+import com.fashionweb.constant.AppConstant;
 import com.fashionweb.constant.Role;
 import com.fashionweb.model.User;
 import jakarta.servlet.ServletException;
@@ -43,6 +44,13 @@ public class LoginServlet extends HttpServlet {
         if (req.getAttribute("mode") == null) {
             req.setAttribute("mode", "customer");
         }
+        var session = req.getSession(false);
+        Object pending = session == null ? null : session.getAttribute(
+                AppConstant.SESSION_LOGIN_EMAIL);
+        String submitted = req.getParameter("email");
+        req.setAttribute("canContinueCode", !"admin".equals(req.getAttribute("mode"))
+                && pending instanceof String email
+                && (submitted == null || email.equalsIgnoreCase(submitted.trim())));
         req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
     }
 }

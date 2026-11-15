@@ -221,6 +221,15 @@ a.thumb:hover { opacity: .85; }
 .co-h--sub { font-size: 16px; line-height: 19.2px; margin: 26px 0 14px; }
 .co-link { font-size: 14px; color: var(--navy); text-decoration: underline; text-underline-offset: 3px; transition: opacity .2s ease-in-out; }
 .co-link:hover { opacity: .6; }
+.co-location { margin: -4px 0 18px; }
+.co-location__button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 40px; padding: 9px 14px; border: 1px solid #dedede; border-radius: 10px; background: var(--white); color: var(--navy); font: inherit; font-weight: 700; transition: border-color .2s ease-in-out, background-color .2s ease-in-out; }
+.co-location__button:hover:not(:disabled) { border-color: var(--navy); background: #f5f5f5; }
+.co-location__button:disabled { opacity: .65; cursor: wait; }
+.co-location__button .spinner { display: none; }
+.co-location__button.is-loading .spinner { display: inline-block; }
+.co-location__notice, .co-location__status { margin-top: 7px; color: #707070; font-size: 12px; line-height: 17px; }
+.co-location__notice a { color: var(--navy); text-decoration: underline; text-underline-offset: 2px; }
+.co-location__status.is-error { color: var(--danger); }
 .co-muted { color: #707070; }
 .co-small { font-size: 12px; }
 .co-hint, .co-error { margin-top: 6px; font-size: 13px; line-height: 18px; color: #707070; }

@@ -27,14 +27,14 @@
 
         <div class="acc-enter" style="--d:1">
           <%@ include file="/WEB-INF/views/common/flash.jspf" %>
-          <form class="auth-form" method="post" action="${ctx}${isAdmin ? '/admin/login' : '/login/email'}">
+          <form class="auth-form" data-login-request data-retry-seconds="${empty retryAfterSeconds ? 0 : retryAfterSeconds}" method="post" action="${ctx}${isAdmin ? '/admin/login' : '/login/email'}">
             <input type="hidden" name="redirect" value="${fn:escapeXml(param.redirect)}">
 
             <div class="field">
               <label class="sr-only" for="login-email">Email</label>
               <input class="input auth__input${not empty errors.email or not empty errors.admin ? ' is-invalid' : ''}" id="login-email" type="email" name="email"
                      value="${fn:escapeXml(param.email)}" placeholder="Email của bạn" autocomplete="email" maxlength="150" required autofocus>
-              <c:if test="${not empty errors.email}"><span class="field__error"><c:out value="${errors.email}"/></span></c:if>
+              <c:if test="${not empty errors.email}"><span class="field__error" data-login-cooldown><c:out value="${errors.email}"/></span></c:if>
               <c:if test="${not empty errors.admin}">
                 <span class="field__error"><c:out value="${errors.admin}"/> <a class="link-underline" href="${ctx}/admin/login">Tới trang đăng nhập quản trị</a></span>
               </c:if>
@@ -42,6 +42,10 @@
 
             <button class="btn btn--primary btn--block" type="submit">Nhận mã đăng nhập</button>
           </form>
+          <c:if test="${canContinueCode}">
+            <p class="auth__note">Bạn đã yêu cầu mã cho email này. Dùng mã trong email mới nhất để tiếp tục.</p>
+            <a class="btn btn--outline btn--block" href="${ctx}/login/code">Nhập mã đã nhận</a>
+          </c:if>
         </div>
 
         <c:if test="${not isAdmin}">

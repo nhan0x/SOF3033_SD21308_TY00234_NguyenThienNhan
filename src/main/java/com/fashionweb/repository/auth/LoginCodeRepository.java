@@ -73,6 +73,19 @@ public class LoginCodeRepository {
         }
     }
 
+    /** SMTP thất bại: chỉ xóa mã của lần gửi đó, không đụng mã của request khác. */
+    public void discardFailedDelivery(String email, String codeHash) {
+        try (Connection con = DBContext.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                     "DELETE FROM login_codes WHERE email = ? AND code_hash = ? AND used = 0")) {
+            ps.setString(1, email);
+            ps.setString(2, codeHash);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Lỗi thu hồi mã chưa gửi được", e);
+        }
+    }
+
     /**
      * Một transaction: khóa mã còn hiệu lực mới nhất của email (FOR UPDATE) để mỗi mã chỉ dùng được một lần.
      * Đúng thì used = 1. Sai thì tăng attempts; đủ maxAttempts thì hủy mã (used = 1).

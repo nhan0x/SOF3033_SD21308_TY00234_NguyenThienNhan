@@ -9,7 +9,7 @@
 * **Công nghệ:** Java 17, Jakarta Servlet 6.1 / JSP 4 / JSTL 3, JDBC `PreparedStatement`, MySQL 8, Apache Tomcat 11, Maven (WAR), HTML/CSS/JS thuần
 * **Kiến trúc:** MVC + Service + Repository. Luồng bắt buộc `Servlet -> Service -> Repository -> MySQL`; Servlet không viết SQL, JSP không gọi Service/Repository. Package chia theo tầng rồi theo chức năng (`auth`, `account`, `shop`, `cart`, `order`, `admin`).
 * **URL chạy local:** `http://localhost:8080/saltair/home` · Trang quản trị: `http://localhost:8080/saltair/admin`
-* **Chạy:** tạo DB bằng `database/schema.sql` rồi `database/data.sql`; chép `db.properties`, `mail.properties`, `cloudinary.properties` từ file `.example` trong `src/main/resources/` (không commit, repo Public); `mvn package` rồi deploy `target/saltair.war`.
+* **Chạy:** tạo DB bằng `database/schema.sql`; chép `db.properties`, `mail.properties`, `cloudinary.properties` từ file `.example` trong `src/main/resources/` (không commit, repo Public); `mvn package` rồi deploy `target/saltair.war`.
 * **Test:** `mvn test` (JUnit 5); GitHub Actions chạy `mvn clean test` khi push hoặc mở PR vào `main`.
 
 ## 2. QUY TẮC NGHIỆP VỤ (BUSINESS RULES)
@@ -43,6 +43,13 @@
 * Khách chưa đăng nhập: giỏ lưu trong session; khi đặt hàng **bắt buộc email**, đơn gắn vào tài khoản của email đó (chưa có thì tạo CUSTOMER), từ chối email Admin hoặc tài khoản bị khóa.
 * Đặt hàng COD trong một transaction: trừ tồn kho, lưu mã voucher, số tiền giảm và phí ship tại thời điểm đặt.
 * **Phí ship cố định 30.000đ**; dùng voucher hợp lệ thì phí ship = 0. `Tổng = tiền hàng − giảm giá + phí ship`.
+* **Dùng vị trí hiện tại (trang thanh toán):**
+  * Chỉ chạy khi khách bấm nút "Dùng vị trí hiện tại"; không tự lấy vị trí khi mở trang. Trình duyệt tự hỏi quyền, chỉ hoạt động trên HTTPS hoặc `localhost`.
+  * Tọa độ được gửi từ trình duyệt tới dịch vụ OpenStreetMap (Nominatim) để tra địa chỉ; trang có ghi chú nói rõ điều này kèm ghi nguồn "© OpenStreetMap contributors". Tối đa 1 lần tra mỗi 1,1 giây.
+  * Kết quả điền vào địa chỉ mới (số nhà + đường, phường, quận/huyện, tỉnh/thành); khách phải kiểm tra lại trước khi đặt hàng. Không tra được thì báo lỗi và khách nhập tay như bình thường.
+  * Thông báo lỗi riêng cho: từ chối quyền, không xác định được vị trí, quá 12 giây, trình duyệt không hỗ trợ, tra địa chỉ thất bại.
+  * Cơ sở dữ liệu: `addresses.latitude/longitude` và `orders.shipping_latitude/shipping_longitude` (`DECIMAL(10,7)`, cho phép NULL; cả hai cùng có hoặc cùng trống, vĩ độ ±90, kinh độ ±180). Địa chỉ nhập tay không có tọa độ.
+  * *Chưa làm:* phía server chưa đọc và lưu các cột tọa độ này; hiện tính năng mới chỉ điền hộ form.
 
 ### 2.5. Voucher (kiểm tra theo đúng thứ tự, gặp lỗi đầu tiên thì dừng)
 1. Mã không tồn tại → 2. Bị vô hiệu hóa → 3. Chưa đến hạn hoặc quá hạn → 4. Hết tổng lượt dùng → 5. Khách đã dùng đủ số lần cho phép → 6. Chưa đạt đơn tối thiểu → 7. Đơn không có sản phẩm thuộc danh mục áp dụng.
@@ -67,14 +74,10 @@
 * **Thống kê:** tổng đơn, doanh thu (chỉ đơn Hoàn thành) theo khoảng ngày, top sản phẩm bán chạy.
 * **Không làm:** thanh toán online, đăng nhập Google, nhập kho riêng, đổi trả, xuất Excel.
 
-## 3. DỮ LIỆU MẪU ĐỂ KIỂM THỬ (`database/data.sql`)
-| Loại | Dữ liệu |
-| :--- | :--- |
-| Admin | `admin@saltair.vn` (đăng nhập ở `/admin/login`) |
-| Khách | `khach@saltair.vn` (có giỏ, đơn đủ trạng thái), `lan.tran@example.com`, `hoang.le@example.com`, `duc.vo@example.com` |
-| Khách bị khóa | `mai.pham@example.com` |
-| Voucher dùng được | `WELCOME10` (giảm 10%, tối đa 50.000đ, đơn từ 200.000đ), `GIAM50K` (giảm 50.000đ, đơn từ 500.000đ, một danh mục) |
-| Voucher lỗi | `HETHAN20` (hết hạn), `HETLUOT` (hết lượt), `TAMDUNG` (vô hiệu hóa) |
+## 3. DỮ LIỆU THẬT VÀ TÀI KHOẢN ADMIN ĐẦU TIÊN
+* Dự án không còn dữ liệu mẫu: sản phẩm, danh mục, voucher, banner, blog đều do Admin nhập qua trang quản trị.
+* `database/schema.sql` chỉ tạo bảng và **xóa sạch dữ liệu cũ** (có `DROP TABLE`), chỉ chạy trên DB mới hoặc DB dùng để thử.
+* Admin đầu tiên: chạy câu `INSERT INTO users ... 'ADMIN'` ở cuối `schema.sql` với email thật của bạn, rồi đăng nhập ở `/admin/login` bằng mã 6 số gửi qua email đó.
 
 ## 4. QUY ƯỚC LÀM VIỆC TRÊN GITHUB
 * **`main`**: bản ổn định, giảng viên chấm. Chỉ nhận PR từ `develop` khi xong một đợt (cuối tuần / nộp bài), không code trực tiếp.
