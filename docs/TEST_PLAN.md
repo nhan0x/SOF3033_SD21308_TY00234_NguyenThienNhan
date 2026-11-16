@@ -35,13 +35,13 @@
 | Toàn luồng | Làm tay (hoặc script curl) | Mục 5 bên dưới | Trước khi merge PR lớn, trước khi lên `main` |
 
 ## 4. MÔI TRƯỜNG & DỮ LIỆU
-* Cách chạy, cấu hình và dữ liệu mẫu: [SPECIFICATIONS.md](SPECIFICATIONS.md) mục 2 và mục 6.
-* Trước mỗi đợt test: chạy lại `database/schema.sql` rồi `database/data.sql` để có dữ liệu sạch.
+* Cách chạy, cấu hình và tài khoản Admin đầu tiên: [SPECIFICATIONS.md](SPECIFICATIONS.md) mục 2 và mục 3.
+* Test trên một DB riêng (ví dụ `saltair_test`, trỏ `db.url` tới đó), không test trên DB dữ liệu thật. Muốn dữ liệu sạch thì chạy lại `database/schema.sql` trên DB test đó rồi tạo Admin và dữ liệu cần thiết.
 
 ## 5. CÁC LUỒNG CHÍNH PHẢI LUÔN CHẠY ĐƯỢC (SMOKE)
 1. Khách chưa đăng nhập mở trang chủ, tìm kiếm, mở chi tiết sản phẩm, thêm vào giỏ.
 2. Khách đăng nhập bằng mã, quay về đúng trang trước đó, giỏ hàng giữ nguyên.
-3. Đặt hàng có voucher `WELCOME10`: phí ship bằng 0, tồn kho giảm.
+3. Đặt hàng có một voucher đang dùng được (do Admin tạo): phí ship bằng 0, tồn kho giảm.
 4. Khách hủy đơn "Chờ xác nhận": tồn kho và lượt dùng voucher được trả lại.
 5. Admin đăng nhập ở `/admin/login`, chuyển đơn sang "Đang giao" rồi "Hoàn thành".
 6. Khách đánh giá đơn "Hoàn thành".

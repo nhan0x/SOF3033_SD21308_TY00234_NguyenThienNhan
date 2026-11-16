@@ -165,18 +165,24 @@ public class OrderService {
 
     /**
      * Một trang đơn của khách (trang "Đơn hàng của tôi"), mỗi đơn kèm items.
+     * status null (tab "Tất cả") không gồm đơn đã hủy: đơn đã hủy chỉ xem ở tab "Đã hủy" (#4).
      */
     public Page<Order> findPageByUser(int userId, OrderStatus status, int page, int pageSize) {
-        Page<Order> p = orderRepository.findPageByUser(userId, status, page, pageSize);
+        Page<Order> p = orderRepository.findPageByUser(userId, status, OrderStatus.CANCELLED, page, pageSize);
         p.getItems().forEach(o -> o.setItems(orderDetailRepository.findByOrder(o.getId())));
         return p;
     }
 
     /**
-     * Số đơn theo từng trạng thái và khóa ALL.
+     * Số đơn của khách theo từng trạng thái. ALL = số đơn ở tab "Tất cả" (không tính đơn đã hủy, #4);
+     * TOTAL = mọi đơn kể cả đã hủy (0 nghĩa là khách chưa từng đặt hàng).
      */
     public Map<String, Integer> countByStatusForUser(int userId) {
-        return orderRepository.countByStatus(userId, null, null);
+        Map<String, Integer> counts = orderRepository.countByStatus(userId, null, null);
+        int total = counts.getOrDefault("ALL", 0);
+        counts.put("TOTAL", total);
+        counts.put("ALL", total - counts.getOrDefault(OrderStatus.CANCELLED.name(), 0));
+        return counts;
     }
 
     /**

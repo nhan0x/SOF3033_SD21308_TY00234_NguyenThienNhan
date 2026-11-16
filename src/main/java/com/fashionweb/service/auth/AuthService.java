@@ -1,6 +1,7 @@
 package com.fashionweb.service.auth;
 
 import com.fashionweb.constant.Role;
+import com.fashionweb.exception.RetryAfterException;
 import com.fashionweb.repository.auth.LoginCodeRepository;
 import com.fashionweb.repository.auth.LoginCodeRepository.RecentStats;
 import com.fashionweb.repository.auth.LoginCodeRepository.VerifyResult;
@@ -8,6 +9,7 @@ import com.fashionweb.repository.auth.UserRepository;
 import com.fashionweb.exception.ValidationException;
 import com.fashionweb.model.User;
 import com.fashionweb.util.MailUtil;
+import com.fashionweb.util.AuthMailTemplate;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -98,9 +100,12 @@ public class AuthService {
         }
 
         RecentStats stats = codeRepository.recentStats(email);
-        if (stats.countLastHour() >= flow.maxPerHour
-                || (stats.secondsSinceLast() >= 0 && stats.secondsSinceLast() < RESEND_SECONDS)) {
-            throw new ValidationException("email", "Bạn thử lại sau ít phút.");
+        if (stats.countLastHour() >= flow.maxPerHour) {
+            throw new ValidationException("email", "Bạn đã yêu cầu tối đa " + flow.maxPerHour
+                    + " mã trong một giờ. Hãy dùng mã mới nhất đã nhận hoặc thử lại khi giới hạn một giờ được làm mới.");
+        }
+        if (stats.secondsSinceLast() >= 0 && stats.secondsSinceLast() < RESEND_SECONDS) {
+            throw new RetryAfterException(RESEND_SECONDS - stats.secondsSinceLast());
         }
 
         String code = String.format("%06d", RANDOM.nextInt(1_000_000));
@@ -111,8 +116,16 @@ public class AuthService {
             return code;
         }
         try {
-            MailUtil.send(email, code + " là mã đăng nhập Saltair của bạn", mailBody(code, flow));
+            AuthMailTemplate.Content mail = AuthMailTemplate.verification(code, flow.minutes,
+                    flow == Flow.ADMIN ? AuthMailTemplate.Purpose.ADMIN_LOGIN
+                            : u == null ? AuthMailTemplate.Purpose.REGISTRATION : AuthMailTemplate.Purpose.LOGIN);
+            MailUtil.send(email, mail.subject(), mail.text(), mail.html());
         } catch (Exception e) {
+            try {
+                codeRepository.discardFailedDelivery(email, hash(email, code));
+            } catch (RuntimeException cleanupError) {
+                e.addSuppressed(cleanupError);
+            }
             LOG.log(Level.WARNING, "Không gửi được mã đăng nhập tới " + email, e);
             throw new ValidationException("email", "Không gửi được mã, vui lòng thử lại.");
         }
@@ -216,14 +229,6 @@ public class AuthService {
         }, "admin-login-mail");
         t.setDaemon(true);
         t.start();
-    }
-
-    private static String mailBody(String code, Flow flow) {
-        return "SALTAIR\n\n"
-                + "Mã xác thực của bạn\n\n"
-                + "    " + code + "\n\n"
-                + "Mã chỉ dùng được một lần và hết hạn sau " + flow.minutes + " phút.\n"
-                + "Nếu bạn không yêu cầu mã này, hãy bỏ qua email.\n";
     }
 
     /** SHA-256 hex của email + ":" + mã: không lưu mã gốc, và cùng một mã ở hai email cho hai băm khác nhau. */

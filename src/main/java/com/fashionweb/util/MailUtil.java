@@ -8,6 +8,8 @@ import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMultipart;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +52,11 @@ public final class MailUtil {
      * @throws IllegalStateException nếu chưa có mail.properties hoặc thiếu username/password
      */
     public static void send(String to, String subject, String body) throws MessagingException {
+        send(to, subject, body, null);
+    }
+
+    /** Gửi HTML với bản văn bản dự phòng cho trình đọc email. */
+    public static void send(String to, String subject, String body, String html) throws MessagingException {
         String host = PROPS.getProperty("mail.host");
         String username = PROPS.getProperty("mail.username");
         String password = PROPS.getProperty("mail.password");
@@ -81,7 +88,18 @@ public final class MailUtil {
         }
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
         message.setSubject(subject, "UTF-8");
-        message.setText(body, "UTF-8");
+        if (html == null) {
+            message.setText(body, "UTF-8");
+        } else {
+            MimeMultipart alternative = new MimeMultipart("alternative");
+            MimeBodyPart plain = new MimeBodyPart();
+            plain.setText(body, "UTF-8");
+            alternative.addBodyPart(plain);
+            MimeBodyPart rich = new MimeBodyPart();
+            rich.setText(html, "UTF-8", "html");
+            alternative.addBodyPart(rich);
+            message.setContent(alternative);
+        }
         Transport.send(message);
     }
 }

@@ -8,20 +8,14 @@
 .acc-enter { animation: acc-enter .6s var(--ease) both; animation-delay: calc(var(--d, 0) * 70ms + 40ms); }
 @keyframes acc-enter { from { opacity: 0; transform: translateY(16px); } }
 
-/* ---------- Đăng nhập / đăng ký: nửa trái là ảnh ---------- */
-.auth__media { overflow: hidden; min-height: 520px; }
-.auth__media > .ph, .auth__media > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.auth__media > .ph .icon { width: 56px; height: 56px; }
-.auth__media > img { transform: scale(1.04); animation: hero-zoom 1.6s var(--ease) forwards; }
-.auth__caption { position: absolute; left: var(--gutter); right: var(--gutter); bottom: 48px; z-index: 1; display: grid; gap: 12px; max-width: 440px; animation: acc-enter .7s .3s var(--ease) both; }
-.auth__media--photo { color: var(--white); }
-.auth__media--photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--navy-60), transparent 55%); }
-
-.auth__box--wide { max-width: 460px; }
-.auth__intro { display: grid; gap: 8px; }
+/* ---------- Đăng nhập: form canh giữa, không ảnh (#6) ---------- */
+.auth__intro { display: grid; gap: 10px; justify-items: center; }
+.auth__title { font-size: 30px; line-height: 36px; font-weight: 700; letter-spacing: -.6px; margin: 0; text-wrap: balance; }
+.auth__input { height: 52px; text-align: center; }
+.auth__note { margin: 0; font-size: 13px; color: var(--navy-60); }
+.auth .field__error { text-align: center; }
+.auth .alert { text-align: left; }
 .auth-form { display: grid; gap: 20px; }
-.auth__alt { text-align: center; font-size: 14px; color: var(--navy-60); }
-.auth__alt a { color: var(--navy); font-weight: 700; }
 
 .auth__devcode { padding: 10px 14px; border-radius: 8px; background: #fff6e0; font-size: 13px; margin: 0 0 16px; }
 
@@ -75,12 +69,6 @@
 .dev-box__links { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* ---------- Quên / đặt lại mật khẩu: thẻ ở giữa ---------- */
-.auth--single { grid-template-columns: 1fr; background: var(--bg); }
-.auth-card { background: var(--white); padding: 48px 40px; max-width: 480px; text-align: center; }
-.auth-card .auth-form, .auth-card .field { text-align: left; }
-.auth-card .btn-row { display: grid; gap: 12px; }
-.auth-card .dev-box { text-align: left; }
-.auth-card > .link-underline { justify-self: center; }
 .state-icon { width: 72px; height: 72px; margin-inline: auto; border-radius: 50%; background: var(--bg); display: grid; place-items: center; animation: pop .5s .2s ease both; }
 .state-icon .icon { width: 28px; height: 28px; }
 .state-icon--ok { color: var(--success); }
@@ -196,7 +184,7 @@ dialog.dialog .dialog__body { flex: 1; min-height: 0; display: grid; gap: 20px; 
 
 /* ---------- Responsive ---------- */
 @media (max-width: 990px) {
-  .auth__form { padding: 40px var(--gutter) 64px; }
+  .auth { padding: 48px var(--gutter) 72px; }
   /* Cột trái xếp lên trên thành một hàng, cuộn ngang được khi không đủ chỗ */
   .acct { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-top: 32px; }
   .acct__nav { position: static; display: flex; align-items: baseline; gap: 6px 24px; flex-wrap: wrap; }
@@ -208,8 +196,8 @@ dialog.dialog .dialog__body { flex: 1; min-height: 0; display: grid; gap: 20px; 
 }
 
 @media (max-width: 750px) {
-  .auth__form { padding-block: 32px 56px; }
-  .auth-card { padding: 36px 24px; }
+  .auth { padding: 40px 20px 64px; align-items: flex-start; }
+  .auth__title { font-size: 26px; line-height: 32px; }
   .acct-header { height: 64px; }
   .acct-header__logo img { height: 34px; }
   .acct-page .account-pop { top: 16px; }

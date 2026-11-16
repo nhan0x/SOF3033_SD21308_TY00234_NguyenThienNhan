@@ -245,7 +245,7 @@
   </footer>
 </c:if>
 
-<script src="${ctx}/assets/js/app.js?v=4" defer></script>
+<script src="${ctx}/assets/js/app.js?v=6" defer></script>
 <jsp:invoke fragment="scripts"/>
 </body>
 </html>

@@ -41,7 +41,31 @@
     return new Intl.NumberFormat('vi-VN').format(Math.round(n)) + 'đ';
   }
 
-  window.Saltair = { toast, formatVnd, demo: DEMO };
+  const loginTimers = new WeakMap();
+  function startLoginCooldown(form, seconds, message) {
+    clearInterval(loginTimers.get(form));
+    const deadline = Number(form.dataset.retryUntil) || Date.now() + seconds * 1000;
+    form.dataset.retryUntil = String(deadline);
+    const button = form.querySelector('button[type="submit"]');
+    const update = () => {
+      const remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      if (button) {
+        button.disabled = remaining > 0;
+        button.textContent = remaining > 0 ? `Gửi lại mã sau ${remaining}s` : 'Nhận mã đăng nhập';
+      }
+      if (message) message.textContent = remaining > 0
+        ? `Mã vừa được yêu cầu. Kiểm tra hộp thư và thư rác, hoặc chờ ${remaining} giây để yêu cầu mã mới.`
+        : 'Bạn có thể yêu cầu mã mới.';
+      if (remaining === 0) {
+        clearInterval(loginTimers.get(form));
+        delete form.dataset.retryUntil;
+        form.dataset.retrySeconds = '0';
+      }
+      return remaining;
+    };
+    if (update() > 0) loginTimers.set(form, setInterval(update, 250));
+  }
+  window.Saltair = { toast, formatVnd, demo: DEMO, startLoginCooldown };
 
   /* ---------- Thanh thông báo ---------- */
   $$('[data-announcements]').forEach((root) => {
@@ -472,6 +496,10 @@
         let html = esc(data.error || 'Không gửi được mã, vui lòng thử lại.');
         if (data.adminUrl) html += ' <a href="' + esc(data.adminUrl) + '">Tới trang quản trị</a>';
         showMsg(html);
+        if (data.retryAfterSeconds > 0) {
+          delete form.dataset.retryUntil;
+          startLoginCooldown(form, data.retryAfterSeconds, msg);
+        }
       } catch (err) {
         showMsg('Không gửi được mã, vui lòng thử lại.');
       }
@@ -872,3 +900,34 @@
     img.replaceWith(ph);
   }, true);
 })();
+
+// Khóa form đăng nhập khi đang gửi để một lần thao tác không tạo nhiều request.
+document.querySelectorAll('form[data-login-request]').forEach((form) => {
+  form.addEventListener('submit', (event) => {
+    if (form.dataset.sending === 'true' || Number(form.dataset.retryUntil) > Date.now()) {
+      event.preventDefault();
+      return;
+    }
+    form.dataset.sending = 'true';
+    form.setAttribute('aria-busy', 'true');
+    const button = form.querySelector('button[type="submit"]');
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Đang gửi mã…';
+    }
+  });
+});
+window.addEventListener('pageshow', () => {
+  document.querySelectorAll('form[data-login-request]').forEach((form) => {
+    delete form.dataset.sending;
+    form.removeAttribute('aria-busy');
+    const button = form.querySelector('button[type="submit"]');
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Nhận mã đăng nhập';
+    }
+    if (Number(form.dataset.retrySeconds) > 0 || Number(form.dataset.retryUntil) > Date.now()) {
+      window.Saltair.startLoginCooldown(form, Number(form.dataset.retrySeconds), form.querySelector('[data-login-cooldown]'));
+    }
+  });
+});

@@ -114,6 +114,191 @@
     $$('[data-req]', newBox).forEach((i) => { i.required = true; });
   }
 
+  // Lấy tọa độ chỉ sau thao tác chủ động của người dùng, rồi tra địa chỉ một lần.
+  const locateButton = $('[data-co-location]');
+  if (locateButton) {
+    const locateStatus = $('[data-co-location-status]');
+    let lastLookupAt = 0;
+    const setLocationStatus = (message, isError = false) => {
+      locateStatus.textContent = message;
+      locateStatus.classList.toggle('is-error', isError);
+      locateStatus.hidden = false;
+    };
+    const currentPosition = () => new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 12000,
+        maximumAge: 60000
+      });
+    });
+    const firstAddressValue = (address, keys) => {
+      for (const key of keys) if (address[key]) return address[key];
+      return '';
+    };
+    const fillAddressField = (name, value) => {
+      const input = checkoutForm?.querySelector(`[name="${name}"]`);
+      if (!input || !value || value.length > Number(input.maxLength || Infinity)) return false;
+      input.value = value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      return true;
+    };
+    locateButton.addEventListener('click', async () => {
+      if (!navigator.geolocation) {
+        setLocationStatus('Trình duyệt này không hỗ trợ lấy vị trí.', true);
+        return;
+      }
+      locateButton.disabled = true;
+      locateButton.classList.add('is-loading');
+      const label = $('[data-co-location-label]', locateButton);
+      if (label) label.textContent = 'Đang lấy vị trí…';
+      setLocationStatus('Hãy cho phép trình duyệt truy cập vị trí của bạn.');
+      try {
+        const position = await currentPosition();
+        const wait = Math.max(0, 1100 - (Date.now() - lastLookupAt));
+        if (wait) await new Promise((resolve) => setTimeout(resolve, wait));
+        lastLookupAt = Date.now();
+        const query = new URLSearchParams({
+          format: 'jsonv2',
+          lat: String(position.coords.latitude),
+          lon: String(position.coords.longitude),
+          zoom: '18',
+          addressdetails: '1',
+          'accept-language': 'vi'
+        });
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?${query}`, {
+          headers: { Accept: 'application/json' }
+        });
+        if (!response.ok) throw new Error('Không tra được địa chỉ từ vị trí hiện tại.');
+        const result = await response.json();
+        const address = result.address || {};
+        const street = firstAddressValue(address, ['road', 'pedestrian', 'residential', 'street', 'path']);
+        const house = address.house_number || '';
+        const addressLine = [house, street].filter(Boolean).join(' ');
+        const ward = firstAddressValue(address, ['ward', 'quarter', 'neighbourhood', 'suburb', 'hamlet']);
+        const district = firstAddressValue(address, ['city_district', 'district', 'county']);
+        const city = firstAddressValue(address, ['state', 'province', 'region', 'city']);
+
+        const newAddress = checkoutForm?.querySelector('input[type="radio"][name="addressId"][value="new"]');
+        if (newAddress) {
+          newAddress.checked = true;
+          newAddress.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        fillAddressField('addressLine', addressLine);
+        fillAddressField('ward', ward);
+        fillAddressField('district', district);
+        fillAddressField('city', city);
+        setLocationStatus(addressLine
+          ? 'Đã điền địa chỉ gần vị trí của bạn. Hãy kiểm tra và bổ sung số nhà nếu cần.'
+          : 'Đã lấy vị trí, nhưng bản đồ chưa có tên đường ở khu vực này. Vui lòng nhập địa chỉ chi tiết.');
+      } catch (error) {
+        const messages = {
+          1: 'Quyền truy cập vị trí bị từ chối. Hãy cho phép trong cài đặt trình duyệt rồi thử lại.',
+          2: 'Không xác định được vị trí. Hãy bật GPS hoặc kiểm tra kết nối rồi thử lại.',
+          3: 'Lấy vị trí quá lâu. Hãy thử lại ở nơi có tín hiệu tốt hơn.'
+        };
+        setLocationStatus(error?.code ? (messages[error.code] || 'Không lấy được vị trí hiện tại.') : (error.message || 'Không tra được địa chỉ. Bạn có thể nhập thủ công.'), true);
+      } finally {
+        locateButton.disabled = false;
+        locateButton.classList.remove('is-loading');
+        if (label) label.textContent = 'Dùng vị trí hiện tại';
+      }
+    });
+  }
+
+  // Lỗi checkout dùng chung một kiểu hiển thị cho kiểm tra tại trình duyệt và lỗi từ server.
+  const checkoutForm = $('[data-checkout-form]');
+  if (checkoutForm) {
+    const messages = {
+      email: 'Nhập email hợp lệ để nhận thông tin đơn hàng.',
+      receiverName: 'Nhập họ tên người nhận (ít nhất 2 ký tự).',
+      receiverPhone: 'Số điện thoại gồm 10 chữ số, bắt đầu bằng 0.',
+      addressLine: 'Nhập số nhà và tên đường (ít nhất 5 ký tự).',
+      city: 'Nhập tỉnh hoặc thành phố.',
+      note: 'Ghi chú tối đa 500 ký tự.'
+    };
+    let validationStarted = false;
+    $$('.co-field.is-invalid', checkoutForm).forEach((field) => {
+      const input = $('input, textarea', field);
+      const error = field.closest('.co-cell')?.querySelector('.co-error') || field.parentElement?.querySelector('.co-error');
+      if (input) {
+        input.setAttribute('aria-invalid', 'true');
+        if (error) {
+          error.classList.add('co-error--validation');
+          error.setAttribute('role', 'alert');
+          error.id ||= `${input.id || input.name}-error`;
+          input.setAttribute('aria-describedby', error.id);
+        }
+      }
+    });
+    const errorNode = (input) => {
+      if (input.id === 'f-email') return $('#f-email-hint');
+      const cell = input.closest('.co-cell') || input.closest('.co-field')?.parentElement;
+      return cell?.querySelector('.co-error') || null;
+    };
+    const paintError = (input, message) => {
+      const field = input.closest('.co-field');
+      let node = errorNode(input);
+      if (message && !node) {
+        node = document.createElement('p');
+        node.className = 'co-error';
+        node.setAttribute('role', 'alert');
+        (field?.closest('.co-cell') || field?.parentElement)?.appendChild(node);
+      }
+      if (node && message) {
+        node.textContent = message;
+        node.classList.add('co-error--validation');
+        node.id ||= `${input.id || input.name}-error`;
+        input.setAttribute('aria-describedby', node.id);
+      } else if (node?.classList.contains('co-error--validation')) {
+        if (input.id === 'f-email') {
+          node.textContent = 'Dùng để xem lại đơn hàng: đăng nhập bằng email này và mã 6 số.';
+          node.classList.remove('co-error--validation');
+          input.setAttribute('aria-describedby', 'f-email-hint');
+        } else node.remove();
+        if (input.id !== 'f-email') input.removeAttribute('aria-describedby');
+      }
+      field?.classList.toggle('is-invalid', !!message);
+      if (message) input.setAttribute('aria-invalid', 'true');
+      else input.removeAttribute('aria-invalid');
+      return !!message;
+    };
+    const validateField = (input) => {
+      if (!input || input.disabled || input.closest('[hidden]')) return false;
+      const value = input.value.trim();
+      let message = '';
+      if (input.required && !value) message = input.name === 'email' ? 'Vui lòng nhập email.' : 'Trường này không được để trống.';
+      else if (value && input.name === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) message = messages.email;
+      else if (value && input.name === 'receiverName' && value.length < 2) message = messages.receiverName;
+      else if (value && input.name === 'receiverPhone' && !/^0[0-9]{9}$/.test(value)) message = messages.receiverPhone;
+      else if (value && input.name === 'addressLine' && value.length < 5) message = messages.addressLine;
+      else if (input.name === 'note' && value.length > 500) message = messages.note;
+      return paintError(input, message);
+    };
+    checkoutForm.addEventListener('submit', (event) => {
+      const submitter = event.submitter;
+      if (submitter && submitter.value !== 'placeOrder') return; // Áp dụng/gỡ voucher không kiểm tra đơn hàng.
+      validationStarted = true;
+      const fields = $$('input[name="email"], [data-req], textarea[name="note"]', checkoutForm)
+        .filter((input) => !input.closest('[hidden]'));
+      const invalid = fields.filter(validateField);
+      if (invalid.length) {
+        event.preventDefault();
+        invalid[0].focus();
+        invalid[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+    checkoutForm.addEventListener('input', (event) => {
+      if (validationStarted && event.target.matches('input, textarea')) validateField(event.target);
+    });
+    checkoutForm.addEventListener('change', (event) => {
+      if (event.target.name === 'addressId') {
+        // Xóa trạng thái lỗi của nhóm địa chỉ khi người dùng chọn địa chỉ khác.
+        const err = checkoutForm.querySelector('.co-choices + .co-error');
+        if (err) err.remove();
+      }
+    });
+  }
+
   // Trang thanh toán mới (#86): chip gợi ý điền mã, gập mở tóm tắt trên điện thoại, chống bấm Đặt hàng hai lần
   const voucherInput = $('[data-voucher-input]');
   if (voucherInput) {

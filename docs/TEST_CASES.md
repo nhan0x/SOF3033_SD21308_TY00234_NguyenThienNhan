@@ -1,7 +1,7 @@
 # BỘ KỊCH BẢN KIỂM THỬ (TEST CASES)
 
 * **Dự án:** Saltair · **Đặc tả:** [SPECIFICATIONS.md](SPECIFICATIONS.md) · **Kế hoạch:** [TEST_PLAN.md](TEST_PLAN.md)
-* **Môi trường:** dữ liệu sạch từ `schema.sql` + `data.sql`, `auth.devCode=true` · **Ngày chạy gần nhất:** 11/11/2026
+* **Môi trường:** DB test riêng dựng từ `schema.sql`, `auth.devCode=true` · **Ngày chạy gần nhất:** 11/11/2026
 
 ## 1. ĐĂNG NHẬP BẰNG EMAIL + MÃ 6 SỐ (mục 2.2 trong SPECIFICATIONS)
 
@@ -34,5 +34,35 @@
 | **TC_AUTH_25** | Giao diện đăng nhập | Gõ mã sai trên 6 ô | Negative | 1. Gõ 6 số sai | `000000` | Ô viền đỏ, rung, báo số lần còn lại, xóa ô và focus ô đầu | Pass |
 | **TC_AUTH_26** | Giao diện đăng nhập | Tắt JavaScript vẫn đăng nhập được | Positive | 1. Tắt JS<br>2. Nhập 6 ô, bấm "Xác nhận" | Mã đúng | Đăng nhập thành công | Pass |
 | **TC_AUTH_27** | Giao diện đăng nhập | Khổ điện thoại | Positive | 1. Mở ở 375px<br>2. Bấm icon người | | Khung rộng `100vw - 32px`, 6 ô vừa màn hình | Pass |
+| **TC_AUTH_28** | Giao diện đăng nhập | Trang đăng nhập tối giản, không ảnh | Positive | 1. Mở `/login` và `/admin/login` ở 1440px và 375px | | Không có khung ảnh, form nằm giữa trang, không tràn ngang; lỗi email vẫn hiện dưới ô nhập | Pass |
 
-> Các chức năng còn lại (giỏ hàng, voucher, đặt hàng, CRUD quản trị) sẽ bổ sung ở Y2 theo [HUONG_DAN_CHI_TIET_6_TUAN.md](HUONG_DAN_CHI_TIET_6_TUAN.md).
+## 2. ĐƠN HÀNG CỦA KHÁCH (mục 2.6 trong SPECIFICATIONS)
+
+| Test Case ID | Chức năng | Mô tả ca kiểm thử | Loại test (Pos/Neg) | Các bước thực hiện | Dữ liệu kiểm thử (Test Data) | Kết quả mong đợi | Trạng thái (Pass/Fail) |
+| :---: | :---: | :--- | :---: | :--- | :--- | :--- | :---: |
+| **TC_ORDER_01** | Đơn hàng | Tab Tất cả không hiện đơn đã hủy | Positive | 1. Đăng nhập<br>2. Mở `/orders` | `khach@saltair.vn` (5 đơn, 1 đã hủy) | Hiện 4 đơn, không có `SA20261024005`; số trên tab Tất cả là 4 | Pass |
+| **TC_ORDER_02** | Đơn hàng | Tab Đã hủy vẫn hiện đơn đã hủy | Positive | 1. Mở `/orders?status=CANCELLED` | `khach@saltair.vn` | Hiện đơn `SA20261024005`, số trên tab Đã hủy là 1 | Pass |
+| **TC_ORDER_03** | Đơn hàng | Khách chỉ còn đơn đã hủy | Negative | 1. Hủy hết đơn của khách<br>2. Mở `/orders` | `duc.vo@example.com` | Tab Tất cả 0, báo "Không có đơn đang xử lý", có nút "Xem đơn đã hủy" | Pass |
+| **TC_ORDER_04** | Đơn hàng | Khách chưa từng đặt hàng | Positive | 1. Đăng nhập email mới<br>2. Mở `/orders` | `newbie4@x.vn` | Hiện thẻ "Chào mừng, sẵn sàng mua sắm?", không có các tab | Pass |
+
+## 3. THANH TOÁN & ĐẶT HÀNG (mục 2.4 trong SPECIFICATIONS)
+
+| Test Case ID | Chức năng | Mô tả ca kiểm thử | Loại test (Pos/Neg) | Các bước thực hiện | Dữ liệu kiểm thử (Test Data) | Kết quả mong đợi | Trạng thái (Pass/Fail) |
+| :---: | :---: | :--- | :---: | :--- | :--- | :--- | :---: |
+| **TC_CHECKOUT_01** | Thanh toán | Bấm Đặt hàng khi để trống trường bắt buộc | Negative | 1. Mở `/checkout`<br>2. Bấm "Đặt hàng" mà không nhập thông tin | Để trống họ tên, số điện thoại, địa chỉ | Không gửi form, cuộn và focus ô lỗi đầu tiên, ô viền đỏ, hiện thông báo lỗi | Pass |
+| **TC_CHECKOUT_02** | Thanh toán | Nhập email sai định dạng | Negative | 1. Mở `/checkout` với khách vãng lai<br>2. Nhập email sai định dạng | `invalid-email` | Báo "Nhập email hợp lệ để nhận thông tin đơn hàng.", ô viền đỏ | Pass |
+| **TC_CHECKOUT_03** | Thanh toán | Nhập số điện thoại sai định dạng | Negative | 1. Nhập SĐT không đủ 10 số hoặc không bắt đầu bằng 0<br>2. Bấm Đặt hàng | `0912345` / `1234567890` | Báo "Số điện thoại gồm 10 chữ số, bắt đầu bằng 0." | Pass |
+| **TC_CHECKOUT_04** | Thanh toán | Nhập địa chỉ dưới 5 ký tự | Negative | 1. Nhập địa chỉ ngắn<br>2. Bấm Đặt hàng | `123` | Báo "Nhập số nhà và tên đường (ít nhất 5 ký tự)." | Pass |
+| **TC_CHECKOUT_05** | Thanh toán | Chọn địa chỉ khác sau khi có lỗi | Positive | 1. Đăng nhập tài khoản có nhiều địa chỉ<br>2. Để trống/chọn sai địa chỉ<br>3. Chọn một địa chỉ hợp lệ có sẵn | Địa chỉ có sẵn | Khung viền đỏ và thông báo lỗi của nhóm địa chỉ tự động biến mất | Pass |
+| **TC_CHECKOUT_06** | Thanh toán | Nhập đầy đủ thông tin hợp lệ | Positive | 1. Nhập đầy đủ thông tin hợp lệ<br>2. Bấm "Đặt hàng" | Họ tên ≥ 2 ký tự, SĐT 10 số, địa chỉ hợp lệ | Form được gửi bình thường, chuyển sang trang xác nhận đơn | Pass |
+| **TC_CHECKOUT_07** | Vị trí hiện tại | Cho phép vị trí, tra được địa chỉ | Positive | 1. Mở `/checkout` trên HTTPS hoặc `localhost`<br>2. Bấm "Dùng vị trí hiện tại"<br>3. Cho phép trình duyệt | Vị trí thật có đường đi | Nút khóa kèm biểu tượng tải; sau đó chọn "địa chỉ mới" và điền số nhà + đường, phường, quận, tỉnh; hiện câu nhắc kiểm tra lại | Chưa chạy |
+| **TC_CHECKOUT_08** | Vị trí hiện tại | Từ chối quyền vị trí | Negative | 1. Bấm nút<br>2. Chọn "Chặn" | — | Báo "Quyền truy cập vị trí bị từ chối…" (màu lỗi); nút dùng lại được; form không bị đổi | Chưa chạy |
+| **TC_CHECKOUT_09** | Vị trí hiện tại | Không xác định được vị trí hoặc quá thời gian | Negative | 1. Tắt định vị hệ thống hoặc giả lập mất tín hiệu<br>2. Bấm nút | — | Báo lỗi "Không xác định được vị trí…" hoặc "Lấy vị trí quá lâu…" sau tối đa 12 giây | Chưa chạy |
+| **TC_CHECKOUT_10** | Vị trí hiện tại | Dịch vụ tra địa chỉ lỗi | Negative | 1. Chặn `nominatim.openstreetmap.org` (DevTools)<br>2. Bấm nút | — | Báo "Không tra được địa chỉ…", khách vẫn nhập tay và đặt hàng được | Chưa chạy |
+| **TC_CHECKOUT_11** | Vị trí hiện tại | Khu vực không có tên đường | Negative | 1. Bấm nút tại vị trí chưa có tên đường trên bản đồ | Vị trí ngoài đường | Báo "…chưa có tên đường…", ô địa chỉ không bị điền bừa | Chưa chạy |
+| **TC_CHECKOUT_12** | Vị trí hiện tại | Khách vãng lai dùng vị trí | Positive | 1. Mở `/checkout` khi chưa đăng nhập<br>2. Bấm nút | Vị trí thật | Các ô địa chỉ được điền, bấm Đặt hàng vẫn qua kiểm tra dữ liệu như TC_CHECKOUT_06 | Chưa chạy |
+| **TC_CHECKOUT_13** | Vị trí hiện tại | Giá trị dài quá giới hạn ô | Negative | 1. Dùng vị trí mà kết quả có phường/tỉnh dài hơn `maxlength` | — | Ô vượt giới hạn bị bỏ trống thay vì cắt cụt | Chưa chạy |
+
+> TC_CHECKOUT_07 đến 13 (vị trí hiện tại) chưa được chạy; cập nhật cột Trạng thái sau khi test.
+
+> Các chức năng còn lại (voucher nâng cao, CRUD quản trị) sẽ bổ sung ở Y2 theo [HUONG_DAN_CHI_TIET_6_TUAN.md](HUONG_DAN_CHI_TIET_6_TUAN.md).

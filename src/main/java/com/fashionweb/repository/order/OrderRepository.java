@@ -99,13 +99,18 @@ public class OrderRepository {
     }
 
     /**
-     * SELECT phân trang đơn của khách, lọc trạng thái (null = tất cả), mới nhất trước.
+     * SELECT phân trang đơn của khách, mới nhất trước. status khác null thì lọc đúng trạng thái đó;
+     * status null thì lấy mọi trạng thái trừ excluded (excluded null = không loại trạng thái nào).
      */
-    public Page<Order> findPageByUser(int userId, OrderStatus status, int page, int pageSize) {
-        String where = "WHERE o.user_id = ?" + (status == null ? " " : " AND o.status = ? ");
+    public Page<Order> findPageByUser(int userId, OrderStatus status, OrderStatus excluded, int page, int pageSize) {
+        String where = "WHERE o.user_id = ? ";
         List<Object> params = new ArrayList<>(List.of(userId));
         if (status != null) {
+            where += "AND o.status = ? ";
             params.add(status.name());
+        } else if (excluded != null) {
+            where += "AND o.status <> ? ";
+            params.add(excluded.name());
         }
         long total = queryLong("SELECT COUNT(*) FROM orders o " + where, params);
         int totalPages = (int) Math.max(1, (total + pageSize - 1) / pageSize);
