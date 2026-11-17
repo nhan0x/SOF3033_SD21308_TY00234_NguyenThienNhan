@@ -83,6 +83,32 @@
             <artifactId>angus-mail</artifactId>
             <version>2.0.3</version>
         </dependency>
+
+        <!-- Flyway: tự tạo/cập nhật cấu trúc database khi web khởi động (src/main/resources/db/migration) -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>10.20.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+            <version>10.20.1</version>
+        </dependency>
+
+        <!-- Đọc JSON phản hồi của payOS (thanh toán chuyển khoản) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.2</version>
+        </dependency>
+
+        <!-- Vẽ mã QR chuyển khoản (VietQR) ngay trên server, không gọi dịch vụ bên ngoài -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.3</version>
+        </dependency>
     </dependencies>
 
     <build>

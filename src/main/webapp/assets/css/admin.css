@@ -1,0 +1,101 @@
+/* ==========================================================================
+   Saltair - Trang quản trị. Dùng chung biến và thành phần từ style.css.
+   Bố cục: menu trái 248px, thanh trên 64px, nền nội dung xám nhạt, thẻ trắng phẳng (không đổ bóng).
+   ========================================================================== */
+body.admin { background: var(--bg); }
+body.admin .drawer { visibility: visible; transform: none; }
+.admin-sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 248px; z-index: 120; background: var(--white); border-right: 1px solid var(--line); display: flex; flex-direction: column; }
+.admin-sidebar__brand { display: flex; align-items: center; gap: 12px; padding: 20px 24px; border-bottom: 1px solid var(--line); }
+.admin-sidebar__brand img { height: 40px; width: auto; }
+.admin-sidebar__nav { flex: 1; overflow-y: auto; padding: 16px 12px; display: grid; gap: 2px; align-content: start; }
+.admin-sidebar__nav a, .admin-sidebar__foot a { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: var(--pill); font-size: 14px; transition: background-color var(--t) var(--ease), color var(--t) var(--ease); }
+.admin-sidebar__nav a:hover, .admin-sidebar__foot a:hover { background: var(--bg); }
+.admin-sidebar__nav a.is-active { background: var(--navy); color: var(--white); }
+.admin-sidebar__group { margin: 20px 14px 6px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--navy-50); }
+.admin-sidebar__foot { padding: 12px; border-top: 1px solid var(--line); display: grid; gap: 2px; }
+
+.admin-main { margin-left: 248px; min-height: 100vh; }
+.admin-topbar { position: sticky; top: 0; z-index: 90; height: 64px; background: var(--white); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 16px; padding: 0 32px; }
+.admin-topbar__title { font-size: 20.2px; line-height: 22px; font-weight: 700; flex: 1; }
+.admin-topbar__burger { display: none; }
+.admin-topbar__user { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+.admin-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--navy); color: var(--white); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
+.admin-content { padding: 24px 32px 64px; }
+.admin-page-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; min-height: 40px; }
+
+.admin-grid { display: grid; gap: 16px; }
+.admin-grid--4 { grid-template-columns: repeat(4, 1fr); }
+.admin-grid--3 { grid-template-columns: repeat(3, 1fr); }
+.admin-grid--2 { grid-template-columns: repeat(2, 1fr); }
+.admin-grid--main { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: start; }
+.admin-card { background: var(--white); border: 1px solid var(--line); padding: 24px; }
+.admin-card__title { font-size: 16.26px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.admin-card--flush { padding: 0; }
+.admin-card--flush .admin-card__title { padding: 20px 24px 0; }
+.stat-card { background: var(--white); border: 1px solid var(--line); padding: 24px; display: grid; gap: 6px; }
+.stat-card__label { color: var(--navy-60); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.stat-card__value { font-size: 30px; line-height: 34px; font-weight: 800; letter-spacing: -.5px; }
+.stat-card__note { font-size: 13px; color: var(--navy-60); }
+
+.admin-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 16px 24px; border-bottom: 1px solid var(--line); }
+.admin-toolbar__left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.admin-toolbar .input, .admin-toolbar .select { min-height: 40px; width: auto; min-width: 180px; font-size: 14px; }
+.admin-table-wrap { overflow-x: auto; position: relative; }   /* relative: chữ ẩn .sr-only (absolute) trong bảng rộng không làm cả trang cuộn ngang */
+.admin-table-wrap .table th:first-child, .admin-table-wrap .table td:first-child { padding-left: 24px; }
+.admin-table-wrap .table th:last-child, .admin-table-wrap .table td:last-child { padding-right: 24px; }
+.admin-table-foot { padding: 12px 24px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--navy-60); }
+.admin-table-foot .pagination { padding: 0; }
+.cell-product { display: flex; align-items: center; gap: 14px; min-width: 220px; }
+.cell-product .thumb { width: 44px; height: 56px; }
+.cell-actions { display: flex; align-items: center; justify-content: flex-end; gap: 4px; white-space: nowrap; }
+.cell-actions .icon-btn { width: 34px; height: 34px; }
+.cell-actions .icon-btn--danger:hover { background: #fbe9e7; color: var(--danger); }
+.empty-row td { text-align: center; color: var(--navy-60); padding: 48px 16px !important; }
+
+.admin-form { display: grid; gap: 24px; }
+.admin-form__section { display: grid; gap: 20px; }
+.admin-form__actions { display: flex; gap: 12px; justify-content: flex-end; padding-top: 8px; }
+.upload-box { border: 1px dashed var(--line-2); background: var(--white); min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; color: var(--navy-60); padding: 24px; transition: border-color var(--t) var(--ease), background-color var(--t) var(--ease); cursor: pointer; }
+.upload-box:hover { border-color: var(--navy); background: #fafafa; }
+.upload-box .icon { width: 28px; height: 28px; stroke-width: 1.2; }
+.color-dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line-2); vertical-align: -2px; margin-right: 8px; background: var(--sw, #ccc); }
+.variant-table input.input { min-height: 38px; font-size: 14px; max-width: 110px; }
+.status-line { display: flex; align-items: center; gap: 8px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line-2); }
+.status-dot--on { background: var(--success); }
+.status-dot--off { background: var(--danger); }
+
+/* Biểu đồ cột thuần CSS */
+.bar-chart { display: grid; grid-template-columns: repeat(var(--n, 7), 1fr); gap: 14px; align-items: end; height: 220px; padding-top: 12px; }
+.bar-chart__col { display: grid; gap: 8px; justify-items: center; align-content: end; height: 100%; }
+.bar-chart__bar { width: 100%; max-width: 44px; background: var(--navy); min-height: 3px; height: calc(var(--v, 0) * 1%); transform-origin: bottom; animation: bar-grow .7s var(--ease) both; animation-delay: calc(var(--i, 0) * 60ms); }   /* [EXTRA] */
+.bar-chart__bar:hover { background: var(--cobalt); }
+.bar-chart__val { font-size: 11px; color: var(--navy-60); }
+.bar-chart__lbl { font-size: 12px; color: var(--navy-60); }
+@keyframes bar-grow { from { transform: scaleY(0); } }
+.progress-row { display: grid; gap: 6px; }
+.progress-row__bar { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+.progress-row__bar span { display: block; height: 100%; width: calc(var(--v, 0) * 1%); background: var(--navy); border-radius: 3px; transition: width .6s var(--ease); }
+
+@media (max-width: 1100px) {
+  .admin-grid--4 { grid-template-columns: repeat(2, 1fr); }
+  .admin-grid--main { grid-template-columns: 1fr; }
+}
+@media (max-width: 990px) {
+  body.admin .drawer { visibility: hidden; transform: translateX(-100%); }
+  body.admin .drawer.is-open { visibility: visible; transform: none; }
+  .admin-sidebar { width: min(280px, 86vw); z-index: 260; }
+  .admin-main { margin-left: 0; }
+  .admin-topbar { padding: 0 16px; }
+  .admin-topbar__burger { display: inline-flex; }
+  .admin-content { padding: 16px 16px 48px; }
+  .admin-grid--3 { grid-template-columns: 1fr; }
+  .admin-grid--2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 750px) {
+  .admin-grid--4 { grid-template-columns: 1fr 1fr; }
+  .stat-card { padding: 16px; }
+  .stat-card__value { font-size: 22px; line-height: 26px; }
+  .admin-toolbar { padding: 12px 16px; }
+  .admin-toolbar .input, .admin-toolbar .select { min-width: 0; flex: 1; }
+}
