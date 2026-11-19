@@ -20,6 +20,13 @@
     </properties>
 
     <dependencies>
+        <!-- Lombok: sinh getter/setter/constructor cho package com.polycoffee.Entity -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.44</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Tomcat 11 uses Jakarta EE APIs; the container provides these. -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
@@ -114,6 +121,13 @@
                 <version>3.13.0</version>
                 <configuration>
                     <release>${maven.compiler.release}</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.44</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
