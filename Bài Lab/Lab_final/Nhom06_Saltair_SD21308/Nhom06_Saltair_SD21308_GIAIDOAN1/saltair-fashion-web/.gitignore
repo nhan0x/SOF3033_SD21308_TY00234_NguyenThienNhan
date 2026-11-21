@@ -1,0 +1,32 @@
+# Build
+target/
+*.class
+*.war
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.smarttomcat/
+
+# Cấu hình DB của từng máy (mỗi người một mật khẩu khác nhau)
+src/main/resources/db.properties
+
+# Cấu hình gửi mail (chứa mật khẩu ứng dụng, tuyệt đối không commit)
+src/main/resources/mail.properties
+
+# Khóa Cloudinary để lưu ảnh lên mây (chứa api_secret, tuyệt đối không commit)
+src/main/resources/cloudinary.properties
+
+# Ảnh upload lúc chạy thử
+uploads/
+
+# Hệ điều hành
+.DS_Store
+Thumbs.db
+
+# Cấu hình thanh toán chuyển khoản (chứa khóa API webhook, tuyệt đối không commit)
+src/main/resources/payment.properties

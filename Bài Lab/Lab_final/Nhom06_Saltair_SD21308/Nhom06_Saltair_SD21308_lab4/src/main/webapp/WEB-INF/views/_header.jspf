@@ -1,0 +1,35 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PolyCoffee</title>
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+</head>
+<body>
+<nav class="nav">
+  <a class="brand" href="${pageContext.request.contextPath}/home">PolyCoffee</a>
+  <c:if test="${not empty sessionScope.authUser}">
+    <c:if test="${sessionScope.authUser.manager}">
+      <a href="${pageContext.request.contextPath}/manager/categories">Loại đồ uống</a>
+      <a href="${pageContext.request.contextPath}/manager/drinks">Đồ uống</a>
+      <a href="${pageContext.request.contextPath}/manager/bills">Hóa đơn</a>
+      <a href="${pageContext.request.contextPath}/manager/staff">Nhân viên</a>
+      <a href="${pageContext.request.contextPath}/manager/stats/top-drinks">Top bán chạy</a>
+      <a href="${pageContext.request.contextPath}/manager/stats/revenue">Doanh thu</a>
+    </c:if>
+    <span class="spacer"></span>
+    <span>${sessionScope.authUser.fullname}</span>
+    <a href="${pageContext.request.contextPath}/auth/logout">Đăng xuất</a>
+  </c:if>
+  <c:if test="${empty sessionScope.authUser}">
+    <span class="spacer"></span>
+    <a href="${pageContext.request.contextPath}/auth/login">Đăng nhập</a>
+  </c:if>
+</nav>
+<main class="container">
+<c:if test="${not empty sessionScope.flashOk}"><div class="msg ok">${sessionScope.flashOk}</div><c:remove var="flashOk" scope="session"/></c:if>
+<c:if test="${not empty sessionScope.flashError}"><div class="msg err">${sessionScope.flashError}</div><c:remove var="flashError" scope="session"/></c:if>

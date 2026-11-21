@@ -1,0 +1,28 @@
+<%--
+  Hộp thoại nhập lý do hủy đơn, dùng chung cho orders.jsp và order-detail.jsp (nhóm shopping).
+  Trang gọi phải khai báo taglib c, fn, t và đặt trước khi include:  <c:set var="dialogReturn" value="orders|detail"/>
+  Nút mở: <button type="button" data-dialog-open="cancel-dialog" data-dialog-title="Hủy đơn SA..." data-fill='{"orderCode":"SA..."}'>
+  Form: POST /order  action=cancel  fields: orderCode, cancelReason, returnTo
+--%>
+<dialog class="dialog" id="cancel-dialog" aria-labelledby="cancel-dialog-title">
+  <div class="dialog__head">
+    <h2 class="h-2" id="cancel-dialog-title" data-dialog-title>Hủy đơn hàng</h2>
+    <button type="button" class="icon-btn" data-dialog-close aria-label="Đóng"><t:icon name="x" size="md"/></button>
+  </div>
+  <form method="post" action="${ctx}/order">
+    <input type="hidden" name="action" value="cancel">
+    <input type="hidden" name="orderCode" value="">
+    <input type="hidden" name="returnTo" value="${fn:escapeXml(dialogReturn)}">
+    <div class="dialog__body stack--sm">
+      <p class="t-muted">Đơn chỉ hủy được khi còn ở trạng thái Chờ xác nhận. Tồn kho và mã giảm giá (nếu có) sẽ được hoàn lại.</p>
+      <div class="field">
+        <label class="field__label" for="cancel-reason">Lý do hủy đơn</label>
+        <textarea class="textarea" id="cancel-reason" name="cancelReason" required minlength="5" maxlength="255" placeholder="Ví dụ: đặt nhầm size, muốn đổi địa chỉ nhận hàng"></textarea>
+      </div>
+    </div>
+    <div class="dialog__foot">
+      <button type="button" class="btn btn--ghost" data-dialog-close>Giữ đơn hàng</button>
+      <button type="submit" class="btn btn--danger">Xác nhận hủy</button>
+    </div>
+  </form>
+</dialog>

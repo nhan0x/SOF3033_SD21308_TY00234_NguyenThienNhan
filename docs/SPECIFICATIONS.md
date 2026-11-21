@@ -6,8 +6,9 @@
 | :--- | :--- |
 | Đề tài | PolyCoffee: ứng dụng Java quản lý quán cà phê (phần hiện có: danh mục đồ uống, kết nối CSDL) |
 | Sinh viên | Nguyễn Thiện Nhân · TY00234 · SD21308 (`nhan0x`) |
-| Phiên bản đặc tả | 3.0 (19/11/2026) |
-| Nguồn sự thật | Mã nguồn tại nhánh `feat/Week-2`, commit `e640f1d` |
+| Phiên bản đặc tả | 3.1 (21/11/2026) |
+| Nguồn sự thật | Mã nguồn tại nhánh `main`, commit `682604c`. `src/` và `pom.xml` giống hệt commit `e640f1d` (đã kiểm tra bằng `git diff`) |
+| Tham chiếu ngoài repo | Đề `Assignment.pdf`, `Lab_Final/Lab_3/sql/Lab_3.sql` và slide Bài 2 (ERD) trong thư mục `JAV102 - Dự án Java 1` trên máy sinh viên. Không nằm trong repo |
 
 ---
 
@@ -22,6 +23,8 @@
 | Kiểm thử | JUnit 5, Mockito | khai báo trong `pom.xml` | Chưa có test nào trong `src/test/` |
 
 > **Lưu ý `pom.xml`:** file còn mang cấu hình của dự án cũ (`artifactId` `saltair`, `packaging` `war`, các dependency Servlet/JSP/Tomcat/Flyway/Selenium). Ứng dụng hiện là **console app**, không chạy trên Tomcat. Chưa có `src/main/webapp` hay `web.xml`.
+
+> **Lệch với đề:** đề JAV102 và `Lab_3.sql` dùng **SQL Server 2008+**, còn code dùng **MySQL 8**. Xem mục 3 và mục 11.
 
 ---
 
@@ -41,13 +44,15 @@ com.polycoffee
 
 Luồng hiện tại: `Main` → `CategoryDAO.findAll()` → `JdbcUtil.getConnection()` → MySQL `polycoffee`.
 
+**Kiến trúc đích theo đề** (chưa có trong repo): Trình duyệt → Servlet/JSP (có Filter phân quyền) → DAO (JDBC) → CSDL. Các lab JAV102 (`Lab_Final/Lab_4` đến `Lab_6`) triển khai theo cấu trúc này, nhưng không nằm trong repo.
+
 ---
 
 ## 3. CƠ SỞ DỮ LIỆU
 
-Repo **không có file SQL** (không có `schema.sql` hay migration). Cấu trúc dưới đây suy ra từ câu SQL trong DAO và trường của Entity, cần đối chiếu với CSDL thật trước khi chạy test.
+Repo **không có file SQL** (không có `schema.sql` hay migration). Schema dưới đây là **suy ra** từ câu SQL trong DAO và trường của Entity. Ngoài repo còn hai nguồn tham chiếu (`Lab_3.sql` của JAV102 và slide ERD Bài 2), và ba nguồn này **không khớp nhau**. Cần chọn một nguồn trước khi viết ca kiểm thử ràng buộc.
 
-**Kết nối** (`JdbcUtil`): `jdbc:mysql://localhost:3306/polycoffee`, user `root`.
+**Kết nối** (`JdbcUtil`): MySQL 8, `jdbc:mysql://localhost:3306/polycoffee`, user `root`. Khác với đề (SQL Server), xem mục 11.
 
 **Bảng `categories`** (có DAO, xác nhận từ code):
 
@@ -64,6 +69,18 @@ Repo **không có file SQL** (không có `schema.sql` hay migration). Cấu trú
 | `Drink` | id, categoryId, name, description, image, price (int), active | Khóa ngoại `categoryId` tới `categories` (suy ra) |
 | `Bill` | id, userId, code, createdAt (LocalDateTime), total (int), status | |
 | `BillDetail` | id, billId, drinkId, quantity (int), price (int) | Khóa ngoại tới `bills` và `drinks` (suy ra) |
+
+**So sánh ba nguồn schema** (`Lab_3.sql` nằm ngoài repo, trong thư mục JAV102):
+
+| Bảng | Code hiện tại | `Lab_3.sql` (SQL Server) | Slide ERD Bài 2 |
+| :--- | :--- | :--- | :--- |
+| `categories` | `id`, `name`, `active` | `id` IDENTITY, `name` NVARCHAR(100) UNIQUE. **Không có `active`** | `id`, `name`, `active` (bit) |
+| `drinks` | `id`, `categoryId`, `name`, `description`, `image`, `price`, `active` | `id`, `name`, `image`, `unit_price`, `discount`, `available`, `category_id`. **Không có `description`** | `id`, `name`, `price`, `image`, `description`, `active`, `category_id` |
+| `users` | **Chưa có Entity** | `id`, `fullname`, `email` UNIQUE, `password`, `manager`, `enabled` | `id`, `email`, `password`, `full_name`, `phone`, `role`, `active` |
+| `bills` | `id`, `userId`, `code`, `createdAt`, `total`, `status` (String) | `id` BIGINT, `user_id`, `created_at`, `checkout_at`, `status` INT (0/1/2). **Không có `code`, `total`** | `id`, `code`, `created_at`, `total`, `status`, `user_id`, `card_id` |
+| `bill_details` | `id`, `billId`, `drinkId`, `quantity`, `price` | `id`, `bill_id`, `drink_id`, `unit_price`, `discount`, `quantity`, UNIQUE(`bill_id`, `drink_id`) | `id`, `quantity`, `price`, `bill_id`, `drink_id` |
+
+> **Hệ quả (suy ra từ đọc mã và DDL, chưa chạy thực tế):** `CategoryDAO` đọc và ghi cột `active`, nhưng `Lab_3.sql` không có cột này. Nếu chạy code với CSDL theo `Lab_3.sql`, `insert` trả `0` và `findAll` trả `[]` (do R-01). Driver MySQL cũng không kết nối được SQL Server.
 
 ---
 
@@ -155,11 +172,36 @@ Repo **không có file SQL** (không có `schema.sql` hay migration). Cấu trú
 | **R-06** | `Drink`, `Bill`, `BillDetail` không có DAO và không có test nên lỗi ánh xạ trong tương lai không được phát hiện | Thư mục `Entity/` | Thấp |
 | **R-07** | `findAll` không có `ORDER BY` nên thứ tự in ra có thể thay đổi giữa các lần chạy | `CategoryDAO.findAll` | Thấp |
 | **R-08** | Build thất bại trên JDK 27 do Lombok, và `pom.xml` còn cấu hình của dự án Saltair (war, Tomcat) | `pom.xml` | Trung bình |
+| **R-09** | Lệch schema và DBMS giữa code, đề và `Lab_3.sql`. `CategoryDAO` đọc và ghi cột `active` không có trong `Lab_3.sql`. Driver là MySQL, đề yêu cầu SQL Server | `JdbcUtil.java` (driver, URL), `CategoryDAO.java` (câu SQL có `active`) | Cao |
+| **R-10** | Repo không có script CSDL (N2). Người khác clone về không có cách tạo bảng và dữ liệu mẫu | Thư mục gốc, không có file `.sql` | Cao |
+| **R-11** | Không có Servlet hay màn hình nào. Mục tiêu tuần 1 (web chạy ở `localhost:8080`) và tuần 2 (Unit Test cho `controllers/`) chưa có đối tượng để kiểm thử | `src/main/java/com/polycoffee/` | Cao |
 
 ---
 
 ## 10. GIẢ ĐỊNH VÀ GIỚI HẠN
 
-- Schema `categories` chưa được xác nhận. Các ca liên quan đến ràng buộc (`NOT NULL`, `UNIQUE`, độ dài cột) được đánh dấu **phụ thuộc DDL**.
+- Schema trong code (MySQL) chưa có DDL xác nhận. `Lab_3.sql` (SQL Server) và slide ERD không khớp code (mục 3). Các ca liên quan đến ràng buộc (`NOT NULL`, `UNIQUE`, độ dài cột) được đánh dấu **phụ thuộc DDL** cho đến khi chốt schema.
 - Môi trường kiểm thử dùng MySQL 8 cục bộ với cơ sở dữ liệu riêng, không dùng dữ liệu thật.
 - Không kiểm thử giao diện người dùng, vì ứng dụng hiện không có giao diện.
+- Mục 11 chỉ để theo dõi khoảng cách với đề. Các mục đó không đưa vào phạm vi kiểm thử trong `TEST_PLAN.md`.
+
+---
+
+## 11. ĐỐI CHIẾU VỚI ĐỀ JAV102 (DỰ ÁN JAVA 1)
+
+Đề yêu cầu website Java Servlet/JSP, JDBC, SQL Server, có đăng nhập, phân quyền, CRUD và validate. Bảng dưới ghi **trạng thái hiện tại của repo**. Đây là khoảng cách cần xử lý, không phải phạm vi đã triển khai.
+
+| Mã | Yêu cầu của đề | Trạng thái trong repo | Ghi chú |
+| :--- | :--- | :--- | :--- |
+| Y1 | Đăng nhập / đăng xuất | Chưa | Chưa có `User` Entity, DAO, Servlet hay màn hình |
+| Y2 | Phân quyền, ít nhất 2 role | Chưa | Schema tham chiếu có cờ `manager`, code chưa có |
+| Y3 | CRUD tối thiểu 3 thực thể | Chưa đạt | Chỉ `Category` có Create (`insert`) và Read (`findAll`) ở DAO. Không có Update, Delete, và không có giao diện |
+| Y4 | Validate phía client và server | Chưa | Không có kiểm tra đầu vào (R-03), không có form |
+| N1 | Mã nguồn | Có một phần | Chỉ là ứng dụng console |
+| N2 | CSDL dạng script có dữ liệu | Chưa | Không có script trong repo (R-10) |
+| N3 | File zip thư mục Publish | Chưa | `pom.xml` đóng gói `war`, nhưng không có `src/main/webapp` |
+| N4 | Tài liệu cài đặt và triển khai | Chưa | `README.md` hiện là template của môn SOF309 |
+
+> **Theo thang đánh giá của đề:** hạng C cần N1 và N2, hạng B cần Y1–Y3, hạng A cần Y1–Y4. Repo hiện thiếu N2 nên chưa đạt cả hạng C.
+
+**Kiến trúc đích theo đề:** trình duyệt → Servlet/JSP → DAO (JDBC) → SQL Server. Mã mẫu trong `Lab_Final/Lab_4` đến `Lab_6` có Filter đăng nhập và chặn nhân viên truy cập `/manager/*` (trả về 403). Các mã mẫu này nằm ngoài repo.
