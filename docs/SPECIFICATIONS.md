@@ -1,14 +1,15 @@
 # ĐẶC TẢ HỆ THỐNG POLYCOFFEE (SPECIFICATIONS)
 
-> Tài liệu đầu vào cho [TEST_PLAN.md](TEST_PLAN.md) và [TEST_CASES.md](TEST_CASES.md). Mọi nội dung được **đối chiếu trực tiếp với mã nguồn** trong `src/main/java/com/polycoffee/`. Những phần chưa có trong code được ghi rõ là "chưa triển khai".
+> Tài liệu đầu vào cho [TEST_PLAN.md](TEST_PLAN.md) và [TEST_CASES.md](TEST_CASES.md).
+> Đặc tả mô tả **sản phẩm đích** theo các bài Lab 1–8 đã làm. Cột **Trạng thái** cho biết phần nào đã có trong mã nguồn `src/main/` của repo này. Phần đánh dấu "chưa có" là việc còn lại.
 
 | Mục | Giá trị |
 | :--- | :--- |
-| Đề tài | PolyCoffee: ứng dụng Java quản lý quán cà phê (phần hiện có: danh mục đồ uống, kết nối CSDL) |
+| Đề tài | PolyCoffee: website quản lý quán cà phê (đồ uống, loại đồ uống, nhân viên, hóa đơn, thống kê) |
 | Sinh viên | Nguyễn Thiện Nhân · TY00234 · SD21308 (`nhan0x`) |
-| Phiên bản đặc tả | 3.1 (21/11/2026) |
-| Nguồn sự thật | Mã nguồn tại nhánh `main`, commit `682604c`. `src/` và `pom.xml` giống hệt commit `e640f1d` (đã kiểm tra bằng `git diff`) |
-| Tham chiếu ngoài repo | Đề `Assignment.pdf`, `Lab_Final/Lab_3/sql/Lab_3.sql` và slide Bài 2 (ERD) trong thư mục `JAV102 - Dự án Java 1` trên máy sinh viên. Không nằm trong repo |
+| Phiên bản đặc tả | 4.0 (21/11/2026) |
+| Nguồn sự thật | Bài làm Lab 1–8 trong thư mục `JAV102 - Dự án Java 1/Lab_Final` (nằm ngoài repo). Quyết định của sinh viên ngày 21/11/2026: **CSDL dùng MySQL 8** |
+| Trạng thái mã nguồn | Repo `main` (commit `682604c`) hiện chỉ là ứng dụng console, đang được sinh viên tự code hoàn thiện. Xem mục 10 |
 
 ---
 
@@ -16,192 +17,354 @@
 
 | Lớp | Công nghệ | Phiên bản | Ghi chú |
 | :--- | :--- | :--- | :--- |
-| Ngôn ngữ | Java | 17 (`maven.compiler.release` trong `pom.xml`) | Build phải dùng JDK 17. Lombok 1.18.44 không chạy trên JDK 27 |
-| Build | Maven | 3.10+ | `mvn clean compile` |
-| Sinh code | Lombok | 1.18.44 | `@Data`, `@AllArgsConstructor`, `@NoArgsConstructor` cho Entity. Cấu hình ở `dependencies` và `annotationProcessorPaths` |
-| CSDL | MySQL | 8 | JDBC thuần (`java.sql`), driver `com.mysql.cj.jdbc.Driver` (`mysql-connector-j`) |
-| Kiểm thử | JUnit 5, Mockito | khai báo trong `pom.xml` | Chưa có test nào trong `src/test/` |
-
-> **Lưu ý `pom.xml`:** file còn mang cấu hình của dự án cũ (`artifactId` `saltair`, `packaging` `war`, các dependency Servlet/JSP/Tomcat/Flyway/Selenium). Ứng dụng hiện là **console app**, không chạy trên Tomcat. Chưa có `src/main/webapp` hay `web.xml`.
-
-> **Lệch với đề:** đề JAV102 và `Lab_3.sql` dùng **SQL Server 2008+**, còn code dùng **MySQL 8**. Xem mục 3 và mục 11.
+| Ngôn ngữ | Java | 8+ (theo Lab 8) | `pom.xml` của repo đang đặt `release` 17 |
+| Web | Java Servlet, JSP, JSTL | Servlet 4.0 (`javax.servlet`), JSP 2.3, JSTL 1.2 | Theo Lab. `pom.xml` của repo đang dùng `jakarta` 6.1 (Tomcat 11). Cần chọn một bộ |
+| Web server | Apache Tomcat | 9.x | Tomcat 10 trở lên không tương thích với `javax.servlet` |
+| CSDL | **MySQL** | 8 | Quyết định ngày 21/11/2026. Driver `mysql-connector-j` (đang có trong `pom.xml`). Lab dùng SQL Server, xem mục 3.3 |
+| Truy cập dữ liệu | JDBC thuần (`java.sql`), `PreparedStatement` | | Không dùng ORM |
+| Gửi email | JavaMail | 1.6.2 (Lab) | `angus-mail` đang có trong `pom.xml`. Dùng cho chức năng cấp lại mật khẩu |
+| Biểu đồ | Chart.js | 4.4.1 (CDN) | Cần Internet khi xem thống kê |
+| Build | Maven | 3.6+ | Đóng gói `target/PolyCoffee.war` |
+| Kiểm thử | JUnit 5, Mockito | | Khai báo trong `pom.xml`. Chưa có test nào trong `src/test/` |
 
 ---
 
 ## 2. KIẾN TRÚC VÀ CẤU TRÚC MÃ
 
+### 2.1 Kiến trúc
+
 ```
-com.polycoffee
-├── Main.java                  Điểm vào: đọc và in danh sách danh mục
-├── Util/JdbcUtil.java         Tạo kết nối JDBC
-├── DAO/CategoryDAO.java       Truy vấn bảng categories
-└── Entity/
-    ├── Category.java          Danh mục đồ uống (có DAO)
-    ├── Drink.java             Đồ uống (chưa có DAO)
-    ├── Bill.java              Hóa đơn (chưa có DAO)
-    └── BillDetail.java        Chi tiết hóa đơn (chưa có DAO)
+[ Trình duyệt ] --HTTP--> [ Tomcat: Filter -> Servlet (Controller) -> DAO -> JSP (View) ] --JDBC--> [ MySQL 8 ]
 ```
 
-Luồng hiện tại: `Main` → `CategoryDAO.findAll()` → `JdbcUtil.getConnection()` → MySQL `polycoffee`.
+Luồng xử lý một request: `Utf8Filter` → `AuthFilter` (đăng nhập, phân quyền) → Servlet (đọc tham số, kiểm tra dữ liệu, gọi DAO) → forward sang JSP trong `WEB-INF/views` (hoặc redirect sau thao tác ghi).
 
-**Kiến trúc đích theo đề** (chưa có trong repo): Trình duyệt → Servlet/JSP (có Filter phân quyền) → DAO (JDBC) → CSDL. Các lab JAV102 (`Lab_Final/Lab_4` đến `Lab_6`) triển khai theo cấu trúc này, nhưng không nằm trong repo.
+### 2.2 Cấu trúc package (theo Lab 4–8)
+
+```
+poly.coffee
+├── servlet/   HomeServlet, AuthServlet, CategoryServlet, DrinkServlet, StaffServlet,
+│              BillManageServlet, StatsServlet
+├── filter/    Utf8Filter, AuthFilter
+├── dao/       CategoryDAO, DrinkDAO, UserDAO, BillDAO, BillDetailDAO
+├── entity/    Category, Drink, User, Bill, BillDetail
+├── dto/       BillSummary, BillLine, TopDrink, RevenuePoint
+└── util/      JdbcUtil, AuthUtil, ParamUtil, PasswordUtil, FileUtil, MailUtil, Page
+webapp/
+├── css/, images/
+└── WEB-INF/views/   _header.jspf, _footer.jspf, home.jsp, auth/login.jsp,
+                     manager/{category, drink, staff, bill, stats}/
+```
+
+| Lớp | Vai trò | Ghi chú |
+| :--- | :--- | :--- |
+| Servlet | Nhận request, đọc và kiểm tra tham số, gọi DAO, chọn view hoặc redirect | Dự án không có tầng Service riêng. Nghiệp vụ đơn giản (kiểm tra xóa, cấp lại mật khẩu) nằm trong Servlet |
+| DAO | Truy vấn JDBC, trả về Entity hoặc DTO | Lỗi SQL ném `RuntimeException` (xem NFR-03) |
+| Entity | Ánh xạ một bảng, có getter và setter | |
+| DTO | Dữ liệu cho màn hình hóa đơn và thống kê (có cột tính toán như tổng tiền) | |
+| View (JSP) | Hiển thị bằng JSTL/EL. Không truy cập CSDL trực tiếp | |
+
+### 2.3 Quy ước
+
+- Package gốc `poly.coffee`. Lớp PascalCase, phương thức và biến camelCase, cột CSDL snake_case.
+- Hậu tố: `*Servlet`, `*DAO`, `*Util`, `*Filter`.
+- Tài nguyên quản lý nằm dưới `/manager/*`. Thao tác ghi dùng **POST**, thao tác đọc dùng **GET**.
+- Sau thao tác ghi thành công: **Post-Redirect-Get**. Thông báo qua session (`flashOk`, `flashError`).
+- Mọi câu SQL dùng `?`, không nối chuỗi từ dữ liệu người dùng.
+- JSP hiển thị dữ liệu người dùng bằng `<c:out>` (chống XSS).
+- UTF-8 toàn bộ: file, `Utf8Filter`, `pageEncoding` của JSP.
 
 ---
 
-## 3. CƠ SỞ DỮ LIỆU
+## 3. CƠ SỞ DỮ LIỆU (MYSQL 8)
 
-Repo **không có file SQL** (không có `schema.sql` hay migration). Schema dưới đây là **suy ra** từ câu SQL trong DAO và trường của Entity. Ngoài repo còn hai nguồn tham chiếu (`Lab_3.sql` của JAV102 và slide ERD Bài 2), và ba nguồn này **không khớp nhau**. Cần chọn một nguồn trước khi viết ca kiểm thử ràng buộc.
+### 3.1 Bảng và quan hệ
 
-**Kết nối** (`JdbcUtil`): MySQL 8, `jdbc:mysql://localhost:3306/polycoffee`, user `root`. Khác với đề (SQL Server), xem mục 11.
-
-**Bảng `categories`** (có DAO, xác nhận từ code):
-
-| Cột | Kiểu suy ra | Được dùng ở |
-| :--- | :--- | :--- |
-| `id` | INT, khóa chính, tự tăng (suy ra) | `CategoryDAO.findAll()` đọc `id` |
-| `name` | VARCHAR (độ dài chưa rõ) | `insert` ghi, `findAll` đọc |
-| `active` | BOOLEAN / TINYINT(1) | `insert` ghi, `findAll` đọc |
-
-**Các bảng còn lại** (`drinks`, `bills`, `bill_details`): chưa có DAO và chưa có câu SQL nào trong code. Cột suy ra từ Entity, chỉ để tham khảo.
-
-| Entity | Trường | Ghi chú |
-| :--- | :--- | :--- |
-| `Drink` | id, categoryId, name, description, image, price (int), active | Khóa ngoại `categoryId` tới `categories` (suy ra) |
-| `Bill` | id, userId, code, createdAt (LocalDateTime), total (int), status | |
-| `BillDetail` | id, billId, drinkId, quantity (int), price (int) | Khóa ngoại tới `bills` và `drinks` (suy ra) |
-
-**So sánh ba nguồn schema** (`Lab_3.sql` nằm ngoài repo, trong thư mục JAV102):
-
-| Bảng | Code hiện tại | `Lab_3.sql` (SQL Server) | Slide ERD Bài 2 |
+| Bảng | Khóa | Quan hệ | Ghi chú |
 | :--- | :--- | :--- | :--- |
-| `categories` | `id`, `name`, `active` | `id` IDENTITY, `name` NVARCHAR(100) UNIQUE. **Không có `active`** | `id`, `name`, `active` (bit) |
-| `drinks` | `id`, `categoryId`, `name`, `description`, `image`, `price`, `active` | `id`, `name`, `image`, `unit_price`, `discount`, `available`, `category_id`. **Không có `description`** | `id`, `name`, `price`, `image`, `description`, `active`, `category_id` |
-| `users` | **Chưa có Entity** | `id`, `fullname`, `email` UNIQUE, `password`, `manager`, `enabled` | `id`, `email`, `password`, `full_name`, `phone`, `role`, `active` |
-| `bills` | `id`, `userId`, `code`, `createdAt`, `total`, `status` (String) | `id` BIGINT, `user_id`, `created_at`, `checkout_at`, `status` INT (0/1/2). **Không có `code`, `total`** | `id`, `code`, `created_at`, `total`, `status`, `user_id`, `card_id` |
-| `bill_details` | `id`, `billId`, `drinkId`, `quantity`, `price` | `id`, `bill_id`, `drink_id`, `unit_price`, `discount`, `quantity`, UNIQUE(`bill_id`, `drink_id`) | `id`, `quantity`, `price`, `bill_id`, `drink_id` |
+| `categories` | `id` | 1 — N `drinks` | Loại đồ uống. Tên duy nhất |
+| `drinks` | `id` | N — 1 `categories`; N — N `bills` qua `bill_details` | Đồ uống. `available = 0` là ngừng bán |
+| `users` | `id` | 1 — N `bills` | Nhân viên và quản lý. `manager = 1` là quản lý |
+| `bills` | `id` | N — 1 `users`; 1 — N `bill_details` | Hóa đơn (phiếu bán hàng) |
+| `bill_details` | `id` | N — 1 `bills`; N — 1 `drinks` | Dòng hàng trong hóa đơn. Cặp (`bill_id`, `drink_id`) là duy nhất |
 
-> **Hệ quả (suy ra từ đọc mã và DDL, chưa chạy thực tế):** `CategoryDAO` đọc và ghi cột `active`, nhưng `Lab_3.sql` không có cột này. Nếu chạy code với CSDL theo `Lab_3.sql`, `insert` trả `0` và `findAll` trả `[]` (do R-01). Driver MySQL cũng không kết nối được SQL Server.
+### 3.2 DDL đích
+
+> DDL này được **chuyển đổi từ `Lab_3.sql`** (SQL Server) sang MySQL 8. Chưa chạy trên MySQL thật. Cần chạy thử trước khi dùng cho test.
+
+```sql
+CREATE DATABASE IF NOT EXISTS polycoffee CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE polycoffee;
+
+DROP TABLE IF EXISTS bill_details, bills, drinks, categories, users;
+
+CREATE TABLE categories (
+    id    INT AUTO_INCREMENT PRIMARY KEY,
+    name  VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE users (
+    id        INT AUTO_INCREMENT PRIMARY KEY,
+    fullname  VARCHAR(100) NOT NULL,
+    email     VARCHAR(100) NOT NULL UNIQUE,
+    password  VARCHAR(100) NOT NULL,              -- SHA-256 dạng hex, 64 ký tự
+    manager   BOOLEAN NOT NULL DEFAULT FALSE,     -- 1: quản lý, 0: nhân viên
+    enabled   BOOLEAN NOT NULL DEFAULT TRUE       -- 1: đang hoạt động, 0: bị khóa
+);
+
+CREATE TABLE drinks (
+    id           INT AUTO_INCREMENT PRIMARY KEY,
+    name         VARCHAR(100) NOT NULL,
+    image        VARCHAR(255) NULL,
+    unit_price   DECIMAL(18,0) NOT NULL CHECK (unit_price >= 0),
+    discount     DOUBLE NOT NULL DEFAULT 0 CHECK (discount BETWEEN 0 AND 1),
+    available    BOOLEAN NOT NULL DEFAULT TRUE,   -- 1: đang bán, 0: ngừng bán
+    category_id  INT NOT NULL,
+    CONSTRAINT fk_drinks_categories FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+CREATE TABLE bills (
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id      INT NOT NULL,
+    created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    checkout_at  DATETIME NULL,
+    status       INT NOT NULL DEFAULT 0 CHECK (status IN (0, 1, 2)),  -- 0: đang xử lý, 1: đã thanh toán, 2: đã hủy
+    CONSTRAINT fk_bills_users FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE bill_details (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    bill_id     BIGINT NOT NULL,
+    drink_id    INT NOT NULL,
+    unit_price  DECIMAL(18,0) NOT NULL,           -- giá tại thời điểm bán (chụp lại)
+    discount    DOUBLE NOT NULL DEFAULT 0,        -- giảm giá tại thời điểm bán
+    quantity    INT NOT NULL CHECK (quantity > 0),
+    CONSTRAINT fk_bd_bills  FOREIGN KEY (bill_id)  REFERENCES bills(id) ON DELETE CASCADE,
+    CONSTRAINT fk_bd_drinks FOREIGN KEY (drink_id) REFERENCES drinks(id),
+    CONSTRAINT uq_bd UNIQUE (bill_id, drink_id)
+);
+```
+
+**Dữ liệu mẫu** (giữ như `Lab_3.sql`): 3 tài khoản (`manager@polycoffee.com` là quản lý; `staff1@polycoffee.com` và `staff2@polycoffee.com` là nhân viên), mật khẩu mẫu `123456`; 4 loại (Cà phê, Trà, Sinh tố, Nước ép); 9 đồ uống, trong đó "Nước ép dưa hấu" đang ngừng bán; 3 hóa đơn (2 đã thanh toán, 1 đang xử lý) với 6 dòng chi tiết.
+
+### 3.3 Chuyển đổi từ SQL Server (Lab) sang MySQL
+
+| SQL Server (`Lab_3.sql`, Lab 5–6) | MySQL 8 |
+| :--- | :--- |
+| `IDENTITY(1,1)` | `AUTO_INCREMENT` |
+| `NVARCHAR(n)` | `VARCHAR(n)`, bảng và kết nối dùng `utf8mb4` |
+| `BIT` | `BOOLEAN` (lưu dưới dạng `TINYINT(1)`) |
+| `FLOAT` | `DOUBLE` |
+| `GETDATE()` | `NOW()` (hoặc `CURRENT_TIMESTAMP` trong DDL) |
+| `DATEADD(day, 1, ?)` | `DATE_ADD(?, INTERVAL 1 DAY)` |
+| `ISNULL(a, b)` | `IFNULL(a, b)` |
+| `SELECT TOP (n) ...` | `... LIMIT n` |
+| Phân trang bằng `ROW_NUMBER() OVER (...)` | `ORDER BY ... LIMIT ? OFFSET ?` |
+| `CONVERT(VARCHAR(10), x, 23)` | `DATE_FORMAT(x, '%Y-%m-%d')` |
+| `SELECT MAX(id)` sau `INSERT` | `Statement.RETURN_GENERATED_KEYS` hoặc `LAST_INSERT_ID()` |
+| `IF OBJECT_ID(...) ... DROP`, `GO` | `DROP TABLE IF EXISTS`, bỏ `GO` |
+| `jdbc:sqlserver://localhost:1433`, user `sa` | `jdbc:mysql://localhost:3306/polycoffee`, user theo máy |
 
 ---
 
-## 4. YÊU CẦU CHỨC NĂNG (THEO CODE)
+## 4. PHÂN QUYỀN VÀ ĐƯỜNG DẪN
 
-| Mã | Chức năng | Mô tả theo code | Trạng thái |
+| Đường dẫn | Phương thức | Vai trò được phép | Chức năng |
 | :--- | :--- | :--- | :--- |
-| FR-01 | Xem danh sách danh mục | `Main.main` gọi `findAll()` và in mỗi danh mục gồm `id`, `name`, `active` (mỗi giá trị một dòng) | Có |
-| FR-02 | Thêm danh mục | `CategoryDAO.insert(Category)` chèn `name`, `active` vào `categories`, trả về số dòng ảnh hưởng | Có ở tầng DAO. **Chưa có giao diện**: `Main` không gọi `insert` |
-| FR-03 | Kết nối CSDL | `JdbcUtil.getConnection()` nạp driver trong static block và mở kết nối mới mỗi lần gọi | Có |
-| FR-04 | Quản lý đồ uống | `Drink` đã khai báo nhưng chưa có DAO, chưa có chức năng | Chưa triển khai |
-| FR-05 | Quản lý hóa đơn và chi tiết | `Bill`, `BillDetail` đã khai báo, chưa có DAO hay chức năng | Chưa triển khai |
-| FR-06 | Sửa, xóa danh mục | Không có trong code | Chưa triển khai |
+| `/`, `/home` | GET | Tất cả (kể cả khách) | Trang chủ, xem thực đơn |
+| `/auth/login` | GET, POST | Tất cả | Hiển thị và xử lý đăng nhập |
+| `/auth/logout` | GET | Đã đăng nhập | Đăng xuất |
+| `/manager/categories`, `/new`, `/edit?id=`, `/save`, `/delete` | GET, POST | Quản lý | Quản lý loại đồ uống |
+| `/manager/drinks`, `/new`, `/edit?id=`, `/save`, `/delete` | GET, POST | Quản lý | Quản lý đồ uống |
+| `/manager/staff`, `/new`, `/edit?id=`, `/save`, `/delete`, `/reset-password` | GET, POST | Quản lý | Quản lý nhân viên |
+| `/manager/bills`, `/detail?id=`, `/cancel` | GET, POST | Quản lý | Quản lý hóa đơn |
+| `/manager/stats/revenue`, `/manager/stats/top-drinks` | GET | Quản lý | Thống kê |
+
+Quy tắc chung (BR-03, BR-04): mọi đường dẫn ngoài danh sách công khai đều yêu cầu đăng nhập. Đường dẫn `/manager/*` chỉ dành cho quản lý. Danh sách công khai: `/`, `/home`, `/auth/*`, `/css/*`, `/js/*`, `/images/*`.
 
 ---
 
-## 5. HÀNH VI CHI TIẾT CỦA DAO
+## 5. QUY TẮC NGHIỆP VỤ
 
-### 5.1. `CategoryDAO.insert(Category category)`
+Mã BR-xx để tham chiếu từ issue và test case. Số liệu lấy từ code Lab 4–6 và đặc tả Lab 7–8.
 
-| Khía cạnh | Hành vi theo code |
+### 5.1 Đăng nhập và phân quyền
+
+| Mã | Quy tắc |
 | :--- | :--- |
-| Câu SQL | `INSERT INTO categories(name, active) VALUES (?, ?)` (`PreparedStatement`, có tham số hóa) |
-| Thành công | Trả về số dòng ảnh hưởng (thường là `1`) |
-| Lỗi `SQLException` | Gọi `printStackTrace()`, **trả về `0`**, không ném lỗi ra ngoài |
-| Trường `id` | Bị bỏ qua. Không trả về `id` vừa sinh |
+| BR-01 | Đăng nhập bằng email và mật khẩu. Thiếu một trong hai: báo "Vui lòng nhập email và mật khẩu". Email không tồn tại hoặc mật khẩu sai: báo "Email hoặc mật khẩu không đúng" (không nói rõ cái nào sai). |
+| BR-02 | Tài khoản có `enabled = 0` bị từ chối với "Tài khoản đã bị khóa", kể cả khi nhập đúng mật khẩu. |
+| BR-03 | Chưa đăng nhập mà truy cập trang không công khai: chuyển đến `/auth/login?redirect=<đường dẫn>`. |
+| BR-04 | Nhân viên truy cập `/manager/*`: trả về HTTP 403, "Bạn không có quyền truy cập chức năng này". |
+| BR-05 | Đăng nhập thành công: chuyển đến `redirect` nếu bắt đầu bằng `/` và không bắt đầu bằng `//`. Ngược lại chuyển đến `/home`. |
+| BR-06 | Đăng xuất: hủy session, chuyển đến `/auth/login`. |
+| BR-07 | Mật khẩu lưu dưới dạng SHA-256 hex (không có muối). So sánh bằng cách băm mật khẩu nhập vào. |
 
-### 5.2. `CategoryDAO.findAll()`
+### 5.2 Trang chủ khách
 
-| Khía cạnh | Hành vi theo code |
+| Mã | Quy tắc |
 | :--- | :--- |
-| Câu SQL | `SELECT * FROM categories` (không có `ORDER BY`, thứ tự không được đảm bảo) |
-| Ánh xạ | Đọc `id` (int), `name` (String), `active` (boolean) và gán vào `Category` |
-| Có dữ liệu | Trả về danh sách đủ dòng |
-| Bảng rỗng | Trả về danh sách rỗng (không phải `null`) |
-| Lỗi `SQLException` | Gọi `printStackTrace()`, **trả về danh sách rỗng**, không ném lỗi ra ngoài |
+| BR-08 | Trang chủ chỉ hiển thị đồ uống có `available = 1`, nhóm theo loại. Không cần đăng nhập. |
 
-### 5.3. `JdbcUtil`
+### 5.3 Loại đồ uống (Lab 4)
 
-| Khía cạnh | Hành vi theo code |
+| Mã | Quy tắc |
 | :--- | :--- |
-| Nạp driver | Static block gọi `Class.forName`. Nếu lỗi thì chỉ in stack trace |
-| `getConnection()` | Gọi `DriverManager.getConnection` với URL, user, password cố định. Lỗi thì ném `SQLException` |
+| BR-09 | Tên loại không được rỗng, tối đa 100 ký tự. Trùng tên với loại khác: báo "Tên loại đã tồn tại". |
+| BR-10 | Không xóa loại còn đồ uống. Báo "Không thể xóa: loại này đang có đồ uống". |
+
+### 5.4 Đồ uống (Lab 5)
+
+| Mã | Quy tắc |
+| :--- | :--- |
+| BR-11 | Tên đồ uống không được rỗng. Đơn giá là số nguyên không âm. Giảm giá nằm trong khoảng 0–100% (lưu 0 đến 1). Phải chọn loại đồ uống tồn tại. |
+| BR-12 | Không xóa đồ uống đã có trong hóa đơn (`bill_details`). Báo "Không thể xóa: đồ uống đã được bán (hãy chuyển sang ngừng bán)". Muốn ngừng bán thì đặt `available = 0`. |
+| BR-13 | Tìm kiếm theo tên (chứa chuỗi), loại và trạng thái. Phân trang 10 dòng mỗi trang. |
+| BR-14 | Ảnh đồ uống tải lên được lưu vào `webapp/images`. Ảnh sẽ mất khi deploy lại file WAR (ghi chú của Lab 5). |
+
+### 5.5 Nhân viên (Lab 5)
+
+| Mã | Quy tắc |
+| :--- | :--- |
+| BR-15 | Họ tên không được rỗng. Email đúng định dạng và duy nhất trong bảng `users`. Trùng email với tài khoản khác: báo "Email đã được sử dụng" (khi sửa thì bỏ qua chính tài khoản đó). |
+| BR-16 | Khi thêm mới, mật khẩu tối thiểu 6 ký tự. |
+| BR-17 | Không tự xóa tài khoản đang đăng nhập. Báo "Không thể tự xóa tài khoản đang đăng nhập". |
+| BR-18 | Không xóa nhân viên đã có hóa đơn. Báo "Không thể xóa: nhân viên đã có dữ liệu (hãy khóa tài khoản)". |
+| BR-19 | Cấp lại mật khẩu: sinh mật khẩu ngẫu nhiên 8 ký tự, lưu bản băm mới, rồi gửi email. Nếu gửi email lỗi thì khôi phục mật khẩu cũ và báo "Gửi email thất bại, mật khẩu chưa bị thay đổi". |
+| BR-20 | Thông tin gửi mail (`MAIL_USER`, `MAIL_PASSWORD`) đọc từ biến môi trường, không ghi trong mã nguồn. |
+
+### 5.6 Hóa đơn (Lab 6, Lab 7)
+
+| Mã | Quy tắc |
+| :--- | :--- |
+| BR-21 | Danh sách hóa đơn: mới nhất trước, 10 dòng mỗi trang, có cột tổng tiền. |
+| BR-22 | Tổng tiền hóa đơn = Σ (`quantity` × `unit_price` × (1 − `discount`)) trên các dòng chi tiết. Không lưu cột tổng trong `bills`. |
+| BR-23 | Chi tiết hóa đơn hiển thị: đồ uống, số lượng, đơn giá, giảm giá, thành tiền, tổng, trạng thái, nhân viên tạo, ngày tạo. |
+| BR-24 | Hủy hóa đơn: chỉ khi `status` khác 2. Thành công thì `status = 2`. Nếu không tồn tại hoặc đã hủy: báo "Không thể hủy hóa đơn (không tồn tại hoặc đã hủy)". |
+| BR-25 | *(Đặc tả Lab 7, chưa có code trong Lab 1–6)* Phiếu mới có `status = 0` và thuộc nhân viên đang đăng nhập. Thêm đồ uống: số lượng là số nguyên dương. Thêm đồ uống đã có trong phiếu thì cộng dồn số lượng, không tạo dòng trùng. |
+| BR-26 | *(Đặc tả Lab 7)* Thanh toán: `status = 1`, ghi `checkout_at`. Phiếu đã thanh toán không sửa được (kể cả khi gửi yêu cầu trực tiếp). |
+| BR-27 | *(Đặc tả Lab 7)* Không thêm đồ uống đang ngừng bán vào phiếu. |
+| BR-28 | *(Đặc tả Lab 7)* Nhân viên chỉ xem được lịch sử phiếu do mình tạo. |
+
+### 5.7 Thống kê (Lab 6)
+
+| Mã | Quy tắc |
+| :--- | :--- |
+| BR-29 | Chỉ tính hóa đơn `status = 1`, theo ngày thanh toán (`checkout_at`). |
+| BR-30 | Khoảng thời gian nhập theo `yyyy-MM-dd`. Ngày sai định dạng: "Ngày không hợp lệ (định dạng yyyy-MM-dd)". Từ ngày lớn hơn đến ngày: "Từ ngày phải nhỏ hơn hoặc bằng đến ngày". Ngày đến được tính đến hết ngày. Mặc định là 30 ngày gần nhất. |
+| BR-31 | Top 5 đồ uống bán chạy: sắp theo số lượng giảm dần, hòa thì theo doanh thu giảm dần. |
+| BR-32 | Doanh thu theo ngày hiển thị bằng biểu đồ cột (Chart.js). |
 
 ---
 
-## 6. HÀNH VI CỦA ENTITY
+## 6. YÊU CẦU VALIDATE
 
-| Khía cạnh | Hành vi theo code |
-| :--- | :--- |
-| Getter/setter, `toString`, `equals`, `hashCode` | Sinh tự động bởi Lombok `@Data` |
-| Constructor không tham số | Giá trị mặc định: `Integer` là `null`, `int` là `0`, `boolean` là `false`, `String` là `null` |
-| Constructor đủ tham số | Thứ tự tham số theo thứ tự khai báo trường (`Category(id, name, active)`) |
-| Getter của `boolean active` | `isActive()` (không phải `getActive()`) |
+Mỗi trường được kiểm tra ở hai nơi: **client** (thuộc tính HTML5 như `required`, `type="email"`, `min`, `max`) và **server** (trong Servlet). Server là nơi quyết định, client chỉ để phản hồi nhanh.
 
----
-
-## 7. HÀNH VI CỦA `Main`
-
-| Khía cạnh | Hành vi theo code |
-| :--- | :--- |
-| Dữ liệu đầu vào | Không có. Không đọc tham số dòng lệnh hay bàn phím |
-| Đầu ra | Với mỗi danh mục, in lần lượt `id`, `name`, `active`, mỗi giá trị một dòng |
-| Bảng rỗng | Không in gì |
-| Lỗi CSDL | `CategoryDAO` tự nuốt lỗi, `Main` in danh sách rỗng và kết thúc bình thường (không có thông báo lỗi cho người dùng) |
-
----
-
-## 8. YÊU CẦU PHI CHỨC NĂNG
-
-| Mã | Nội dung | Trạng thái |
+| Trường | Điều kiện | Thông báo (server) |
 | :--- | :--- | :--- |
-| NFR-01 | Truy vấn dùng `PreparedStatement` (chống SQL injection cho `insert`) | Đạt |
-| NFR-02 | Tài nguyên JDBC được đóng bằng `try-with-resources` | Đạt |
-| NFR-03 | Lỗi CSDL được báo cho người gọi | **Không đạt**: DAO nuốt lỗi và trả giá trị mặc định (xem R-01) |
-| NFR-04 | Thông tin kết nối không nằm trong mã nguồn | **Không đạt**: mật khẩu được hardcode trong `JdbcUtil` (xem R-02) |
+| Email đăng nhập | Không rỗng | Vui lòng nhập email và mật khẩu |
+| Mật khẩu đăng nhập | Không rỗng | Vui lòng nhập email và mật khẩu |
+| Tên loại | Không rỗng, ≤ 100 ký tự, duy nhất | Tên loại không được để trống / tối đa 100 ký tự / Tên loại đã tồn tại |
+| Tên đồ uống | Không rỗng | Tên đồ uống không được để trống |
+| Đơn giá | Số nguyên ≥ 0 | Đơn giá phải là số không âm |
+| Giảm giá | 0 ≤ giá trị ≤ 100% | Giảm giá phải từ 0 đến 100% |
+| Loại đồ uống | Phải tồn tại | Vui lòng chọn loại đồ uống |
+| Họ tên nhân viên | Không rỗng | Họ tên không được để trống |
+| Email nhân viên | Đúng định dạng `^[\w.+-]+@[\w-]+(\.[\w-]+)+$`, duy nhất | Email không hợp lệ / Email đã được sử dụng |
+| Mật khẩu nhân viên (thêm mới) | ≥ 6 ký tự | Mật khẩu tối thiểu 6 ký tự |
+| Ngày thống kê | Định dạng `yyyy-MM-dd`, từ ≤ đến | Ngày không hợp lệ / Từ ngày phải nhỏ hơn hoặc bằng đến ngày |
+| Số lượng dòng hóa đơn *(Lab 7)* | Số nguyên > 0 | Số lượng phải là số nguyên dương |
 
 ---
 
-## 9. RỦI RO ĐÃ NHẬN DIỆN (GIẢ THUYẾT LỖI)
+## 7. YÊU CẦU PHI CHỨC NĂNG
 
-| Mã | Rủi ro | Căn cứ trong code | Mức |
+| Mã | Nội dung | Ghi chú |
+| :--- | :--- | :--- |
+| NFR-01 | Mọi truy vấn dùng `PreparedStatement` | Chống SQL Injection |
+| NFR-02 | Tài nguyên JDBC được đóng bằng `try-with-resources` | |
+| NFR-03 | Lỗi CSDL ném `RuntimeException` về Servlet, không nuốt lỗi | Khác với code console hiện tại (R-01) |
+| NFR-04 | Thông tin kết nối CSDL và mật khẩu mail không nằm trong mã nguồn | Lab 3 còn ghi cứng, cần chuyển sang cấu hình |
+| NFR-05 | Giao diện dùng được trên máy tính (1440px) và điện thoại (375px) | Theo tiêu chí giao diện của dự án |
+| NFR-06 | Post-Redirect-Get sau mọi thao tác ghi | Tránh gửi lại form khi tải lại trang |
+| NFR-07 | Dữ liệu người dùng hiển thị bằng `<c:out>` | Chống XSS |
+
+---
+
+## 8. GIAO DIỆN (TÓM TẮT)
+
+| Màn hình | Đường dẫn | Ai dùng |
+| :--- | :--- | :--- |
+| Đăng nhập | `/auth/login` | Tất cả |
+| Trang chủ (thực đơn) | `/home` | Khách, nhân viên, quản lý |
+| Quản lý loại đồ uống | `/manager/categories` | Quản lý |
+| Quản lý đồ uống | `/manager/drinks` | Quản lý |
+| Quản lý nhân viên | `/manager/staff` | Quản lý |
+| Quản lý hóa đơn | `/manager/bills` | Quản lý |
+| Thống kê doanh thu | `/manager/stats/revenue` | Quản lý |
+| Top đồ uống bán chạy | `/manager/stats/top-drinks` | Quản lý |
+
+Phần đầu và chân trang dùng chung nằm trong `_header.jspf` và `_footer.jspf`.
+
+---
+
+## 9. RỦI RO (GIẢ THUYẾT LỖI)
+
+| Mã | Rủi ro | Căn cứ | Mức |
 | :--- | :--- | :--- | :---: |
-| **R-01** | Lỗi CSDL bị nuốt. `insert` trả `0` và `findAll` trả `[]`, không phân biệt được với "không có dữ liệu" hay "thêm thất bại" | `CategoryDAO.java` (khối `catch` của cả hai hàm) | Cao |
-| **R-02** | Mật khẩu MySQL (`root`) được hardcode trong mã nguồn và đã được đẩy lên repo public | `JdbcUtil.java`, dòng khai báo `password` | Cao |
-| **R-03** | `insert` không có kiểm tra đầu vào: `name` null, rỗng, quá dài đều đi thẳng xuống CSDL | `CategoryDAO.insert` | Trung bình |
-| **R-04** | `insert` không trả về `id` vừa tạo nên người gọi không biết khóa mới | `CategoryDAO.insert` | Thấp |
-| **R-05** | Không có đường đi từ giao diện đến `insert`. Chức năng thêm danh mục chỉ dùng được khi gọi trực tiếp từ mã | `Main.java` | Thấp |
-| **R-06** | `Drink`, `Bill`, `BillDetail` không có DAO và không có test nên lỗi ánh xạ trong tương lai không được phát hiện | Thư mục `Entity/` | Thấp |
-| **R-07** | `findAll` không có `ORDER BY` nên thứ tự in ra có thể thay đổi giữa các lần chạy | `CategoryDAO.findAll` | Thấp |
-| **R-08** | Build thất bại trên JDK 27 do Lombok, và `pom.xml` còn cấu hình của dự án Saltair (war, Tomcat) | `pom.xml` | Trung bình |
-| **R-09** | Lệch schema và DBMS giữa code, đề và `Lab_3.sql`. `CategoryDAO` đọc và ghi cột `active` không có trong `Lab_3.sql`. Driver là MySQL, đề yêu cầu SQL Server | `JdbcUtil.java` (driver, URL), `CategoryDAO.java` (câu SQL có `active`) | Cao |
-| **R-10** | Repo không có script CSDL (N2). Người khác clone về không có cách tạo bảng và dữ liệu mẫu | Thư mục gốc, không có file `.sql` | Cao |
-| **R-11** | Không có Servlet hay màn hình nào. Mục tiêu tuần 1 (web chạy ở `localhost:8080`) và tuần 2 (Unit Test cho `controllers/`) chưa có đối tượng để kiểm thử | `src/main/java/com/polycoffee/` | Cao |
+| **R-01** | Mã console hiện tại nuốt lỗi SQL: `insert` trả `0`, `findAll` trả `[]`, không phân biệt được với "không có dữ liệu" | `CategoryDAO.java` | Cao |
+| **R-02** | Mật khẩu MySQL (`root`) được ghi cứng trong `JdbcUtil.java` và repo đang PUBLIC | `JdbcUtil.java`, repo `nhan0x/SOF3033_...` | Cao |
+| **R-03** | Lab 3 ghi cứng mật khẩu SQL Server trong `JdbcUtil`. Khi chuyển sang MySQL, dễ chép lại cách làm này | `Lab_3/.../JdbcUtil.java` | Cao |
+| **R-04** | Mật khẩu băm SHA-256 không có muối. Bảng băm tra cứu sẵn có thể đoán được mật khẩu yếu như `123456` | BR-07, DDL `users` | Trung bình |
+| **R-05** | Hủy được hóa đơn đã thanh toán (BR-24 chỉ chặn `status = 2`). Điều này ảnh hưởng doanh thu đã báo cáo | `BillDAO.cancel` | Trung bình |
+| **R-06** | Ảnh tải lên lưu trong `webapp/images` nên mất khi deploy lại WAR | Lab 5 README | Trung bình |
+| **R-07** | Lệch phiên bản Servlet: `pom.xml` dùng `jakarta`, Lab dùng `javax` và Tomcat 9 | `pom.xml` | Cao |
+| **R-08** | Entity hiện tại không khớp DDL MySQL (xem mục 10.2). Ví dụ `Category.active`, `Bill.code`, `Bill.total` không có trong DDL | `src/main/.../Entity/` | Cao |
+| **R-09** | Schema và DDL MySQL chưa được chạy thử. DDL được chuyển đổi tay từ SQL Server | mục 3.2 | Trung bình |
+| **R-10** | Repo chưa có script CSDL (N2 của đề) và chưa có `README` cài đặt (N4) | Thư mục gốc | Cao |
 
 ---
 
-## 10. GIẢ ĐỊNH VÀ GIỚI HẠN
+## 10. TRẠNG THÁI SO VỚI ĐỀ VÀ MÃ NGUỒN
 
-- Schema trong code (MySQL) chưa có DDL xác nhận. `Lab_3.sql` (SQL Server) và slide ERD không khớp code (mục 3). Các ca liên quan đến ràng buộc (`NOT NULL`, `UNIQUE`, độ dài cột) được đánh dấu **phụ thuộc DDL** cho đến khi chốt schema.
-- Môi trường kiểm thử dùng MySQL 8 cục bộ với cơ sở dữ liệu riêng, không dùng dữ liệu thật.
-- Không kiểm thử giao diện người dùng, vì ứng dụng hiện không có giao diện.
-- Mục 11 chỉ để theo dõi khoảng cách với đề. Các mục đó không đưa vào phạm vi kiểm thử trong `TEST_PLAN.md`.
+### 10.1 Đối chiếu đề JAV102 (Dự án Java 1)
 
----
+Đề yêu cầu Y1–Y4 (chức năng) và N1–N4 (sản phẩm nộp). Cột "Bài Lab" là trạng thái trong bài làm Lab 1–8 (ngoài repo). Cột "Repo" là trạng thái trong `src/main/` của repo này.
 
-## 11. ĐỐI CHIẾU VỚI ĐỀ JAV102 (DỰ ÁN JAVA 1)
-
-Đề yêu cầu website Java Servlet/JSP, JDBC, SQL Server, có đăng nhập, phân quyền, CRUD và validate. Bảng dưới ghi **trạng thái hiện tại của repo**. Đây là khoảng cách cần xử lý, không phải phạm vi đã triển khai.
-
-| Mã | Yêu cầu của đề | Trạng thái trong repo | Ghi chú |
+| Mã | Yêu cầu | Bài Lab | Repo |
 | :--- | :--- | :--- | :--- |
-| Y1 | Đăng nhập / đăng xuất | Chưa | Chưa có `User` Entity, DAO, Servlet hay màn hình |
-| Y2 | Phân quyền, ít nhất 2 role | Chưa | Schema tham chiếu có cờ `manager`, code chưa có |
-| Y3 | CRUD tối thiểu 3 thực thể | Chưa đạt | Chỉ `Category` có Create (`insert`) và Read (`findAll`) ở DAO. Không có Update, Delete, và không có giao diện |
-| Y4 | Validate phía client và server | Chưa | Không có kiểm tra đầu vào (R-03), không có form |
-| N1 | Mã nguồn | Có một phần | Chỉ là ứng dụng console |
-| N2 | CSDL dạng script có dữ liệu | Chưa | Không có script trong repo (R-10) |
-| N3 | File zip thư mục Publish | Chưa | `pom.xml` đóng gói `war`, nhưng không có `src/main/webapp` |
-| N4 | Tài liệu cài đặt và triển khai | Chưa | `README.md` hiện là template của môn SOF309 |
+| Y1 | Đăng nhập / đăng xuất | Có (Lab 4) | Chưa |
+| Y2 | Phân quyền, ít nhất 2 role | Có (Lab 4: quản lý và nhân viên, `AuthFilter`) | Chưa |
+| Y3 | CRUD tối thiểu 3 thực thể | Có: loại, đồ uống, nhân viên đủ CRUD. Hóa đơn chỉ xem và hủy (Lab 6) | Một phần: `Category` có thêm và đọc |
+| Y4 | Validate client và server | Có (Lab 4–6) | Chưa |
+| N1 | Mã nguồn | Có | Có một phần (console) |
+| N2 | CSDL dạng script có dữ liệu | Có (`Lab_3.sql`, SQL Server) | Chưa (MySQL, xem R-10) |
+| N3 | File zip thư mục Publish | Chưa xác nhận | Chưa |
+| N4 | Tài liệu cài đặt và triển khai | Có (Lab 8, Bài 4) | Chưa |
 
-> **Theo thang đánh giá của đề:** hạng C cần N1 và N2, hạng B cần Y1–Y3, hạng A cần Y1–Y4. Repo hiện thiếu N2 nên chưa đạt cả hạng C.
+> **Thang đánh giá của đề:** A cần Y1–Y4, B cần Y1–Y3, C cần N1–N2, D là không đạt.
 
-**Kiến trúc đích theo đề:** trình duyệt → Servlet/JSP → DAO (JDBC) → SQL Server. Mã mẫu trong `Lab_Final/Lab_4` đến `Lab_6` có Filter đăng nhập và chặn nhân viên truy cập `/manager/*` (trả về 403). Các mã mẫu này nằm ngoài repo.
+### 10.2 Mã nguồn `src/main/` hiện tại
+
+| Thành phần | Trạng thái | Chênh với đặc tả |
+| :--- | :--- | :--- |
+| `Main.java` | Có, console, in danh sách loại | Sẽ thay bằng Servlet |
+| `Util/JdbcUtil.java` | Có, MySQL, ghi cứng mật khẩu | NFR-04, R-02 |
+| `DAO/CategoryDAO.java` | `insert` và `findAll` | Thiếu `findById`, cập nhật, xóa, đếm đồ uống, kiểm tra trùng tên (BR-09, BR-10). Đọc và ghi cột `active` không có trong DDL (R-08) |
+| `Entity/Category.java` | Có | Cột `active` không có trong DDL |
+| `Entity/Drink.java` | Có | Dùng `active` thay cho `available`. Thiếu `discount`. Có `description` không có trong DDL |
+| `Entity/Bill.java` | Có | Có `code`, `total` không có trong DDL. `status` kiểu `String`, DDL dùng `INT` |
+| `Entity/BillDetail.java` | Có | Trường `price` đổi thành `unit_price`, thiếu `discount` |
+| `Entity/User.java` | **Chưa có** | Cần cho Y1, Y2 |
+| Servlet, Filter, JSP | **Chưa có** | Y1–Y4, mục 4 |
+| Test | Chưa có | Mục 9 |
+
+---
+
+## 11. GIẢ ĐỊNH VÀ GIỚI HẠN
+
+- DDL ở mục 3.2 là bản chuyển đổi từ Lab, chưa chạy thử trên MySQL. Các ca kiểm thử ràng buộc (`NOT NULL`, `UNIQUE`, `CHECK`) phải chờ DDL được xác nhận.
+- Đặc tả BR-25 đến BR-28 (phiếu bán hàng) lấy từ Lab 7–8, chưa có code trong Lab 1–6. Cần thống nhất trước khi viết test.
+- Môi trường kiểm thử dùng MySQL 8 cục bộ với cơ sở dữ liệu riêng (ví dụ `polycoffee_test`), không dùng dữ liệu thật.
+- Không kiểm thử hiệu năng, bảo mật chuyên sâu, thanh toán điện tử, in hóa đơn, hay dịch vụ gửi mail của bên thứ ba.
