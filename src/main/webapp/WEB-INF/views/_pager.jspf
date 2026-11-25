@@ -1,0 +1,11 @@
+<%-- Cần: pg (Page) và pagerBase (URL kết thúc bằng ? hoặc &) --%>
+<c:if test="${pg.totalPages > 1}">
+  <nav class="pager" aria-label="Phân trang">
+    <c:forEach begin="1" end="${pg.totalPages}" var="i">
+      <c:choose>
+        <c:when test="${i == pg.page}"><span class="cur">${i}</span></c:when>
+        <c:otherwise><a href="<c:out value='${pagerBase}page=${i}'/>">${i}</a></c:otherwise>
+      </c:choose>
+    </c:forEach>
+  </nav>
+</c:if>

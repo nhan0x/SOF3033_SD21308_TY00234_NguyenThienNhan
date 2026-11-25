@@ -1,0 +1,9 @@
+# Cấu hình kết nối MySQL cho PolyCoffee.
+# Sao chép file này thành db.properties (file đó đã nằm trong .gitignore, KHÔNG commit).
+#
+# Thứ tự ưu tiên: biến môi trường DB_URL / DB_USER / DB_PASSWORD  >  db.properties  >  giá trị mặc định.
+# Khi chạy test, đặt DB_URL trỏ tới CSDL polycoffee_test để không đụng dữ liệu thật.
+
+db.url=jdbc:mysql://localhost:3306/polycoffee?useSSL=false&allowPublicKeyRetrieval=true
+db.user=root
+db.password=

@@ -1,0 +1,36 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<fmt:setLocale value="vi_VN"/>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><c:out value="${empty pageTitle ? 'PolyCoffee' : pageTitle}"/><c:if test="${not empty pageTitle}"> · PolyCoffee</c:if></title>
+  <link rel="stylesheet" href="${ctx}/css/style.css">
+</head>
+<body>
+<c:set var="uri" value="${empty requestScope['jakarta.servlet.forward.request_uri'] ? pageContext.request.requestURI : requestScope['jakarta.servlet.forward.request_uri']}"/>
+<nav class="nav">
+  <a class="brand" href="${ctx}/home">☕ PolyCoffee</a>
+  <c:if test="${not empty sessionScope.authUser}">
+    <c:if test="${sessionScope.authUser.manager}">
+      <a href="${ctx}/manager/categories" class="${fn:contains(uri, '/manager/categories') ? 'active' : ''}">Loại đồ uống</a>
+      <a href="${ctx}/manager/drinks" class="${fn:contains(uri, '/manager/drinks') ? 'active' : ''}">Đồ uống</a>
+      <a href="${ctx}/manager/bills" class="${fn:contains(uri, '/manager/bills') ? 'active' : ''}">Hóa đơn</a>
+      <a href="${ctx}/manager/staff" class="${fn:contains(uri, '/manager/staff') ? 'active' : ''}">Nhân viên</a>
+      <a href="${ctx}/manager/stats/top-drinks" class="${fn:contains(uri, '/manager/stats/top-drinks') ? 'active' : ''}">Top bán chạy</a>
+      <a href="${ctx}/manager/stats/revenue" class="${fn:contains(uri, '/manager/stats/revenue') ? 'active' : ''}">Doanh thu</a>
+    </c:if>
+    <span class="spacer"></span>
+    <span class="user"><c:out value="${sessionScope.authUser.fullname}"/></span>
+    <a href="${ctx}/auth/logout">Đăng xuất</a>
+  </c:if>
+  <c:if test="${empty sessionScope.authUser}">
+    <span class="spacer"></span>
+    <a class="login-link" href="${ctx}/auth/login">Đăng nhập</a>
+  </c:if>
+</nav>
+<main class="container">
+<c:if test="${not empty sessionScope.flashOk}"><div class="msg ok" role="status"><c:out value="${sessionScope.flashOk}"/></div><c:remove var="flashOk" scope="session"/></c:if>
+<c:if test="${not empty sessionScope.flashError}"><div class="msg err" role="alert"><c:out value="${sessionScope.flashError}"/></div><c:remove var="flashError" scope="session"/></c:if>

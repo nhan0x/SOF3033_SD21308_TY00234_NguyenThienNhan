@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+    <display-name>PolyCoffee</display-name>
+
+    <!-- Thứ tự filter được khai báo ở đây (annotation không đảm bảo thứ tự):
+         Utf8Filter phải chạy trước AuthFilter và mọi servlet đọc tham số. -->
+    <filter>
+        <filter-name>Utf8Filter</filter-name>
+        <filter-class>com.polycoffee.Filter.Utf8Filter</filter-class>
+    </filter>
+    <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>com.polycoffee.Filter.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>Utf8Filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+        </cookie-config>
+    </session-config>
+
+    <!-- JSP và JSP fragment đều đọc bằng UTF-8 (tiếng Việt trong _header.jspf...) -->
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+            <url-pattern>*.jspf</url-pattern>
+            <page-encoding>UTF-8</page-encoding>
+        </jsp-property-group>
+    </jsp-config>
+
+    <!-- Trang lỗi chung: không hiển thị stack trace, chuỗi kết nối hay thông tin nhạy cảm -->
+    <error-page>
+        <error-code>403</error-code>
+        <location>/WEB-INF/views/error/403.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/views/error/404.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>405</error-code>
+        <location>/WEB-INF/views/error/405.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/WEB-INF/views/error/500.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/WEB-INF/views/error/500.jsp</location>
+    </error-page>
+</web-app>
