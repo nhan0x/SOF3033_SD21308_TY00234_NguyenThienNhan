@@ -1,56 +1,48 @@
 package com.polycoffee.DAO;
+
 import com.polycoffee.Entity.Category;
 import com.polycoffee.Util.JdbcUtil;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.polycoffee.Util.JdbcUtil.RowMapper;
 import java.util.List;
-import java.util.ArrayList;
 
-public class CategoryDAO{
-    public int insert(Category category){
-        int rows  = 0;
-        String sql = " INSERT INTO categories(name, active) VALUES (?, ?)";
+/** Truy cập bảng {@code categories}. Lỗi SQL được ném ra dạng RuntimeException (NFR-03). */
+public class CategoryDAO {
 
-        try (Connection conn = JdbcUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, category.getName());
-            ps.setBoolean(2, category.isActive());
-            rows = ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return rows;
+    private static final RowMapper<Category> MAPPER =
+            rs -> new Category(rs.getInt("id"), rs.getString("name"));
+
+    public List<Category> findAll() {
+        return JdbcUtil.query("SELECT id, name FROM categories ORDER BY id", MAPPER);
     }
 
-    public List<Category> findAll(){
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM categories";
+    public Category findById(int id) {
+        return JdbcUtil.queryOne("SELECT id, name FROM categories WHERE id = ?", MAPPER, id);
+    }
 
-        try(Connection conn = JdbcUtil.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()) {
-            
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                boolean active = rs.getBoolean("active");
+    /** Thêm loại mới, trả về id vừa sinh. */
+    public int create(Category c) {
+        return (int) JdbcUtil.insert("INSERT INTO categories(name) VALUES (?)", c.getName());
+    }
 
-                Category c = new Category();
-                c.setId(id);
-                c.setName(name);
-                c.setActive(active);
+    public int update(Category c) {
+        return JdbcUtil.update("UPDATE categories SET name = ? WHERE id = ?", c.getName(), c.getId());
+    }
 
-                list.add(c);
-            }
-        }
-            catch(SQLException e){
-                e.printStackTrace();
-            }
-            return list;
-        } 
+    public int deleteById(int id) {
+        return JdbcUtil.update("DELETE FROM categories WHERE id = ?", id);
+    }
+
+    /** Số đồ uống thuộc loại, dùng để chặn xóa loại đang được sử dụng (BR-10). */
+    public int countDrinks(int categoryId) {
+        return (int) JdbcUtil.count("SELECT COUNT(*) FROM drinks WHERE category_id = ?", categoryId);
+    }
+
+    /**
+     * Tên loại đã tồn tại ở loại khác chưa (BR-09). Khi sửa, truyền id của chính loại đó
+     * để không báo trùng với chính nó. Khi thêm mới truyền 0.
+     */
+    public boolean existsByName(String name, int excludeId) {
+        return JdbcUtil.count("SELECT COUNT(*) FROM categories WHERE name = ? AND id <> ?",
+                name, excludeId) > 0;
+    }
 }
-
-        
-

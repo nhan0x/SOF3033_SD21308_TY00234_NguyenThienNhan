@@ -4,13 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor 
-@NoArgsConstructor 
-@Data 
-
-
+/** Loại đồ uống. Ánh xạ bảng {@code categories}. {@code id == 0} nghĩa là chưa lưu. */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Category {
-    private Integer id;
+    private int id;
     private String name;
-    private boolean active;
-};
+}

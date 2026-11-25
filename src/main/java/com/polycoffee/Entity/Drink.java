@@ -1,18 +1,24 @@
 package com.polycoffee.Entity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@NoArgsConstructor
+/** Đồ uống. Ánh xạ bảng {@code drinks}. {@code discount} nằm trong khoảng 0 đến 1. */
 @Data
-
+@NoArgsConstructor
+@AllArgsConstructor
 public class Drink {
-    private Integer id;
-    private Integer categoryId;
+    private int id;
     private String name;
-    private String description;
     private String image;
-    private int price;
-    private boolean active;
+    private double unitPrice;
+    private double discount;
+    private boolean available;
+    private int categoryId;
+
+    /** Giá sau giảm giá. */
+    public double getFinalPrice() {
+        return unitPrice * (1 - discount);
+    }
 }

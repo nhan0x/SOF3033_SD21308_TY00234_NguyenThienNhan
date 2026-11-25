@@ -4,11 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.fashionweb</groupId>
-    <artifactId>saltair</artifactId>
+    <groupId>com.polycoffee</groupId>
+    <artifactId>PolyCoffee</artifactId>
     <version>1.0.0</version>
     <packaging>war</packaging>
-    <name>Saltair</name>
+    <name>PolyCoffee</name>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
@@ -20,7 +20,7 @@
     </properties>
 
     <dependencies>
-        <!-- Lombok: sinh getter/setter/constructor cho package com.polycoffee.Entity -->
+        <!-- Lombok: sinh getter/setter/constructor cho Entity và Dto -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -64,27 +64,7 @@
             <version>2.0.3</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>10.20.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-mysql</artifactId>
-            <version>10.20.1</version>
-        </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.15.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>core</artifactId>
-            <version>3.5.3</version>
-        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -113,7 +93,7 @@
     </dependencies>
 
     <build>
-        <finalName>saltair</finalName>
+        <finalName>PolyCoffee</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
